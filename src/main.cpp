@@ -11,47 +11,8 @@
 #include "Mesh.h"
 #include "Mouse.h"
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI, GLuint VBO);
+void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI, GLuint& VBO, GLuint& VAO);
 void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, float display_h);
-
-void DrawSquare()
-{
-
-}
-
-void DrawCircle(GLfloat x, GLfloat y, GLfloat z, GLfloat radius, GLint sides)
-{
-	GLint resolution = sides + 2;
-	GLfloat doublePi = 2.0f * M_PI;
-	GLfloat circleVerticesX[16];
-	GLfloat circleVerticesY[16];
-	GLfloat circleVerticesZ[16];
-
-	circleVerticesX[0] = x;
-	circleVerticesY[0] = y;
-	circleVerticesZ[0] = z;
-
-	for (int i = 1; i < 16; i++)
-	{
-		circleVerticesX[i] = x + (radius * cos(i * doublePi / 14));
-		circleVerticesY[i] = y + (radius * sin(i * doublePi / 14));
-		circleVerticesZ[i] = z;
-	}
-
-	GLfloat allCircleVertices[16 * 3];
-
-	for (int i = 0; i < 16; i++)
-	{
-		allCircleVertices[i * 3] = circleVerticesX[i];
-		allCircleVertices[(i * 3) + 1] = circleVerticesY[i];
-		allCircleVertices[(i * 3) + 2] = circleVerticesZ[i];
-	}
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, allCircleVertices);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 16);
-	glDisableClientState(GL_VERTEX_ARRAY);
-}
 
 struct InitReturn
 {
@@ -101,6 +62,39 @@ static InitReturn WindowInitialization(Camera2D& camera)
 	return r;
 }
 
+std::vector<GLfloat> ConvertToFLoat(std::vector<glm::vec3> vertices)
+{
+	std::vector<GLfloat> fvertices;
+
+	for (glm::vec3 v : vertices)
+	{
+		fvertices.push_back(v.x);
+		fvertices.push_back(v.y);
+		fvertices.push_back(v.z);
+	}
+
+	return fvertices;
+}
+
+std::vector<glm::vec3> CreateLine(glm::vec3 start, glm::vec3 end, float width)
+{
+	std::vector<glm::vec3> vertices;
+
+	glm::vec3 direction = glm::normalize(end - start);
+	glm::vec3 perpendicular = glm::vec3(-direction.y, direction.x, 0);
+			
+	glm::vec3 offset = perpendicular * width;
+
+	//triangle 1
+	vertices.push_back(start + offset);	vertices.push_back({ 1, 0, 0 });
+	vertices.push_back(start - offset);	vertices.push_back({ 1, 0, 0 });
+
+	vertices.push_back(end + offset);	vertices.push_back({ 1, 0, 0 });
+	vertices.push_back(end - offset);   vertices.push_back({ 1, 0, 0 });
+
+	return vertices;
+}
+
 int main()
 {
 	Camera2D camera({ 0.0f, 0.0f, 1.0f }); //z omhoog en y de diepte in 2d
@@ -122,39 +116,51 @@ int main()
 	shader.use();
 
 	GLuint VAO, VBO, EBO;
-	GLfloat vertices[] =
+
+	/*std::vector<GLfloat> oldVerticesSquare =
 	{
 		 1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
 		 1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
 		-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,
 		-1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f
 	};
-	GLuint indices[6] =
+	GLuint oindices[6] =
 	{
-		0, 1, 3,
+		0, 1, 2,
 		2, 1, 3
+	};*/
+
+	GLuint indices[] = 
+	{ 
+		0, 3, 1, 
+		0, 2, 3 
 	};
 
-	std::vector<GLfloat> verticesCircle;
+	std::vector<glm::vec3> vertices = CreateLine(glm::vec3(-2, -2, 0), glm::vec3(2, -2, 0), 1.f);
+
+	std::vector<GLfloat> fvertices;
+
+	fvertices = ConvertToFLoat(vertices);
+
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
-
 	glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO); //in iedere mesh deze 2 lijnen dus wanneer een mesh gerendered word dat het opnieuw alles bind
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fvertices.size(), fvertices.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+	//position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	//color
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
 
@@ -172,7 +178,7 @@ int main()
 		lastFrame = currentFrame;
 
 		SDL_Event event;
-		SDLEvents(event, settings, camera, mouse, deltaTime, allMeshes, screen, overUI, VBO);
+		SDLEvents(event, settings, camera, mouse, deltaTime, allMeshes, screen, overUI, VBO, VAO);
 
 		// Start the ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -180,14 +186,13 @@ int main()
 		ImGui::NewFrame();
 
 		// Rendering
-		int display_w, display_h;
-		SDL_GetWindowSize(window, &display_w, &display_h);
-		SDL_GL_GetDrawableSize(window, &display_w, &display_h);
-		glViewport(0, 0, display_w, display_h);
+		SDL_GetWindowSize(window, &camera.viewport.screenWidth, &camera.viewport.screenHeight);
+		SDL_GL_GetDrawableSize(window, &camera.viewport.screenWidth, &camera.viewport.screenHeight);
+		glViewport(0, 0, camera.viewport.screenWidth, camera.viewport.screenHeight);
 		glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		screen.x = display_w;
-		screen.y = display_h;
+		screen.x = camera.viewport.screenWidth;
+		screen.y = camera.viewport.screenHeight;
 
 		//order:
 		// clear color
@@ -199,22 +204,22 @@ int main()
 
 		// 3d cam: glm::mat4 projection = glm::perspective(glm::radians(camera.fov), (float)display_w / (float)display_h, 0.1f, 1000.0f);
 		//de transform is de camera het is de rand om het scherm heen die word verplaatst met de camera.position
-		glm::mat4 transform = glm::ortho(-(float)display_w / 2 + camera.position.x, (float)display_w / 2 + camera.position.x, -(float)display_h / 2 + camera.position.y, (float)display_h / 2 + camera.position.y, -100.0f, 100.0f);
-		shader.setMat4("transform", transform);
+		
+		camera.Update();
+		camera.SetTransform(shader);
 
-		glBindVertexArray(VAO);
-		for (Mesh& m : allMeshes)
+		for (Mesh& m : allMeshes) 
 		{
-
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, m.position);
 			model = glm::scale(model, m.scale);
 			shader.setMat4("model", model);
+			
 
-			m.Draw();
+			m.Draw(fvertices, EBO, indices);
 		}
 
-		UI(overUI, wireframe, deltaTime, mouse, camera, display_w, display_h);
+		UI(overUI, wireframe, deltaTime, mouse, camera, camera.viewport.screenWidth, camera.viewport.screenHeight);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -251,18 +256,16 @@ void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& 
 	ImGui::End();
 }
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI, GLuint VBO)
+void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI, GLuint& VBO, GLuint& VAO)
 {
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
-	mouse.pixelPosition.x = mouseX;
-	mouse.pixelPosition.y = mouseY;
-	mouse.ndcPosition.x = ((float)mouseX / camera.viewport.screenWidth) * 2 - 1;
-	mouse.ndcPosition.y = ((float)mouseY / camera.viewport.screenHeight) * 2 - 1;
-	mouse.position.x = (mouseX / (screen.x) - 0.5f) * screen.x + camera.position.x;
-	mouse.position.y = (0.5f - mouseY / screen.y) * screen.y + camera.position.y;
+	
+	//de raw sdl screen position in pixels
+	mouse.position = glm::vec3(mouseX, mouseY, 0);
 
-
+	//mouse.position.x = (mouseX / (screen.x) - 0.5f) * screen.x + camera.position.x;
+	//mouse.position.y = (0.5f - mouseY / screen.y) * screen.y + camera.position.y;
 
 	while (SDL_PollEvent(&event))
 	{
@@ -273,12 +276,25 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 		{
 			settings.appRunning = false;
 		}break;
+		case SDL_MOUSEWHEEL:
+		{
+			if (camera.zoom < 1 && camera.zoom > 100) break;
+
+			if (event.wheel.y < 0) camera.zoom--;
+			if (event.wheel.y > 0) camera.zoom++;
+		}break;
 		case SDL_MOUSEBUTTONDOWN:
 		{
 			if (overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
-				Mesh m(VBO, glm::vec3(mouse.position.x, mouse.position.y, {}));
+				glm::vec3 worldPos = camera.ToWorldPosition(glm::vec3(mouse.position.x, mouse.position.y, 0));
+				//TODO: fix worldPos en camera / screen / world coordinates
+				std::cout << "wp:     " << worldPos.x << " " << worldPos.y << std::endl;
+				Mesh m(VBO, VAO, glm::vec3(mouse.position.x, mouse.position.y, 0));
+
+				std::cout << "mesh p: " << m.position.x << " " << m.position.y << std::endl;
+
 				allMeshes.push_back(m);
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)

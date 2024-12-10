@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "Shader.h"
 
 enum CameraMovement
 {
@@ -14,13 +15,11 @@ enum CameraMovement
 
 struct Viewport
 {
-	unsigned int screenWidth = 1280;
-	unsigned int screenHeight = 720;
+	int screenWidth = 1280;
+	int screenHeight = 720;
 
-	float top = 0;
-	float bottom = 0;
-	float left = screenWidth;
-	float right = screenHeight;
+	float cameraWidth;
+	float cameraHeight;
 };
 
 class Camera2D 
@@ -32,8 +31,9 @@ public:
 	glm::vec3 right;
 	glm::vec3 worldUp;
 	float movementSpeed = 1500.f;
-	float fov = 45.0f;
 	Viewport viewport;
+	float zoom = 20;
+	glm::mat4 transform;
 
 	Camera2D(glm::vec3 position)
 	{
@@ -43,7 +43,11 @@ public:
 	}
 
 	void ProcessKeyboard(CameraMovement direction, float deltaTime);
-	glm::mat4 GetViewMatrix();
+	glm::mat4 GetViewMatrix(); //voor 3d
+	void Update();
+	void SetTransform(Shader& shader);
+
+	glm::vec3 ToWorldPosition(glm::vec3 position);
 
 private:
 	void UpdateCameraVectors();

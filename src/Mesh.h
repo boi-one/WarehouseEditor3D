@@ -9,15 +9,16 @@ class Mesh
 public:
 	glm::vec3 position;
 	glm::vec3 scale;
+	GLuint VBO, VAO;
 
-	GLuint VBO;
-
-	Mesh(GLuint VBO, glm::vec3 position = { 0, 0, 0 }, glm::vec3 scale = { 20, 20, 0 })
+	Mesh(GLuint VBO, GLuint VAO, glm::vec3 position = { 0, 0, 0 }, glm::vec3 scale = { 1, 1, 0 })
 	{
 		this->position = position;
 		this->scale = scale;
 		this->VBO = VBO;
+		this->VAO = VAO;
 	}
 
-	void Draw();
+
+	void Draw(std::vector<GLfloat> vertices, GLuint& EBO, GLuint indices[6] = 0);
 };
