@@ -3,6 +3,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <GL/glew.h>
+#include <math.h>
 
 #include "Settings.h"
 #include "Shader.h"
@@ -10,98 +11,139 @@
 #include "Mesh.h"
 #include "Mouse.h"
 
-#include <chrono>
+void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI, GLuint VBO);
+void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, float display_h);
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI);
-
-int main()
+void DrawSquare()
 {
-	Settings settings;
-	Camera2D camera({ 0.0f, 0.0f, 1.0f });
-	Mouse mouse;
-	std::vector<Mesh> allMeshes;
 
-	auto start_time = std::chrono::high_resolution_clock::now();
+}
 
-	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+void DrawCircle(GLfloat x, GLfloat y, GLfloat z, GLfloat radius, GLint sides)
+{
+	GLint resolution = sides + 2;
+	GLfloat doublePi = 2.0f * M_PI;
+	GLfloat circleVerticesX[16];
+	GLfloat circleVerticesY[16];
+	GLfloat circleVerticesZ[16];
+
+	circleVerticesX[0] = x;
+	circleVerticesY[0] = y;
+	circleVerticesZ[0] = z;
+
+	for (int i = 1; i < 16; i++)
 	{
-		return -1;
+		circleVerticesX[i] = x + (radius * cos(i * doublePi / 14));
+		circleVerticesY[i] = y + (radius * sin(i * doublePi / 14));
+		circleVerticesZ[i] = z;
 	}
 
+	GLfloat allCircleVertices[16 * 3];
+
+	for (int i = 0; i < 16; i++)
+	{
+		allCircleVertices[i * 3] = circleVerticesX[i];
+		allCircleVertices[(i * 3) + 1] = circleVerticesY[i];
+		allCircleVertices[(i * 3) + 2] = circleVerticesZ[i];
+	}
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, allCircleVertices);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 16);
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+struct InitReturn
+{
+	int failed;
+	SDL_Window* window;
+	SDL_GLContext gl_context;
+	InitReturn(int failed = 0, SDL_Window* window = 0)
+	{
+		this->failed = failed;
+		this->window = window;
+		this->gl_context = 0;
+	}
+};
+static InitReturn WindowInitialization(Camera2D& camera)
+{
+	InitReturn r;
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		return { -1 };
+	}
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-	// Create SDL window
-	SDL_Window* window = SDL_CreateWindow("Warehouse Editor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, camera.viewport.screenWidth, camera.viewport.screenHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	SDL_Window* window = SDL_CreateWindow("Warehouse Editor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, camera.viewport.screenWidth, camera.viewport.screenHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_MAXIMIZED);
 	if (!window)
 	{
 		SDL_Quit();
-		return -1;
+		return { -1 };
 	}
-
-	// Create SDL GL context
-	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-	if (!gl_context)
+	SDL_SetWindowMinimumSize(window, 160 * 4, 90 * 4);
+	r.gl_context = SDL_GL_CreateContext(window);
+	if (!r.gl_context)
 	{
 		SDL_DestroyWindow(window);
 		SDL_Quit();
-		return -1;
+		return { -1 };
 	}
-
-	auto end_time = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> duration = end_time - start_time;
-	std::cout << "SDL Initialization and Window Creation took " << duration.count() << " seconds." << std::endl;
-
-
-	// Initialize OpenGL loader
 	if (glewInit())
 	{
-		SDL_GL_DeleteContext(gl_context);
+		SDL_GL_DeleteContext(r.gl_context);
 		SDL_DestroyWindow(window);
 		SDL_Quit();
-		return -1;
+		return { -1 };
 	}
+	r.window = window;
+	return r;
+}
 
-	const GLubyte* vendor = glGetString(GL_VENDOR);
-	const GLubyte* renderer = glGetString(GL_RENDERER);
+int main()
+{
+	Camera2D camera({ 0.0f, 0.0f, 1.0f }); //z omhoog en y de diepte in 2d
 
-	std::cout << "Vendor: " << vendor << "\nRenderer: " << renderer << std::endl;
+	InitReturn r = WindowInitialization(camera);
+	if (r.failed == -1) return -1;
+	SDL_Window* window = r.window;
+	SDL_GLContext& gl_context = r.gl_context;
 
-	// Setup ImGui
 	ImGui::CreateContext();
 	ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
 	ImGui_ImplOpenGL3_Init("#version 330");
 	ImGuiIO& io = ImGui::GetIO();
 
-
+	Settings settings;
+	Mouse mouse;
+	std::vector<Mesh> allMeshes;
 	Shader shader("shader.vert", "shader.frag");
+	shader.use();
 
-	float vertices[] =
+	GLuint VAO, VBO, EBO;
+	GLfloat vertices[] =
 	{
-		100.5f,  100.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // top right
-		100.5f, -100.5f, 0.0f,  0.0f, 1.0f, 0.0f, // bottom right
-	   -100.5f, -100.5f, 0.0f,  0.0f, 0.0f, 1.0f,  // bottom left
-	   -100.5f,  100.5f, 0.0f,  1.0f, 1.0f, 1.0f
+		 1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+		-1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f
 	};
-
-	unsigned int indices[] =
+	GLuint indices[6] =
 	{
 		0, 1, 3,
 		2, 1, 3
 	};
 
-	unsigned int VAO;
-	unsigned int VBO;
-	unsigned int EBO;
+	std::vector<GLfloat> verticesCircle;
+
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 
 	glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO); //in iedere mesh deze 2 lijnen dus wanneer een mesh gerendered word dat het opnieuw alles bind
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -115,17 +157,11 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	shader.use();
 
 	bool wireframe = false;
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
-
-	int width = camera.viewport.screenWidth;
-	int height = camera.viewport.screenHeight;
-
-	bool autoScreenResolution = true;
-	glm::vec2 screen = {0, 0};
+	glm::vec2 screen = { 0, 0 };
 	bool overUI = false;
 
 	// Main loop
@@ -136,7 +172,7 @@ int main()
 		lastFrame = currentFrame;
 
 		SDL_Event event;
-		SDLEvents(event, settings, camera, mouse, deltaTime, allMeshes, screen, overUI); //TODO: convert mouse to screen position
+		SDLEvents(event, settings, camera, mouse, deltaTime, allMeshes, screen, overUI, VBO);
 
 		// Start the ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -155,62 +191,30 @@ int main()
 
 		//order:
 		// clear color
-		// openGL
-		//imgui code
+		// openGL code
+		// imgui code
 		// imgui render
 		//swap window
 		shader.use();
 
 		// 3d cam: glm::mat4 projection = glm::perspective(glm::radians(camera.fov), (float)display_w / (float)display_h, 0.1f, 1000.0f);
-
 		//de transform is de camera het is de rand om het scherm heen die word verplaatst met de camera.position
-		glm::mat4 transform;
-		if (autoScreenResolution)
-			transform = glm::ortho(-(float)display_w / 2 + camera.position.x, (float)display_w / 2 + camera.position.x, -(float)display_h / 2 + camera.position.y, (float)display_h / 2 + camera.position.y, -100.0f, 100.0f);
-		else
-			transform = glm::ortho(-width + camera.position.x, width + camera.position.x, -height + camera.position.y, height + camera.position.y, -100.0f, 100.0f);
+		glm::mat4 transform = glm::ortho(-(float)display_w / 2 + camera.position.x, (float)display_w / 2 + camera.position.x, -(float)display_h / 2 + camera.position.y, (float)display_h / 2 + camera.position.y, -100.0f, 100.0f);
 		shader.setMat4("transform", transform);
 
 		glBindVertexArray(VAO);
-
 		for (Mesh& m : allMeshes)
 		{
+
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, m.position);
+			model = glm::scale(model, m.scale);
 			shader.setMat4("model", model);
-			//std::cout << m.position.x << " " << m.position.y << std::endl;
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			m.Draw();
 		}
 
-		ImGui::Begin("test");
-
-		overUI = ImGui::IsWindowHovered();
-
-		ImGui::Text("FPS: %.0f", 1 / deltaTime);
-		if (ImGui::Button("wireframe"))
-		{
-			wireframe = !wireframe;
-			if (wireframe)
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			else
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-
-		ImGui::SliderInt("w", &width, 0, display_w);
-		ImGui::SliderInt("h", &height, 0, display_h);
-
-		if (!autoScreenResolution && ImGui::Button("revert to current screen aspect"))
-		{
-			width = display_w;
-			height = display_h;
-		}
-		if (ImGui::Button("auto"))
-		{
-			autoScreenResolution = !autoScreenResolution;
-		}
-		if (ImGui::SliderFloat("speed", &camera.movementSpeed, 0, 3000.0f));
-
-		ImGui::End();
+		UI(overUI, wireframe, deltaTime, mouse, camera, display_w, display_h);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -228,7 +232,26 @@ int main()
 	return 0;
 }
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI)
+void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, float display_h)
+{
+	ImGui::Begin("test");
+	overUI = ImGui::IsWindowHovered();
+	ImGui::Text("FPS: %.0f", 1 / deltaTime);
+	ImGui::Text("Mouse position: X %.0f, Y %.0f", mouse.position.x, mouse.position.y);
+	ImGui::Text("Camera position: X %.0f, Y %.0f", camera.position.x, camera.position.y);
+	ImGui::Text("Screen resolution: X %d, Y %d", display_w, display_h);
+	if (ImGui::Button("wireframe"))
+	{
+		wireframe = !wireframe;
+		if (wireframe)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	ImGui::End();
+}
+
+void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI, GLuint VBO)
 {
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
@@ -236,8 +259,9 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 	mouse.pixelPosition.y = mouseY;
 	mouse.ndcPosition.x = ((float)mouseX / camera.viewport.screenWidth) * 2 - 1;
 	mouse.ndcPosition.y = ((float)mouseY / camera.viewport.screenHeight) * 2 - 1;
-	mouse.position.x = (mouseX / (screen.x) - 0.5f)* screen.x + camera.position.x;
-	mouse.position.y = (0.5f - mouseY / screen.y) * screen.y  + camera.position.y;
+	mouse.position.x = (mouseX / (screen.x) - 0.5f) * screen.x + camera.position.x;
+	mouse.position.y = (0.5f - mouseY / screen.y) * screen.y + camera.position.y;
+
 
 
 	while (SDL_PollEvent(&event))
@@ -254,11 +278,12 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 			if (overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
-				std::cout << mouse.position.x << " " << mouse.position.y << " " << mouse.pixelPosition.x << " " << mouse.pixelPosition.y << " | " << mouse.ndcPosition.x << " " << mouse.ndcPosition.y << std::endl;
-				
-				Mesh m(glm::vec3(mouse.position.x, mouse.position.y, 0));
+				Mesh m(VBO, glm::vec3(mouse.position.x, mouse.position.y, {}));
 				allMeshes.push_back(m);
-				
+			}
+			if (event.button.button == SDL_BUTTON_RIGHT)
+			{
+				//stretch cube
 			}
 		}break;
 		}
@@ -274,4 +299,6 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 		camera.ProcessKeyboard(Left, deltaTime);
 	if (key[SDL_SCANCODE_D])
 		camera.ProcessKeyboard(Right, deltaTime);
+	if (key[SDL_SCANCODE_R])
+		camera.position = glm::vec3(0, 0, 0);
 }
