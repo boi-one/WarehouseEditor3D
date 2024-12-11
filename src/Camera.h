@@ -18,8 +18,9 @@ struct Viewport
 	int screenWidth = 1280;
 	int screenHeight = 720;
 
-	float cameraWidth;
-	float cameraHeight;
+	float cameraWidth, cameraHeight;
+	float left, right, top, bottom;
+
 };
 
 class Camera2D 
@@ -32,7 +33,7 @@ public:
 	glm::vec3 worldUp;
 	float movementSpeed = 1500.f;
 	Viewport viewport;
-	float zoom = 20;
+	float zoom = 1;
 	glm::mat4 transform;
 
 	Camera2D(glm::vec3 position)
@@ -47,7 +48,7 @@ public:
 	void Update();
 	void SetTransform(Shader& shader);
 
-	glm::vec3 ToWorldPosition(glm::vec3 position);
+	glm::vec2 ToWorldPosition(glm::vec2 position);
 
 private:
 	void UpdateCameraVectors();

@@ -11,7 +11,7 @@ public:
 	glm::vec3 scale;
 	GLuint VBO, VAO;
 
-	Mesh(GLuint VBO, GLuint VAO, glm::vec3 position = { 0, 0, 0 }, glm::vec3 scale = { 1, 1, 0 })
+	Mesh(GLuint VBO, GLuint VAO, glm::vec3 position = { 0, 0, 0 }, glm::vec3 scale = { 100, 100, 0 })
 	{
 		this->position = position;
 		this->scale = scale;
