@@ -82,7 +82,7 @@ std::vector<glm::vec3> CreateLine(glm::vec3 start, glm::vec3 end, float width)
 
 	glm::vec3 direction = glm::normalize(end - start);
 	glm::vec3 perpendicular = glm::vec3(-direction.y, direction.x, 0);
-			
+
 	glm::vec3 offset = perpendicular * width;
 
 	//triangle 1
@@ -130,10 +130,10 @@ int main()
 		0, 2, 3
 	};
 
-	GLuint indices[] = 
-	{ 
-		0, 3, 1, 
-		3, 1, 2 
+	GLuint indices[] =
+	{
+		0, 3, 1,
+		3, 1, 2
 	};
 
 	//std::vector<glm::vec3> vertices = CreateLine(glm::vec3(-2, -2, 0), glm::vec3(2, -2, 0), 1.f);
@@ -167,13 +167,15 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
-	glBindVertexArray(0); 
+	glBindVertexArray(0);
 
 	bool wireframe = false;
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 	glm::vec2 screen = { 0, 0 };
 	bool overUI = false;
+
+	allMeshes.push_back(Mesh(VBO, VAO));
 
 	// Main loop
 	while (settings.appRunning)
@@ -209,17 +211,25 @@ int main()
 
 		// 3d cam: glm::mat4 projection = glm::perspective(glm::radians(camera.fov), (float)display_w / (float)display_h, 0.1f, 1000.0f);
 		//de transform is de camera het is de rand om het scherm heen die word verplaatst met de camera.position
-		
+
 		camera.Update();
 		camera.SetTransform(shader);
 
-		for (Mesh& m : allMeshes) 
+		for (Mesh& m : allMeshes)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, m.position);
+
+			float meshAngle;
+			//meshAngle = atan2(m.position.y, m.position.x) - atan2(mouse.position.y, mouse.position.x);
+			meshAngle = acos(glm::dot(m.position, mouse.position));
+
+			std::cout << meshAngle << std::endl;
+			model = glm::rotate(model, meshAngle * 4.5f, glm::vec3(0, 0, 1));
+
+			//m.scale.y = -glm::length(mouse.position.y - m.position.y);
 			model = glm::scale(model, m.scale);
 			shader.setMat4("model", model);
-			
 
 			m.Draw(squareVertices, EBO, indices);
 		}
@@ -247,7 +257,7 @@ void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& 
 	ImGui::Begin("test");
 	overUI = ImGui::IsWindowHovered();
 	ImGui::Text("FPS: %.0f", 1 / deltaTime);
-	glm::vec3 mousePos = { camera.ToWorldPosition(mouse.position) , 0};
+	glm::vec3 mousePos = { camera.ToWorldPosition(mouse.position) , 0 };
 	ImGui::Text("Mouse position: X %.0f, Y %.0f", mousePos.x, mousePos.y);
 	ImGui::Text("Camera position: X %.0f, Y %.0f", camera.position.x, camera.position.y);
 	ImGui::Text("Screen resolution: X %d, Y %d", display_w, display_h);
@@ -266,12 +276,10 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 {
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
-	
 	//de raw sdl screen position in pixels
 	mouse.position = glm::vec3(mouseX, mouseY, 0);
 
-	//mouse.position.x = (mouseX / (screen.x) - 0.5f) * screen.x + camera.position.x;
-	//mouse.position.y = (0.5f - mouseY / screen.y) * screen.y + camera.position.y;
+
 
 	while (SDL_PollEvent(&event))
 	{
@@ -292,8 +300,9 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 			if (overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
+				break;
 				glm::vec2 worldPos = camera.ToWorldPosition({ mouse.position.x, mouse.position.y });
-				Mesh m(VBO, VAO, {worldPos, 0});
+				Mesh m(VBO, VAO, { worldPos, 0 });
 				std::cout << "push back mesh : " << m.position.x << " " << m.position.y << m.position.z << std::endl;
 				allMeshes.push_back(m);
 			}

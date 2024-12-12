@@ -70,7 +70,7 @@ glm::vec2 Camera2D::ToWorldPosition(glm::vec2 inputPosition)
 	mousePosition.x = (mousePosition.x - 0.5f) * 2;
 	mousePosition.y = (mousePosition.y - 0.5f) * 2;
 
-	//to world space -500 ,500 (of wat je zelf wilt? idk vgm is het screen res???? of de cameraW/H)
+	//to world space (of wat je zelf wilt? idk vgm is het screen res???? of de cameraW/H)
 	mousePosition.x = mousePosition.x * viewport.cameraWidth / 2;
 	mousePosition.y = mousePosition.y * viewport.cameraHeight / 2;
 
