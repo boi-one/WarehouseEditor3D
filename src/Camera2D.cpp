@@ -62,9 +62,11 @@ glm::vec2 Camera2D::ToWorldPosition(glm::vec2 inputPosition)
 	mousePosition.x = (mousePosition.x - 0.5f) * 2;
 	mousePosition.y = (mousePosition.y - 0.5f) * 2;
 
-	//to world space (of wat je zelf wilt? idk vgm is het screen res???? of de cameraW/H)
+	//to world space (je kan hier zelf bepalen wat de world coordinates zijn)
+	//(nu is het half de scherm resolutie waar een zoom factor op is toegepast)
+	//?? of niet want als ik de scherm resolutie aanpas hier klopt de muis positie niet meer vergeleken met de mesh scale
 	mousePosition.x = mousePosition.x * viewport.cameraWidth / 2;
-	mousePosition.y = mousePosition.y * viewport.cameraHeight / 2;
+	mousePosition.y = mousePosition.y * viewport.cameraHeight/ 2;
 
 	//offset voor als de camera beweegt
 	mousePosition += glm::vec2(this->position.x, -this->position.y);
