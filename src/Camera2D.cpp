@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "Camera2D.h"
 #include <iostream>
 
 void Camera2D::ProcessKeyboard(CameraMovement direction, float deltaTime)
@@ -7,29 +7,21 @@ void Camera2D::ProcessKeyboard(CameraMovement direction, float deltaTime)
 
 	switch (direction)
 	{
-	case CameraMovement::Forward:
-	{
-		position += front * velocity;
-	}break;
-	case CameraMovement::Backward:
-	{
-		position -= front * velocity;
-	}break;
 	case CameraMovement::Left:
 	{
-		position -= right * velocity;
+		position -= glm::vec3(1, 0, 0) * velocity;
 	}break;
 	case CameraMovement::Right:
 	{
-		position += right * velocity;
+		position += glm::vec3(1, 0, 0) * velocity;
 	}break;
 	case CameraMovement::Up:
 	{
-		position += up * velocity;
+		position += glm::vec3(0, 1, 0) * velocity;
 	}break;
 	case CameraMovement::Down:
 	{
-		position -= up * velocity;
+		position -= glm::vec3(0, 1, 0) * velocity;
 	}break;
 	}
 }
@@ -87,9 +79,3 @@ glm::vec2 Camera2D::ToWorldPosition(glm::vec2 inputPosition)
 
 }
 
-void Camera2D::UpdateCameraVectors()
-{
-	this->front = glm::normalize(front);
-	this->right = glm::normalize(glm::cross(this->front, worldUp));
-	this->up = glm::normalize(glm::cross(this->right, this->front));
-}

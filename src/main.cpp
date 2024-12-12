@@ -7,7 +7,7 @@
 
 #include "Settings.h"
 #include "Shader.h"
-#include "Camera.h"
+#include "Camera2D.h"
 #include "Mesh.h"
 #include "Mouse.h"
 
@@ -136,23 +136,10 @@ int main()
 		3, 1, 2
 	};
 
-	//std::vector<glm::vec3> vertices = CreateLine(glm::vec3(-2, -2, 0), glm::vec3(2, -2, 0), 1.f);
-	//
-	//std::vector<GLfloat> fvertices;
-	//
-	//fvertices = ConvertToFloat(vertices);
-
-
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glBindVertexArray(VAO);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fvertices.size(), fvertices.data(), GL_STATIC_DRAW);
-	//
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * squareVertices.size(), squareVertices.data(), GL_STATIC_DRAW);
@@ -209,11 +196,12 @@ int main()
 		//swap window
 		shader.use();
 
-		// 3d cam: glm::mat4 projection = glm::perspective(glm::radians(camera.fov), (float)display_w / (float)display_h, 0.1f, 1000.0f);
-		//de transform is de camera het is de rand om het scherm heen die word verplaatst met de camera.position
+		
 
 		camera.Update();
+		//de transform is de camera het is de rand om het scherm heen die word verplaatst met de camera.position
 		camera.SetTransform(shader);
+		mouse.Update(camera);
 
 		for (Mesh& m : allMeshes)
 		{
@@ -221,13 +209,12 @@ int main()
 			model = glm::translate(model, m.position);
 
 			float meshAngle;
-			//meshAngle = atan2(m.position.y, m.position.x) - atan2(mouse.position.y, mouse.position.x);
-			meshAngle = acos(glm::dot(m.position, mouse.position));
 
-			std::cout << meshAngle << std::endl;
-			model = glm::rotate(model, meshAngle * 4.5f, glm::vec3(0, 0, 1));
+			//atan2 heeft de positie in de wereld nodig (eigenlijk alles heeft de positie in de wereld nodig tijdens calculeren VERGEET DIT NIET!!!)
+			meshAngle = -atan2(m.position.y, m.position.x) + atan2(mouse.position.y, mouse.position.x) + 1 * M_PI /2;
+			model = glm::rotate(model, meshAngle, {0, 0, 1});
 
-			//m.scale.y = -glm::length(mouse.position.y - m.position.y);
+			m.scale.y = -glm::length(m.position - mouse.position);
 			model = glm::scale(model, m.scale);
 			shader.setMat4("model", model);
 
@@ -257,8 +244,7 @@ void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& 
 	ImGui::Begin("test");
 	overUI = ImGui::IsWindowHovered();
 	ImGui::Text("FPS: %.0f", 1 / deltaTime);
-	glm::vec3 mousePos = { camera.ToWorldPosition(mouse.position) , 0 };
-	ImGui::Text("Mouse position: X %.0f, Y %.0f", mousePos.x, mousePos.y);
+	ImGui::Text("Mouse position: X %.0f, Y %.0f", mouse.position.x, mouse.position.y);
 	ImGui::Text("Camera position: X %.0f, Y %.0f", camera.position.x, camera.position.y);
 	ImGui::Text("Screen resolution: X %d, Y %d", display_w, display_h);
 	if (ImGui::Button("wireframe"))
@@ -276,10 +262,7 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 {
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
-	//de raw sdl screen position in pixels
-	mouse.position = glm::vec3(mouseX, mouseY, 0);
-
-
+	mouse.SetScreenPosition(mouseX, mouseY);
 
 	while (SDL_PollEvent(&event))
 	{
@@ -300,10 +283,7 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 			if (overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
-				break;
-				glm::vec2 worldPos = camera.ToWorldPosition({ mouse.position.x, mouse.position.y });
-				Mesh m(VBO, VAO, { worldPos, 0 });
-				std::cout << "push back mesh : " << m.position.x << " " << m.position.y << m.position.z << std::endl;
+				Mesh m(VBO, VAO, mouse.position);
 				allMeshes.push_back(m);
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)
