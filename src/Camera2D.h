@@ -14,8 +14,8 @@ enum CameraMovement
 
 struct Viewport
 {
-	int screenWidth = 1280;
-	int screenHeight = 720;
+	int windowWidth = 1280;
+	int windowHeight = 720;
 
 	float cameraWidth, cameraHeight;
 	float left, right, top, bottom;

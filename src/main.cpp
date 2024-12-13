@@ -37,7 +37,7 @@ static InitReturn WindowInitialization(Camera2D& camera)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_Window* window = SDL_CreateWindow("Warehouse Editor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, camera.viewport.screenWidth, camera.viewport.screenHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_MAXIMIZED);
+	SDL_Window* window = SDL_CreateWindow("Warehouse Editor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, camera.viewport.windowWidth, camera.viewport.windowHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_MAXIMIZED);
 	if (!window)
 	{
 		SDL_Quit();
@@ -180,13 +180,13 @@ int main()
 		ImGui::NewFrame();
 
 		// Rendering
-		SDL_GetWindowSize(window, &camera.viewport.screenWidth, &camera.viewport.screenHeight);
-		SDL_GL_GetDrawableSize(window, &camera.viewport.screenWidth, &camera.viewport.screenHeight);
-		glViewport(0, 0, camera.viewport.screenWidth, camera.viewport.screenHeight);
+		SDL_GetWindowSize(window, &camera.viewport.windowWidth, &camera.viewport.windowHeight);
+		SDL_GL_GetDrawableSize(window, &camera.viewport.windowWidth, &camera.viewport.windowHeight);
+		glViewport(0, 0, camera.viewport.windowWidth, camera.viewport.windowHeight);
 		glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		screen.x = camera.viewport.screenWidth;
-		screen.y = camera.viewport.screenHeight;
+		screen.x = camera.viewport.windowWidth;
+		screen.y = camera.viewport.windowHeight;
 		//order:
 		// clear color
 		// openGL code
@@ -201,21 +201,24 @@ int main()
 		for (Mesh& m : allMeshes)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, m.position);
+			glm::vec3 end = (m.position + mouse.position);
+			model = glm::translate(model, end);
 
-			//atan2 heeft de positie in de wereld nodig (eigenlijk alles heeft de positie in de wereld nodig tijdens calculeren VERGEET DIT NIET!!!)
-			float meshAngle = -atan2(m.position.y, m.position.x) + atan2(mouse.position.y, mouse.position.x) + 1 * M_PI /2;
-			model = glm::rotate(model, meshAngle, {0, 0, 1});
+			{
+				float meshAngle = -atan2(m.position.y, m.position.x) + atan2(mouse.position.y, mouse.position.x) + 1 * M_PI / 2;
+				model = glm::rotate(model, meshAngle, { 0, 0, 1 });
+			}
 
-			m.scale.y = -glm::length(m.position - mouse.position);
+			float length = glm::distance(m.position, mouse.position);
+			m.scale.y = length;
 			model = glm::scale(model, m.scale);
-			
+
 			shader.setMat4("model", model);
 
 			m.Draw(squareVertices, EBO, indices);
 		}
 
-		UI(overUI, wireframe, deltaTime, mouse, camera, camera.viewport.screenWidth, camera.viewport.screenHeight);
+		UI(overUI, wireframe, deltaTime, mouse, camera, camera.viewport.windowWidth, camera.viewport.windowHeight);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -269,15 +272,15 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 		}break;
 		case SDL_MOUSEWHEEL:
 		{
-			if (event.wheel.y < 0 && camera.zoom > 1) camera.zoom--;
-			if (event.wheel.y > 0 && camera.zoom < 8) camera.zoom++;
+			if (event.wheel.y < 0 && camera.zoom > 1) camera.zoom -= 0.4f;
+			if (event.wheel.y > 0 && camera.zoom < 8) camera.zoom += 0.4f;
 		}break;
 		case SDL_MOUSEBUTTONDOWN:
 		{
 			if (overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
-				break; 
+				break;
 				Mesh m(VBO, VAO, mouse.position);
 				allMeshes.push_back(m);
 			}

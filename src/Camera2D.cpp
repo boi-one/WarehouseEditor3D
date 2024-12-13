@@ -33,8 +33,8 @@ glm::mat4 Camera2D::GetViewMatrix()
 
 void Camera2D::Update()
 {
-	viewport.cameraWidth = viewport.screenWidth / zoom;
-	viewport.cameraHeight = viewport.screenHeight / zoom;
+	viewport.cameraWidth = viewport.windowWidth / zoom;
+	viewport.cameraHeight = viewport.windowHeight / zoom;
 	//
 	//movementSpeed  zoom;
 }
@@ -52,32 +52,33 @@ void Camera2D::SetTransform(Shader& shader)
 
 glm::vec2 Camera2D::ToWorldPosition(glm::vec2 inputPosition)
 {
-	glm::vec2 mousePosition;
+	glm::vec2 screenPosition;
 
 	//to clip space 0, 1
-	mousePosition.x = inputPosition.x / viewport.screenWidth;
-	mousePosition.y = inputPosition.y / viewport.screenHeight;
+	screenPosition.x = inputPosition.x / viewport.windowWidth;
+	screenPosition.y = inputPosition.y / viewport.windowHeight;
 
 	//to cam space -1, 1
-	mousePosition.x = (mousePosition.x - 0.5f) * 2;
-	mousePosition.y = (mousePosition.y - 0.5f) * 2;
+	screenPosition.x = (screenPosition.x - 0.5f) * 2;
+	screenPosition.y = (screenPosition.y - 0.5f) * 2;
 
-	//to world space (je kan hier zelf bepalen wat de world coordinates zijn)
-	//(nu is het half de scherm resolutie waar een zoom factor op is toegepast)
-	//?? of niet want als ik de scherm resolutie aanpas hier klopt de muis positie niet meer vergeleken met de mesh scale
-	mousePosition.x = mousePosition.x * viewport.cameraWidth / 2;
-	mousePosition.y = mousePosition.y * viewport.cameraHeight/ 2;
+	//to world space (je kan hier zelf bepalen wat de world coordinates zijn maar wel /2 houden omdat het 0 punt in het midden is, anders hoef je niet /2 te doen als het 0 punt in de hoek is)
+	
+	float width = viewport.cameraWidth;
+	float height = viewport.cameraHeight;
+	screenPosition.x = screenPosition.x * width  / 2;
+	screenPosition.y = screenPosition.y * height / 2;
 
 	//offset voor als de camera beweegt
-	mousePosition += glm::vec2(this->position.x, -this->position.y);
+	screenPosition += glm::vec2(this->position.x, -this->position.y);
 
-	mousePosition.y = -mousePosition.y;
+	screenPosition.y = -screenPosition.y;
 
 	//std::cout << "screen l, r, t, d   : " << viewport.left << " " << viewport.right << " " << viewport.top << " " << viewport.bottom << " ";
 	//std::cout << "mouse world position: " << mousePosition.x << " " << mousePosition.y << std::endl;
 	
 	//de uiteindelijke world position
-	return mousePosition;
+	return screenPosition;
 
 }
 
