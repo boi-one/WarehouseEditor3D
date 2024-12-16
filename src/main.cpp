@@ -10,8 +10,9 @@
 #include "Camera2D.h"
 #include "Mesh.h"
 #include "Mouse.h"
+#include "Conveyor.h"
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI, GLuint& VBO, GLuint& VAO);
+void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, glm::vec2& screen, bool& overUI, GLuint& VBO, GLuint& VAO);
 void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, int display_h);
 
 struct InitReturn
@@ -164,6 +165,8 @@ int main()
 
 	allMeshes.push_back(Mesh(VBO, VAO));
 
+	Mesh newLineMesh(VBO, VAO);
+
 	// Main loop
 	while (settings.appRunning)
 	{
@@ -172,7 +175,7 @@ int main()
 		lastFrame = currentFrame;
 
 		SDL_Event event;
-		SDLEvents(event, settings, camera, mouse, deltaTime, allMeshes, screen, overUI, VBO, VAO);
+		SDLEvents(event, settings, camera, mouse, deltaTime, screen, overUI, VBO, VAO);
 
 		// Start the ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -198,24 +201,41 @@ int main()
 		camera.SetTransform(shader);						//de transform is de camera het is de rand om het scherm heen die word verplaatst met de camera.position
 		mouse.Update(camera);
 
-		for (Mesh& m : allMeshes)
+		if (ConveyorManager::selectedConveyor)
 		{
-			glm::mat4 model = glm::mat4(1.0f);
-			glm::vec3 end = (m.position + mouse.position);
-			model = glm::translate(model, end);
+			ConveyorManager::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, mouse.position, newLineMesh, shader);
+		}
 
+		Mesh m(VBO, VAO);
+
+		for (Conveyor& c : ConveyorManager::allConveyors) //draw lines
+		{
+			glm::vec3 color = { 1, 1, 1 };
+			shader.setVec3("mColor", color);
+			for (int i = 0; i < c.path.size() - 1; i++)
 			{
-				float meshAngle = -atan2(m.position.y, m.position.x) + atan2(mouse.position.y, mouse.position.x) + 1 * M_PI / 2;
-				model = glm::rotate(model, meshAngle, { 0, 0, 1 });
+				c.DrawLine(c.path.at(i).position, c.path.at(i + 1).position, shader);
 			}
+		}
+		for (Conveyor& c : ConveyorManager::allConveyors)
+		{
+			for (Point& p : c.path) //draw points
+			{
+				glm::vec3 color = { 1, 1, 1 };
 
-			float length = glm::distance(m.position, mouse.position);
-			m.scale.y = length;
-			model = glm::scale(model, m.scale);
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, p.position);
+				model = glm::scale(model, { 10, 10, 0 });
+				shader.setMat4("model", model);
 
-			shader.setMat4("model", model);
+				if (ConveyorManager::selectedConveyor && ConveyorManager::selectedConveyor->selectedPoint && &p == ConveyorManager::selectedConveyor->selectedPoint)
+				{
+					color = { 1, 0, 0 };
+				}
 
-			m.Draw(squareVertices, EBO, indices);
+				shader.setVec3("mColor", color);
+				m.Draw();
+			}
 		}
 
 		UI(overUI, wireframe, deltaTime, mouse, camera, camera.viewport.windowWidth, camera.viewport.windowHeight);
@@ -255,7 +275,7 @@ void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& 
 	ImGui::End();
 }
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, std::vector<Mesh>& allMeshes, glm::vec2& screen, bool& overUI, GLuint& VBO, GLuint& VAO)
+void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, glm::vec2& screen, bool& overUI, GLuint& VBO, GLuint& VAO)
 {
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
@@ -272,7 +292,7 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 		}break;
 		case SDL_MOUSEWHEEL:
 		{
-			if (event.wheel.y < 0 && camera.zoom > 1) camera.zoom -= 0.4f;
+			if (event.wheel.y < 0 && camera.zoom > 0.4f) camera.zoom -= 0.4f;
 			if (event.wheel.y > 0 && camera.zoom < 8) camera.zoom += 0.4f;
 		}break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -280,13 +300,25 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 			if (overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
-				break;
-				Mesh m(VBO, VAO, mouse.position);
-				allMeshes.push_back(m);
+				if (!ConveyorManager::selectedConveyor)
+				{
+
+					Conveyor c({ VBO, VAO });
+					c.path.push_back({ mouse.position });
+					c.selectedPoint = &c.path.at(c.path.size() - 1);
+					ConveyorManager::allConveyors.push_back(c);
+					ConveyorManager::selectedConveyor = &ConveyorManager::allConveyors.at(ConveyorManager::allConveyors.size() - 1);
+					ConveyorManager::selectedConveyor->selectedPoint = &ConveyorManager::selectedConveyor->path.at(ConveyorManager::selectedConveyor->path.size() - 1);
+				}
+				else
+				{
+					ConveyorManager::selectedConveyor->path.push_back({ mouse.position });
+					ConveyorManager::selectedConveyor->selectedPoint = &ConveyorManager::selectedConveyor->path.at(ConveyorManager::selectedConveyor->path.size() - 1);
+				}
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{
-				//stretch cube
+				ConveyorManager::selectedConveyor->selectedPoint = Conveyor::ClosestPoint(ConveyorManager::selectedConveyor->path, mouse.position);
 			}
 		}break;
 		}
@@ -304,4 +336,6 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 		camera.ProcessKeyboard(Right, deltaTime);
 	if (key[SDL_SCANCODE_R])
 		camera.position = glm::vec3(0, 0, 0);
+	if (key[SDL_SCANCODE_ESCAPE])
+		ConveyorManager::selectedConveyor = 0;
 }

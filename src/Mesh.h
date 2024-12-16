@@ -15,7 +15,7 @@ public:
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 right;
 
-	Mesh(GLuint VBO, GLuint VAO, glm::vec3 position = { 0, 0, 0 }, glm::vec3 scale = { 10, 10, 0 })
+	Mesh(GLuint VBO = 0, GLuint VAO = 0, glm::vec3 position = { 0, 0, 0 }, glm::vec3 scale = { 10, 10, 0 })
 	{
 		this->position = position;
 		this->scale = scale;
@@ -23,5 +23,5 @@ public:
 		this->VAO = VAO;
 	}
 
-	void Draw(std::vector<GLfloat> vertices, GLuint& EBO, GLuint indices[6] = 0);
+	void Draw();
 };
