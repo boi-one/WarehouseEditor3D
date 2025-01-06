@@ -98,6 +98,7 @@ std::vector<glm::vec3> CreateLine(glm::vec3 start, glm::vec3 end, float width)
 
 int main()
 {
+
 	Camera2D camera({ 0.0f, 0.0f, 1.0f }); //z omhoog en y de diepte in 2d
 
 	InitReturn r = WindowInitialization(camera);
