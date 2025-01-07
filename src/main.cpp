@@ -13,9 +13,11 @@
 #include "Mouse.h"
 #include "Conveyor.h"
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& plane, bool& orthoProjection);
-void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, int display_h, bool& orthoProjection);
+void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& depthTest);
 
 struct InitReturn
 {
@@ -92,12 +94,25 @@ int main()
 	float lastFrame = 0.0f;
 	bool overUI = false;
 	bool orthoProjection = true;
+	bool depthTest = true;
 	Mesh plane;
 	plane.CreatePlane();
+	Mesh cube;
+	cube.CreateCube();
 #pragma endregion localvariables
 	// Main loop
 	while (settings.appRunning)
 	{
+		if (depthTest)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+		}
+
 		float currentFrame = (float)SDL_GetTicks() / 1000;
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -117,6 +132,7 @@ int main()
 		if (orthoProjection)	glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
 		else glClearColor(0.25f, 0.25f, 1.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
 		//order:
 		// clear color
 		// openGL code
@@ -129,7 +145,8 @@ int main()
 			camera.SetTransform(shader);
 		else
 		{
-			glm::mat4 projection = glm::perspective(glm::radians(camera3d.fov), (float)camera.viewport.cameraWidth / (float)camera.viewport.cameraHeight, 0.1f, 1000.0f);
+			glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(camera3d.fov), (float)camera.viewport.cameraWidth / (float)camera.viewport.cameraHeight, 0.1f, 1000.0f);
+			
 			shader.setMat4("projection", projection);
 
 			glm::mat4 view = camera3d.GetViewMatrix();
@@ -137,11 +154,42 @@ int main()
 		}
 		mouse.Update(camera);
 
+		glm::mat4 cubeModel = glm::mat4(1.0f);
+		cubeModel = glm::translate(cubeModel, { 0, 0, 0 });
+		cubeModel = glm::scale(cubeModel, { 10, 10, 10 });
+		shader.setMat4("model", cubeModel);
+		cube.Draw(shader);
+
 		if (ConveyorManager::selectedConveyor)
 		{
 			ConveyorManager::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, mouse.position, plane, shader);
 		}
 
+		for (int i = 0; i < 3; i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			if (i == 0)
+			{
+				shader.setVec3("mColor", { 1, 0, 0 });
+				model = glm::scale(model, { 900, 1, 1 });
+				shader.setMat4("model", model);
+			}
+			if (i == 1)
+			{
+				shader.setVec3("mColor", { 0, 1, 0 });
+				model = glm::scale(model, { 1, 900, 1 });
+				shader.setMat4("model", model);
+			}
+			if (i == 2)
+			{
+				shader.setVec3("mColor", { 0, 0, 1 });
+				model = glm::scale(model, { 1, 1, 900 });
+				shader.setMat4("model", model);
+			}
+			
+			cube.Draw(shader);
+		}
+		shader.setVec3("mColor", { 1, 1, 1 });
 
 		for (Conveyor& c : ConveyorManager::allConveyors) //draw lines
 		{
@@ -173,7 +221,7 @@ int main()
 			}
 		}
 
-		UI(overUI, wireframe, deltaTime, mouse, camera, camera.viewport.windowWidth, camera.viewport.windowHeight, orthoProjection);
+		UI(overUI, wireframe, deltaTime, mouse, camera, camera3d, camera.viewport.windowWidth, camera.viewport.windowHeight, orthoProjection, depthTest);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -191,13 +239,14 @@ int main()
 	return 0;
 }
 
-void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, int display_h, bool& orthoProjection)
+void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& depthTest)
 {
 	ImGui::Begin("test");
 	overUI = ImGui::IsWindowHovered();
 	ImGui::Text("FPS: %.0f", 1 / deltaTime);
 	ImGui::Text("- Mouse position: X %.0f, Y %.0f", mouse.position.x, mouse.position.y);
 	ImGui::Text("- Camera position: X %.0f, Y %.0f", camera.position.x, camera.position.y);
+	ImGui::Text("- 3D Camera position: X %.0f, Y %.0f, Z %.0f", camera3d.Position.x, camera3d.Position.y, camera3d.Position.z);
 	ImGui::Text("- Screen resolution: X %d, Y %d", display_w, display_h);
 	if (ImGui::Button("wireframe"))
 	{
@@ -209,11 +258,16 @@ void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& 
 	}
 	const char* currentProjection = orthoProjection ? "ortho (2D)" : "perspective (3D)";
 	if (ImGui::Button(currentProjection)) orthoProjection = !orthoProjection;
+	const char* depthTestEnabled = depthTest ? "depth test enabled" : "depth test disabled";
+	if (ImGui::Button(depthTestEnabled))
+	{
+		depthTest = !depthTest;
+	}
 	ImGui::End();
 }
 
 void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& plane, bool& orthoProjection)
-{//TODO: 
+{
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
 	mouse.SetScreenPosition(mouseX, mouseY);
@@ -229,6 +283,7 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D&
 		}break;
 		case SDL_MOUSEWHEEL:
 		{
+			if (overUI) break;
 			if (event.wheel.y < 0 && camera.zoom > 0.4f) camera.zoom -= 0.4f;
 			if (event.wheel.y > 0 && camera.zoom < 8) camera.zoom += 0.4f;
 		}break;
@@ -239,10 +294,9 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D&
 			{
 				if (!ConveyorManager::selectedConveyor)
 				{
-
 					Conveyor c;
 					c.mesh = &plane;
-					c.path.push_back(glm::vec3(mouse.position.x, mouse.position.y, 1));
+					c.path.push_back(glm::vec3(mouse.position.x, mouse.position.y, -1));
 					c.selectedPoint = &c.path.at(c.path.size() - 1);
 					ConveyorManager::allConveyors.push_back(c);
 					ConveyorManager::selectedConveyor = &ConveyorManager::allConveyors.at(ConveyorManager::allConveyors.size() - 1);
@@ -250,7 +304,7 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D&
 				}
 				else
 				{
-					ConveyorManager::selectedConveyor->path.push_back({ mouse.position });
+					ConveyorManager::selectedConveyor->path.push_back(glm::vec3(mouse.position.x, mouse.position.y, -1));
 					ConveyorManager::selectedConveyor->selectedPoint = &ConveyorManager::selectedConveyor->path.at(ConveyorManager::selectedConveyor->path.size() - 1);
 				}
 			}

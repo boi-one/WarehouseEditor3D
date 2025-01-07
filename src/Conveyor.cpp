@@ -48,8 +48,6 @@ void Conveyor::DrawLine(glm::vec3& start, glm::vec3& end, Shader& shader)
 
 void ConveyorManager::DrawNewLine(glm::vec3& start, glm::vec3& end, Mesh& mesh, Shader& shader)
 {
-	mesh.position = ConveyorManager::selectedConveyor->selectedPoint->position;
-
 	glm::mat4 model = glm::mat4(1.0f);
 
 	glm::vec3 pivot = (start + end);

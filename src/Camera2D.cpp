@@ -50,7 +50,7 @@ void Camera2D::SetTransform(Shader& shader)
 	shader.setMat4("projection", projection);
 
 	glm::vec3 worldPosition;
-	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0.0f));
+	glm::mat4 view = glm::mat4(1.f);
 	shader.setMat4("view", view);
 }
 
@@ -77,9 +77,6 @@ glm::vec2 Camera2D::ToWorldPosition(glm::vec2 inputPosition)
 	screenPosition += glm::vec2(this->position.x, -this->position.y);
 
 	screenPosition.y = -screenPosition.y;
-
-	//std::cout << "screen l, r, t, d   : " << viewport.left << " " << viewport.right << " " << viewport.top << " " << viewport.bottom << " ";
-	//std::cout << "mouse world position: " << mousePosition.x << " " << mousePosition.y << std::endl;
 
 	//de uiteindelijke world position
 	return screenPosition;
