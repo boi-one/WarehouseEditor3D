@@ -19,14 +19,9 @@ class Conveyor
 {
 public:
 	bool selected;
-	Mesh mesh;
+	Mesh* mesh = 0;
 	std::vector<Point> path;
 	Point* selectedPoint = 0;
-
-	Conveyor(Mesh mesh = Mesh())
-	{
-		this->mesh = mesh;
-	}
 
 	static Point* ClosestPoint(std::vector<Point> list, glm::vec3 origin, float range = 99999);
 	void DrawLine(glm::vec3& start, glm::vec3& end, Shader& shader);

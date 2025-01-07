@@ -1,4 +1,5 @@
 #include "Camera3D.h"
+#include "iostream"
 
 glm::mat4 Camera3D::GetViewMatrix()
 {
@@ -7,6 +8,8 @@ glm::mat4 Camera3D::GetViewMatrix()
 
 void Camera3D::ProcessKeyboard(Camera_Movement direction, float deltaTime)
 {
+    std::cout << Position.x << " " << Position.y << " " << Position.z << std::endl;
+
     float velocity = MovementSpeed * deltaTime;
     if (direction == FORWARD)
         Position += Front * velocity;
@@ -39,11 +42,11 @@ void Camera3D::ProcessMouseMovement(float xoffset, float yoffset, bool constrain
 
 void Camera3D::ProcessMouseScroll(float yoffset)
 {
-    Zoom -= (float)yoffset;
-    if (Zoom < 1.0f)
-        Zoom = 1.0f;
-    if (Zoom > 45.0f)
-        Zoom = 45.0f;
+    fov -= (float)yoffset;
+    if (fov < 1.0f)
+        fov = 1.0f;
+    if (fov > 45.0f)
+        fov = 45.0f;
 }
 
 void Camera3D::updateCameraVectors()

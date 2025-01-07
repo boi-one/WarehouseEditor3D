@@ -33,7 +33,7 @@ public:
 	float movementSpeed = 500.f;
 	Viewport viewport;
 	float zoom = 1;
-	glm::mat4 transform;
+	glm::mat4 projection;
 
 	Camera2D(glm::vec3 position)
 	{

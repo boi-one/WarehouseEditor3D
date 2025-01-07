@@ -34,16 +34,16 @@ void Conveyor::DrawLine(glm::vec3& start, glm::vec3& end, Shader& shader)
 	glm::vec3 pivot = (start + end);
 	model = glm::translate(model, pivot / 2.f);
 
-	double pi = 3.14159265358979323846;
+	const double pi = 3.14159265358979323846;
 	float meshAngle = atan2(start.y - end.y, start.x - end.x);
 	model = glm::rotate(model, meshAngle, { 0, 0, 1 });
 
 	float length = glm::distance(start, end);
-	this->mesh.scale.x = length / 2.f;
-	model = glm::scale(model, this->mesh.scale);
+	this->mesh->scale.x = length / 2.f;
+	model = glm::scale(model, this->mesh->scale);
 
 	shader.setMat4("model", model);
-	this->mesh.Draw();
+	this->mesh->Draw(shader);
 }
 
 void ConveyorManager::DrawNewLine(glm::vec3& start, glm::vec3& end, Mesh& mesh, Shader& shader)
@@ -65,5 +65,5 @@ void ConveyorManager::DrawNewLine(glm::vec3& start, glm::vec3& end, Mesh& mesh, 
 	model = glm::scale(model, mesh.scale);
 
 	shader.setMat4("model", model);
-	mesh.Draw();
+	mesh.Draw(shader);
 }

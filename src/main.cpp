@@ -8,12 +8,14 @@
 #include "Settings.h"
 #include "Shader.h"
 #include "Camera2D.h"
+#include "Camera3D.h"
 #include "Mesh.h"
 #include "Mouse.h"
 #include "Conveyor.h"
+#include <glm/gtc/matrix_transform.hpp>
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, glm::vec2& screen, bool& overUI, GLuint& VBO, GLuint& VAO);
-void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, int display_h);
+void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& plane, bool& orthoProjection);
+void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, int display_h, bool& orthoProjection);
 
 struct InitReturn
 {
@@ -63,44 +65,11 @@ static InitReturn WindowInitialization(Camera2D& camera)
 	return r;
 }
 
-std::vector<GLfloat> ConvertToFloat(std::vector<glm::vec3> vertices)
-{
-	std::vector<GLfloat> fvertices;
-
-	for (glm::vec3 v : vertices)
-	{
-		fvertices.push_back(v.x);
-		fvertices.push_back(v.y);
-		fvertices.push_back(v.z);
-	}
-
-	return fvertices;
-}
-
-std::vector<glm::vec3> CreateLine(glm::vec3 start, glm::vec3 end, float width)
-{
-	std::vector<glm::vec3> vertices;
-
-	glm::vec3 direction = glm::normalize(end - start);
-	glm::vec3 perpendicular = glm::vec3(-direction.y, direction.x, 0);
-
-	glm::vec3 offset = perpendicular * width;
-
-	//triangle 1
-	vertices.push_back(start + offset);	vertices.push_back({ 1, 0, 0 });
-	vertices.push_back(start - offset);	vertices.push_back({ 1, 0, 0 });
-
-	vertices.push_back(end + offset);	vertices.push_back({ 1, 0, 0 });
-	vertices.push_back(end - offset);   vertices.push_back({ 1, 0, 0 });
-
-	return vertices;
-}
-
 int main()
 {
-
 	Camera2D camera({ 0.0f, 0.0f, 1.0f }); //z omhoog en y de diepte in 2d
-
+	Camera3D camera3d;
+#pragma region setup
 	InitReturn r = WindowInitialization(camera);
 	if (r.failed == -1) return -1;
 	SDL_Window* window = r.window;
@@ -110,64 +79,22 @@ int main()
 	ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
 	ImGui_ImplOpenGL3_Init("#version 330");
 	ImGuiIO& io = ImGui::GetIO();
-
+#pragma endregion setup
+#pragma region localvariables
 	Settings settings;
 	Mouse mouse;
 	std::vector<Mesh> allMeshes;
 	Shader shader("shader.vert", "shader.frag");
 	shader.use();
-
 	GLuint VAO, VBO, EBO;
-
-	std::vector<GLfloat> squareVertices =
-	{
-		 1.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,
-		 1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-		-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,
-		-1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f
-	};
-	GLuint squareIndices[6] =
-	{
-		0, 1, 2,
-		0, 2, 3
-	};
-
-	GLuint indices[] =
-	{
-		0, 3, 1,
-		3, 1, 2
-	};
-
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * squareVertices.size(), squareVertices.data(), GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	//position
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
-	//color
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-
-	glBindVertexArray(0);
-
 	bool wireframe = false;
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
-	glm::vec2 screen = { 0, 0 };
 	bool overUI = false;
-
-	allMeshes.push_back(Mesh(VBO, VAO));
-
-	Mesh newLineMesh(VBO, VAO);
-
+	bool orthoProjection = true;
+	Mesh plane;
+	plane.CreatePlane();
+#pragma endregion localvariables
 	// Main loop
 	while (settings.appRunning)
 	{
@@ -176,7 +103,7 @@ int main()
 		lastFrame = currentFrame;
 
 		SDL_Event event;
-		SDLEvents(event, settings, camera, mouse, deltaTime, screen, overUI, VBO, VAO);
+		SDLEvents(event, settings, camera, camera3d, mouse, deltaTime, overUI, VBO, VAO, plane, orthoProjection);
 
 		// Start the ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -187,10 +114,9 @@ int main()
 		SDL_GetWindowSize(window, &camera.viewport.windowWidth, &camera.viewport.windowHeight);
 		SDL_GL_GetDrawableSize(window, &camera.viewport.windowWidth, &camera.viewport.windowHeight);
 		glViewport(0, 0, camera.viewport.windowWidth, camera.viewport.windowHeight);
-		glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
+		if (orthoProjection)	glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
+		else glClearColor(0.25f, 0.25f, 1.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		screen.x = camera.viewport.windowWidth;
-		screen.y = camera.viewport.windowHeight;
 		//order:
 		// clear color
 		// openGL code
@@ -199,15 +125,23 @@ int main()
 		//swap window
 		shader.use();
 		camera.Update();
-		camera.SetTransform(shader);						//de transform is de camera het is de rand om het scherm heen die word verplaatst met de camera.position
+		if (orthoProjection)
+			camera.SetTransform(shader);
+		else
+		{
+			glm::mat4 projection = glm::perspective(glm::radians(camera3d.fov), (float)camera.viewport.cameraWidth / (float)camera.viewport.cameraHeight, 0.1f, 1000.0f);
+			shader.setMat4("projection", projection);
+
+			glm::mat4 view = camera3d.GetViewMatrix();
+			shader.setMat4("view", view);
+		}
 		mouse.Update(camera);
 
 		if (ConveyorManager::selectedConveyor)
 		{
-			ConveyorManager::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, mouse.position, newLineMesh, shader);
+			ConveyorManager::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, mouse.position, plane, shader);
 		}
 
-		Mesh m(VBO, VAO);
 
 		for (Conveyor& c : ConveyorManager::allConveyors) //draw lines
 		{
@@ -226,7 +160,7 @@ int main()
 
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, p.position);
-				model = glm::scale(model, { 10, 10, 0 });
+				model = glm::scale(model, { 10, 10, 1 });
 				shader.setMat4("model", model);
 
 				if (ConveyorManager::selectedConveyor && ConveyorManager::selectedConveyor->selectedPoint && &p == ConveyorManager::selectedConveyor->selectedPoint)
@@ -235,11 +169,11 @@ int main()
 				}
 
 				shader.setVec3("mColor", color);
-				m.Draw();
+				plane.Draw(shader);
 			}
 		}
 
-		UI(overUI, wireframe, deltaTime, mouse, camera, camera.viewport.windowWidth, camera.viewport.windowHeight);
+		UI(overUI, wireframe, deltaTime, mouse, camera, camera.viewport.windowWidth, camera.viewport.windowHeight, orthoProjection);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -257,7 +191,7 @@ int main()
 	return 0;
 }
 
-void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, int display_h)
+void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, int display_w, int display_h, bool& orthoProjection)
 {
 	ImGui::Begin("test");
 	overUI = ImGui::IsWindowHovered();
@@ -273,11 +207,13 @@ void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& 
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+	const char* currentProjection = orthoProjection ? "ortho (2D)" : "perspective (3D)";
+	if (ImGui::Button(currentProjection)) orthoProjection = !orthoProjection;
 	ImGui::End();
 }
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mouse, float deltaTime, glm::vec2& screen, bool& overUI, GLuint& VBO, GLuint& VAO)
-{
+void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& plane, bool& orthoProjection)
+{//TODO: 
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
 	mouse.SetScreenPosition(mouseX, mouseY);
@@ -304,8 +240,9 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 				if (!ConveyorManager::selectedConveyor)
 				{
 
-					Conveyor c({ VBO, VAO });
-					c.path.push_back({ mouse.position });
+					Conveyor c;
+					c.mesh = &plane;
+					c.path.push_back(glm::vec3(mouse.position.x, mouse.position.y, 1));
 					c.selectedPoint = &c.path.at(c.path.size() - 1);
 					ConveyorManager::allConveyors.push_back(c);
 					ConveyorManager::selectedConveyor = &ConveyorManager::allConveyors.at(ConveyorManager::allConveyors.size() - 1);
@@ -318,7 +255,7 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 				}
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)
-			{
+			{//crashes
 				ConveyorManager::selectedConveyor->selectedPoint = Conveyor::ClosestPoint(ConveyorManager::selectedConveyor->path, mouse.position);
 			}
 		}break;
@@ -328,15 +265,27 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Mouse& mo
 	const Uint8* key = SDL_GetKeyboardState(0);
 
 	if (key[SDL_SCANCODE_W])
-		camera.ProcessKeyboard(Up, deltaTime);
+	{
+		if (orthoProjection) camera.ProcessKeyboard(Up, deltaTime);
+		else camera3d.ProcessKeyboard(FORWARD, deltaTime);
+	}
 	if (key[SDL_SCANCODE_S])
-		camera.ProcessKeyboard(Down, deltaTime);
+	{
+		if (orthoProjection) camera.ProcessKeyboard(Down, deltaTime);
+		else camera3d.ProcessKeyboard(BACKWARD, deltaTime);
+	}
 	if (key[SDL_SCANCODE_A])
-		camera.ProcessKeyboard(Left, deltaTime);
+	{
+		if (orthoProjection) camera.ProcessKeyboard(Left, deltaTime);
+		else camera3d.ProcessKeyboard(LEFT, deltaTime);
+	}
 	if (key[SDL_SCANCODE_D])
-		camera.ProcessKeyboard(Right, deltaTime);
+	{
+		if (orthoProjection) camera.ProcessKeyboard(Right, deltaTime);
+		else camera3d.ProcessKeyboard(RIGHT, deltaTime);
+	}
 	if (key[SDL_SCANCODE_R])
-		camera.position = glm::vec3(0, 0, 0);
+		camera.position = glm::vec3(0, 0, 3);
 	if (key[SDL_SCANCODE_ESCAPE])
 		ConveyorManager::selectedConveyor = 0;
 }

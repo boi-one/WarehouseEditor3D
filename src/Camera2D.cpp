@@ -46,8 +46,12 @@ void Camera2D::SetTransform(Shader& shader)
 	viewport.bottom = -viewport.cameraHeight / 2;
 	viewport.top = viewport.cameraHeight / 2;
 
-	transform = glm::ortho(viewport.left + position.x, viewport.right + position.x, viewport.bottom + position.y, viewport.top + position.y, -100.0f, 100.0f);
-	shader.setMat4("transform", transform);
+	projection = glm::ortho(viewport.left + position.x, viewport.right + position.x, viewport.bottom + position.y, viewport.top + position.y, -100.0f, 100.0f);
+	shader.setMat4("projection", projection);
+
+	glm::vec3 worldPosition;
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0.0f));
+	shader.setMat4("view", view);
 }
 
 glm::vec2 Camera2D::ToWorldPosition(glm::vec2 inputPosition)
@@ -63,10 +67,10 @@ glm::vec2 Camera2D::ToWorldPosition(glm::vec2 inputPosition)
 	screenPosition.y = (screenPosition.y - 0.5f) * 2;
 
 	//to world space (je kan hier zelf bepalen wat de world coordinates zijn maar wel /2 houden omdat het 0 punt in het midden is, anders hoef je niet /2 te doen als het 0 punt in de hoek is)
-	
+
 	float width = viewport.cameraWidth;
 	float height = viewport.cameraHeight;
-	screenPosition.x = screenPosition.x * width  / 2;
+	screenPosition.x = screenPosition.x * width / 2;
 	screenPosition.y = screenPosition.y * height / 2;
 
 	//offset voor als de camera beweegt
@@ -76,7 +80,7 @@ glm::vec2 Camera2D::ToWorldPosition(glm::vec2 inputPosition)
 
 	//std::cout << "screen l, r, t, d   : " << viewport.left << " " << viewport.right << " " << viewport.top << " " << viewport.bottom << " ";
 	//std::cout << "mouse world position: " << mousePosition.x << " " << mousePosition.y << std::endl;
-	
+
 	//de uiteindelijke world position
 	return screenPosition;
 
