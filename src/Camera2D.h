@@ -4,8 +4,6 @@
 
 enum CameraMovement
 {
-	Forward,
-	Backward,
 	Left,
 	Right,
 	Up,

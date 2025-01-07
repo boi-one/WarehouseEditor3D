@@ -16,7 +16,7 @@ private:
 	glm::vec3 right;
 	int verticesCount = 0;
 public:
-	Mesh(glm::vec3 scale = { 10, 10, 0 })
+	Mesh(glm::vec3 scale = { 10, 10, 10 })
 	{
 		this->scale = scale;
 	}
