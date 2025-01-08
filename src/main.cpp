@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <GL/glew.h>
 #include <math.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Settings.h"
 #include "Shader.h"
@@ -12,7 +13,7 @@
 #include "Mesh.h"
 #include "Mouse.h"
 #include "Conveyor.h"
-#include <glm/gtc/matrix_transform.hpp>
+#include "Input.h"
 
 void SDLEvents(SDL_Event& event, SDL_Window* window, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& cube, bool& orthoProjection);
 void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& showAxes);
@@ -67,8 +68,11 @@ static InitReturn WindowInitialization(Camera2D& camera)
 
 int main()
 {
+#pragma region localvariables
 	Camera2D camera({ 0.0f, 0.0f, 1.0f }); //z omhoog en y de diepte in 2d
-	Camera3D	 camera3d;
+	Camera3D camera3d;
+#pragma endregion localvariables
+	
 #pragma region setup
 	InitReturn r = WindowInitialization(camera);
 	if (r.failed == -1) return -1;
@@ -82,7 +86,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 #pragma endregion setup
-#pragma region localvariables
+
 	Settings settings;
 	Mouse mouse;
 	std::vector<Mesh> allMeshes;
@@ -96,8 +100,8 @@ int main()
 	bool orthoProjection = true;
 	bool showAxes = true;
 	Mesh cube;
+	Input input(&deltaTime, &orthoProjection, &camera, &camera3d, &settings);
 	cube.CreateCube();
-#pragma endregion localvariables
 	// Main loop
 	while (settings.appRunning)
 	{
@@ -129,6 +133,9 @@ int main()
 		//swap window
 		shader.use();
 		camera.Update();
+		input.KeyInput();
+		input.Update();
+
 		if (orthoProjection)
 		{
 			camera.SetTransform(shader);
@@ -311,6 +318,7 @@ void SDLEvents(SDL_Event& event, SDL_Window* window, Settings& settings, Camera2
 		}break;
 		case SDL_MOUSEMOTION:
 		{
+			if (orthoProjection) break;
 			int offsetX = event.motion.xrel;
 			int offsetY = event.motion.yrel;
 
@@ -331,37 +339,6 @@ void SDLEvents(SDL_Event& event, SDL_Window* window, Settings& settings, Camera2
 		}
 	}
 
-	const Uint8* key = SDL_GetKeyboardState(0);
-
-	if (key[SDL_SCANCODE_W])
-	{
-		if (orthoProjection) camera.ProcessKeyboard(Up, deltaTime);
-		else camera3d.ProcessKeyboard(FORWARD, deltaTime);
-	}
-	if (key[SDL_SCANCODE_S])
-	{
-		if (orthoProjection) camera.ProcessKeyboard(Down, deltaTime);
-		else camera3d.ProcessKeyboard(BACKWARD, deltaTime);
-	}
-	if (key[SDL_SCANCODE_A])
-	{
-		if (orthoProjection) camera.ProcessKeyboard(Left, deltaTime);
-		else camera3d.ProcessKeyboard(LEFT, deltaTime);
-	}
-	if (key[SDL_SCANCODE_D])
-	{
-		if (orthoProjection) camera.ProcessKeyboard(Right, deltaTime);
-		else camera3d.ProcessKeyboard(RIGHT, deltaTime);
-	}
-	if (key[SDL_SCANCODE_SPACE]) camera3d.ProcessKeyboard(UP, deltaTime);
-	if (key[SDL_SCANCODE_LSHIFT]) camera3d.ProcessKeyboard(DOWN, deltaTime);
-	if (key[SDL_SCANCODE_R]) camera.position = glm::vec3(0, 0, 3);
-	if (key[SDL_SCANCODE_ESCAPE]) ConveyorManager::selectedConveyor = 0;
-	if (key[SDL_SCANCODE_TAB] && !tab)
-	{
-		tab = true;
-		orthoProjection = !orthoProjection;
-	}
-	if(!key[SDL_SCANCODE_TAB]) tab = false;
+	
 
 }
