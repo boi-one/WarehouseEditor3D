@@ -14,7 +14,7 @@
 #include "Conveyor.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& cube, bool& orthoProjection);
+void SDLEvents(SDL_Event& event, SDL_Window* window, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& cube, bool& orthoProjection);
 void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& showAxes);
 
 struct InitReturn
@@ -106,7 +106,7 @@ int main()
 		lastFrame = currentFrame;
 
 		SDL_Event event;
-		SDLEvents(event, settings, camera, camera3d, mouse, deltaTime, overUI, VBO, VAO, cube, orthoProjection);
+		SDLEvents(event, window, settings, camera, camera3d, mouse, deltaTime, overUI, VBO, VAO, cube, orthoProjection);
 
 		// Start the ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -130,9 +130,14 @@ int main()
 		shader.use();
 		camera.Update();
 		if (orthoProjection)
+		{
 			camera.SetTransform(shader);
+			SDL_SetRelativeMouseMode(SDL_FALSE);
+		}
 		else
 		{
+			SDL_SetRelativeMouseMode(SDL_TRUE);
+
 			glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(camera3d.fov), (float)camera.viewport.cameraWidth / (float)camera.viewport.cameraHeight, 0.1f, 10000.0f);
 			
 			shader.setMat4("projection", projection);
@@ -142,9 +147,10 @@ int main()
 		}
 		mouse.Update(camera);
 
+
 		glm::mat4 cubeModel = glm::mat4(1.0f);
 		cubeModel = glm::translate(cubeModel, { 0, 0, 0 });
-		cubeModel = glm::scale(cubeModel, { 10, 10, 10 });
+		cubeModel = glm::scale(cubeModel, { 2, 2, 2 });
 		shader.setMat4("model", cubeModel);
 		shader.setVec3("mColor", { 1, 1, 1 });
 		cube.Draw(shader);
@@ -254,7 +260,9 @@ void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& 
 	ImGui::End();
 }
 
-void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& cube, bool& orthoProjection)
+bool tab = false;
+
+void SDLEvents(SDL_Event& event, SDL_Window* window, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& cube, bool& orthoProjection)
 {
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
@@ -301,6 +309,25 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D&
 				ConveyorManager::selectedConveyor->selectedPoint = Conveyor::ClosestPoint(ConveyorManager::selectedConveyor->path, mouse.position);
 			}
 		}break;
+		case SDL_MOUSEMOTION:
+		{
+			int offsetX = event.motion.xrel;
+			int offsetY = event.motion.yrel;
+
+			camera3d.yaw += mouse.sensitivity * offsetX;
+			camera3d.pitch -= mouse.sensitivity * offsetY;
+
+			if (camera3d.pitch > 89.0f) camera3d.pitch = 89.0f;
+			if (camera3d.pitch < -89.0f) camera3d.pitch = -89.0f;
+
+			glm::vec3 direction;
+			direction.x = cos(glm::radians(camera3d.pitch)) * cos(glm::radians(camera3d.yaw));
+			direction.z = sin(glm::radians(camera3d.pitch));
+			direction.y = -cos(glm::radians(camera3d.pitch)) * sin(glm::radians(camera3d.yaw));
+			camera3d.front = glm::normalize(direction);
+
+			camera3d.right = glm::normalize(glm::cross(camera3d.front, camera3d.up));
+		}break;
 		}
 	}
 
@@ -330,4 +357,11 @@ void SDLEvents(SDL_Event& event, Settings& settings, Camera2D& camera, Camera3D&
 	if (key[SDL_SCANCODE_LSHIFT]) camera3d.ProcessKeyboard(DOWN, deltaTime);
 	if (key[SDL_SCANCODE_R]) camera.position = glm::vec3(0, 0, 3);
 	if (key[SDL_SCANCODE_ESCAPE]) ConveyorManager::selectedConveyor = 0;
+	if (key[SDL_SCANCODE_TAB] && !tab)
+	{
+		tab = true;
+		orthoProjection = !orthoProjection;
+	}
+	if(!key[SDL_SCANCODE_TAB]) tab = false;
+
 }

@@ -22,3 +22,4 @@ void Camera3D::ProcessKeyboard(CameraMovement3D direction, float deltaTime)
 	if (direction == DOWN)
 		position -= up * velocity;
 }
+
