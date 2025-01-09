@@ -20,6 +20,9 @@ struct Viewport
 
 };
 
+/// <summary>
+/// Z omhoog en Y de diepte in met de huidige coordinaten
+/// </summary>
 class Camera2D 
 {
 public:
@@ -33,12 +36,12 @@ public:
 	float zoom = 1;
 	glm::mat4 projection;
 
-	Camera2D(glm::vec3 position)
+	Camera2D(glm::vec3 position = { 0.0f, 0.0f, 1.0f })
 	{
 		this->position = position;
 	}
 
-	void ProcessKeyboard(CameraMovement direction, float deltaTime);
+	void ProcessKeyboard(CameraMovement direction, float& deltaTime);
 	glm::mat4 GetViewMatrix(); //voor 3d
 	void Update();
 	void SetTransform(Shader& shader);

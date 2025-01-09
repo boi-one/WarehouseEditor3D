@@ -5,5 +5,7 @@
 class CameraManager
 {
 public:
-	static inline bool orthoProjection = true;
+	bool orthoProjection = true;
+	Camera2D camera2d;
+	Camera3D camera3d;
 };

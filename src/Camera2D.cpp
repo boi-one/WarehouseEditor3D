@@ -1,7 +1,7 @@
 #include "Camera2D.h"
 #include <iostream>
 
-void Camera2D::ProcessKeyboard(CameraMovement direction, float deltaTime)
+void Camera2D::ProcessKeyboard(CameraMovement direction, float& deltaTime)
 {
 	float velocity = movementSpeed * deltaTime;
 

@@ -14,7 +14,7 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEWHEEL:
 		{
-			mouse.Scroll(event, *camera2d);
+			mouse.Scroll(event, cameraManager->camera2d);
 		}break;
 		case SDL_MOUSEBUTTONDOWN:
 		{
@@ -30,7 +30,7 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEMOTION:
 		{
-			mouse.MouseMovement3D(event, *camera3d);
+			mouse.MouseMovement3D(event, cameraManager->camera3d);
 		}break;
 		}
 	}
@@ -38,10 +38,10 @@ void Input::SDLEvents()
 
 void Input::UpdateMouse(Mouse& mouse)
 {
-	mouse.Update(*camera2d);
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
 	mouse.SetScreenPosition(mouseX, mouseY);
+	mouse.Update(cameraManager->camera2d);
 }
 
 void Input::ProcessInput()
@@ -51,43 +51,43 @@ void Input::ProcessInput()
 		k.RegisterInput(key);
 }
 
-void Input::Update()
+void Input::Update(float deltaTime)
 {
 	SDLEvents();
-	mouse.Update(*camera2d);
+	UpdateMouse(mouse);
 	ProcessInput();
 
 	if (keys[W].Hold())
 	{
-		if (*orthoProjection) camera2d->ProcessKeyboard(Up, *deltaTime);
-		else camera3d->ProcessKeyboard(FORWARD, *deltaTime);
+		if (cameraManager->orthoProjection) cameraManager->camera2d.ProcessKeyboard(Up, deltaTime);
+		else cameraManager->camera3d.ProcessKeyboard(FORWARD, deltaTime);
 	}
 	if (keys[A].Hold())
 	{
-		if (*orthoProjection) camera2d->ProcessKeyboard(Left, *deltaTime);
-		else camera3d->ProcessKeyboard(LEFT, *deltaTime);
+		if (cameraManager->orthoProjection) cameraManager->camera2d.ProcessKeyboard(Left, deltaTime);
+		else cameraManager->camera3d.ProcessKeyboard(LEFT, deltaTime);
 	}
 	if (keys[S].Hold())
 	{
-		if (*orthoProjection) camera2d->ProcessKeyboard(Down, *deltaTime);
-		else camera3d->ProcessKeyboard(BACKWARD, *deltaTime);
+		if (cameraManager->orthoProjection) cameraManager->camera2d.ProcessKeyboard(Down, deltaTime);
+		else cameraManager->camera3d.ProcessKeyboard(BACKWARD, deltaTime);
 	}
 	if (keys[D].Hold())
 	{
-		if (*orthoProjection) camera2d->ProcessKeyboard(Right, *deltaTime);
-		else camera3d->ProcessKeyboard(RIGHT, *deltaTime);
+		if (cameraManager->orthoProjection) cameraManager->camera2d.ProcessKeyboard(Right, deltaTime);
+		else cameraManager->camera3d.ProcessKeyboard(RIGHT, deltaTime);
 	}
-	if (keys[SPACE].Hold() && !*orthoProjection)
+	if (keys[SPACE].Hold() && !cameraManager->orthoProjection)
 	{
-		camera3d->ProcessKeyboard(UP, *deltaTime);
+		cameraManager->camera3d.ProcessKeyboard(UP, deltaTime);
 	}
-	if (keys[LSHIFT].Hold() && !*orthoProjection)
+	if (keys[LSHIFT].Hold() && !cameraManager->orthoProjection)
 	{
-		camera3d->ProcessKeyboard(DOWN, *deltaTime);
+		cameraManager->camera3d.ProcessKeyboard(DOWN, deltaTime);
 	}
-	if (keys[R].Down() && *orthoProjection)
+	if (keys[R].Down() && cameraManager->orthoProjection)
 	{
-		camera2d->position = glm::vec3(0, 0, 3);
+		cameraManager->camera2d.position = glm::vec3(0, 0, 3);
 	}
 	if (keys[Z].Down())
 	{
@@ -99,7 +99,7 @@ void Input::Update()
 	}
 	if (keys[TAB].Down())
 	{
-		*orthoProjection = !*orthoProjection;
+		cameraManager->orthoProjection = !cameraManager->orthoProjection;
 	}
 }
 

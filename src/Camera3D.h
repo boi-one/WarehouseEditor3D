@@ -34,6 +34,6 @@ public:
 	}
 
 	glm::mat4 GetViewMatrix();
-	void ProcessKeyboard(CameraMovement3D direction, float deltaTime);
+	void ProcessKeyboard(CameraMovement3D direction, float& deltaTime);
 
 };

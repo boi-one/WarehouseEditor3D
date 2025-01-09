@@ -12,7 +12,7 @@ void Mouse::SetScreenPosition(int x, int y)
 
 void Mouse::MouseMovement3D(SDL_Event& event, Camera3D& camera3d)
 {
-	if (CameraManager::orthoProjection) return;
+	if (cameraManager->orthoProjection) return;
 	int offsetX = event.motion.xrel;
 	int offsetY = event.motion.yrel;
 

@@ -60,10 +60,7 @@ public:
 	Mouse mouse;
 
 private:
-	float* deltaTime = 0;
-	bool* orthoProjection = 0;
-	Camera2D* camera2d = 0;
-	Camera3D* camera3d = 0;
+	CameraManager* cameraManager = 0;
 	Settings* settings = 0;
 	
 	std::vector<Key> keys =
@@ -81,17 +78,15 @@ private:
 	};
 
 public:
-	Input(float* deltaTime, bool* orthoProjection, Camera2D* camera2d, Camera3D* camera3d, Settings* settings)
+	Input(CameraManager* cameraManager, Settings* settings)
 	{
-		this->deltaTime = deltaTime;
-		this->orthoProjection = orthoProjection;
-		this->camera2d = camera2d;
-		this->camera3d = camera3d;
+		this->cameraManager = cameraManager;
 		this->settings = settings;
+		mouse.cameraManager = cameraManager;
 	}
 
 	void SDLEvents();
 	void UpdateMouse(Mouse& mouse);
 	void ProcessInput();
-	void Update();
+	void Update(float deltaTime);
 };

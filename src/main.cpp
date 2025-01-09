@@ -1,5 +1,4 @@
-#include "imgui_impl_sdl2.h"
-#include "imgui_impl_opengl3.h"
+
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <GL/glew.h>
@@ -14,6 +13,7 @@
 #include "Conveyor.h"
 #include "Input.h"
 #include "Time.h"
+#include "UserInterface.h"
 
 void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& showAxes);
 
@@ -67,13 +67,13 @@ static InitReturn WindowInitialization(Camera2D& camera)
 
 int main()
 {
-#pragma region localvariables
-	Camera2D camera({ 0.0f, 0.0f, 1.0f }); //z omhoog en y de diepte in 2d
-	Camera3D camera3d;
-#pragma endregion localvariables
+	CameraManager cameraManager;
+	float currentFrame = 0;
+	float lastFrame = 0;
+	float deltaTime = 0;
 	
 #pragma region setup
-	InitReturn r = WindowInitialization(camera);
+	InitReturn r = WindowInitialization(cameraManager.camera2d);
 	if (r.failed == -1) return -1;
 	SDL_Window* window = r.window;
 	SDL_GLContext& gl_context = r.gl_context;
@@ -86,37 +86,30 @@ int main()
 	glDepthFunc(GL_LESS);
 #pragma endregion setup
 
-	Settings settings;
-	std::vector<Mesh> allMeshes;
 	Shader shader("shader.vert", "shader.frag");
 	shader.use();
-	GLuint VAO, VBO, EBO;
-	bool wireframe = false;
-	float dT = 0.0f;
-	float lastFrame = 0.0f;
-	bool overUI = false;
-	bool showAxes = true;
+
+	Settings settings;
+	Input input(&cameraManager, &settings);
+	UserInterface ui(&settings, &input.mouse, &cameraManager);
 	Mesh cube;
-	Input input(&dT, &CameraManager::orthoProjection, &camera, &camera3d, &settings);
-	cube.CreateCube();
+	Conveyor::mesh = &cube;
 	// Main loop
 	while (settings.appRunning)
 	{
-		float deltaTime = Time::GetDeltaTime();
-		dT = deltaTime;
-		//SDLEvents(event, window, settings, camera, camera3d, mouse, deltaTime, overUI, VBO, VAO, cube, orthoProjection);
-		input.Update();
+		currentFrame = (float)SDL_GetTicks() / 1000;
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 
-		// Start the ImGui frame
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
+		input.Update(deltaTime);
+		ui.NewImGuiFrame();
 
+#pragma region maakanderclass
 		// Rendering
-		SDL_GetWindowSize(window, &camera.viewport.windowWidth, &camera.viewport.windowHeight);
-		SDL_GL_GetDrawableSize(window, &camera.viewport.windowWidth, &camera.viewport.windowHeight);
-		glViewport(0, 0, camera.viewport.windowWidth, camera.viewport.windowHeight);
-		if (CameraManager::orthoProjection)	glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
+		SDL_GetWindowSize(window, &cameraManager.camera2d.viewport.windowWidth, &cameraManager.camera2d.viewport.windowHeight);
+		SDL_GL_GetDrawableSize(window, &cameraManager.camera2d.viewport.windowWidth, &cameraManager.camera2d.viewport.windowHeight);
+		glViewport(0, 0, cameraManager.camera2d.viewport.windowWidth, cameraManager.camera2d.viewport.windowHeight);
+		if (cameraManager.orthoProjection)	glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
 		else glClearColor(0.25f, 0.25f, 1.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -127,41 +120,46 @@ int main()
 		// imgui render
 		//swap window
 		shader.use();
-		camera.Update();
+#pragma endregion maakanderclass
+		cameraManager.camera2d.Update();
 
-		if (CameraManager::orthoProjection)
+		//TODO: lees wat er bij alle pragma regions staan in deze loop
+#pragma region verplaats_naar_cameraManager
+		if (cameraManager.orthoProjection)
 		{
-			camera.SetTransform(shader);
+			cameraManager.camera2d.SetTransform(shader);
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 		}
 		else
 		{
 			SDL_SetRelativeMouseMode(SDL_TRUE);
 
-			glm::mat4 projection = glm::perspectiveRH_NO(glm::radians(camera3d.fov), (float)camera.viewport.cameraWidth / (float)camera.viewport.cameraHeight, 0.1f, 10000.0f);
+			glm::mat4 projection = glm::perspectiveRH_NO(glm::radians(cameraManager.camera3d.fov), (float)cameraManager.camera2d.viewport.cameraWidth / (float)cameraManager.camera2d.viewport.cameraHeight, 0.1f, 10000.0f);
 			
 			shader.setMat4("projection", projection);
 
-			glm::mat4 view = camera3d.GetViewMatrix();
+			glm::mat4 view = cameraManager.camera3d.GetViewMatrix();
 			shader.setMat4("view", view);
 		}
+#pragma endregion verplaats_naar_cameraManager
 
-
-		glm::mat4 cubeModel = glm::mat4(1.0f);
-		cubeModel = glm::translate(cubeModel, { 0, 0, 0 });
-		cubeModel = glm::scale(cubeModel, { 2, 2, 2 });
-		shader.setMat4("model", cubeModel);
+		glm::mat4 cubeModelMatrix = glm::mat4(1.0f);
+		cubeModelMatrix = glm::translate(cubeModelMatrix, { 0, 0, 0 });
+		cubeModelMatrix = glm::scale(cubeModelMatrix, { 2, 2, 2 });
+		shader.setMat4("model", cubeModelMatrix);
 		shader.setVec3("mColor", { 1, 1, 1 });
 		cube.Draw(shader);
 		shader.setVec3("mColor", { 1, 0, 0 });
 
+
+#pragma region verplaats_naar_conveyorManager
 		if (ConveyorManager::selectedConveyor)
 		{
-			ConveyorManager::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, input.mouse.position, cube, shader);
+			Conveyor::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, input.mouse.position, shader);
 		}
 
 		int axes = 0;
-		if (showAxes) axes = 3;
+		if (settings.showAxes) axes = 3;
 		for (int i = 0; i < axes; i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
@@ -217,8 +215,9 @@ int main()
 				cube.Draw(shader);
 			}
 		}
+#pragma endregion verplaats_naar_conveyorManager
 
-		UI(overUI, wireframe, deltaTime, input.mouse, camera, camera3d, camera.viewport.windowWidth, camera.viewport.windowHeight, CameraManager::orthoProjection, showAxes);
+		ui.InterfaceInteraction(deltaTime);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -234,28 +233,4 @@ int main()
 	SDL_Quit();
 
 	return 0;
-}
-
-void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& showAxes)
-{
-	ImGui::Begin("test");
-	overUI = ImGui::IsWindowHovered();
-	ImGui::Text("FPS: %.0f", 1 / deltaTime);
-	ImGui::Text("- Mouse position: X %.0f, Y %.0f", mouse.position.x, mouse.position.y);
-	ImGui::Text("- Camera position: X %.0f, Y %.0f", camera.position.x, camera.position.y);
-	ImGui::Text("- 3D Camera position: X %.0f, Y %.0f, Z %.0f", camera3d.position.x, camera3d.position.y, camera3d.position.z);
-	ImGui::Text("- Screen resolution: X %d, Y %d", display_w, display_h);
-	if (ImGui::Button("wireframe"))
-	{
-		wireframe = !wireframe;
-		if (wireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-	if (ImGui::Button("show axes")) showAxes = !showAxes;
-	const char* currentProjection = orthoProjection ? "ortho (2D)" : "perspective (3D)";
-	if (ImGui::Button(currentProjection)) orthoProjection = !orthoProjection;
-
-	ImGui::End();
 }
