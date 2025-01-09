@@ -39,11 +39,32 @@ void Conveyor::DrawLine(glm::vec3& start, glm::vec3& end, Shader& shader)
 	model = glm::rotate(model, meshAngle, { 0, 0, 1 });
 
 	float length = glm::distance(start, end);
-	this->mesh->scale.x = length / 2.f;
-	model = glm::scale(model, this->mesh->scale);
+	mesh.scale.x = length / 2.f;
+	model = glm::scale(model, mesh.scale);
 
 	shader.setMat4("model", model);
-	this->mesh->Draw(shader);
+	mesh.Draw(shader);
+}
+
+void Conveyor::Place(glm::vec3 position)
+{
+	if (!ConveyorManager::selectedConveyor)
+	{
+		Conveyor c;
+		c.path.push_back(glm::vec3(position.x, position.y, -1));
+		
+		std::cout << c.path.size() << std::endl;
+		
+		c.selectedPoint = &c.path.at(c.path.size() - 1);
+		ConveyorManager::allConveyors.push_back(c);
+		ConveyorManager::selectedConveyor = &ConveyorManager::allConveyors.at(ConveyorManager::allConveyors.size() - 1);
+		ConveyorManager::selectedConveyor->selectedPoint = &ConveyorManager::selectedConveyor->path.at(ConveyorManager::selectedConveyor->path.size() - 1);
+	}
+	else
+	{
+		ConveyorManager::selectedConveyor->path.push_back(glm::vec3(position.x, position.y, -1));
+		ConveyorManager::selectedConveyor->selectedPoint = &ConveyorManager::selectedConveyor->path.at(ConveyorManager::selectedConveyor->path.size() - 1);
+	}
 }
 
 void ConveyorManager::DrawNewLine(glm::vec3& start, glm::vec3& end, Mesh& mesh, Shader& shader)

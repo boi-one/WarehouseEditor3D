@@ -1,6 +1,7 @@
 #pragma once
 #include "Mesh.h"
 #include "Shader.h"
+#include "Mouse.h"
 
 class Point
 {
@@ -19,12 +20,13 @@ class Conveyor
 {
 public:
 	bool selected;
-	Mesh* mesh = 0;
+	Mesh mesh = Mesh({20, 20, 20});
 	std::vector<Point> path;
 	Point* selectedPoint = 0;
 
 	static Point* ClosestPoint(std::vector<Point> list, glm::vec3 origin, float range = 99999);
 	void DrawLine(glm::vec3& start, glm::vec3& end, Shader& shader);
+	static void Place(glm::vec3 position);
 };
 
 class ConveyorManager

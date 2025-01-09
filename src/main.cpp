@@ -8,14 +8,13 @@
 
 #include "Settings.h"
 #include "Shader.h"
-#include "Camera2D.h"
-#include "Camera3D.h"
+#include "CameraManager.h"
 #include "Mesh.h"
 #include "Mouse.h"
 #include "Conveyor.h"
 #include "Input.h"
+#include "Time.h"
 
-void SDLEvents(SDL_Event& event, SDL_Window* window, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& cube, bool& orthoProjection);
 void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& showAxes);
 
 struct InitReturn
@@ -88,29 +87,25 @@ int main()
 #pragma endregion setup
 
 	Settings settings;
-	Mouse mouse;
 	std::vector<Mesh> allMeshes;
 	Shader shader("shader.vert", "shader.frag");
 	shader.use();
 	GLuint VAO, VBO, EBO;
 	bool wireframe = false;
-	float deltaTime = 0.0f;
+	float dT = 0.0f;
 	float lastFrame = 0.0f;
 	bool overUI = false;
-	bool orthoProjection = true;
 	bool showAxes = true;
 	Mesh cube;
-	Input input(&deltaTime, &orthoProjection, &camera, &camera3d, &settings);
+	Input input(&dT, &CameraManager::orthoProjection, &camera, &camera3d, &settings);
 	cube.CreateCube();
 	// Main loop
 	while (settings.appRunning)
 	{
-		float currentFrame = (float)SDL_GetTicks() / 1000;
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		SDL_Event event;
-		SDLEvents(event, window, settings, camera, camera3d, mouse, deltaTime, overUI, VBO, VAO, cube, orthoProjection);
+		float deltaTime = Time::GetDeltaTime();
+		dT = deltaTime;
+		//SDLEvents(event, window, settings, camera, camera3d, mouse, deltaTime, overUI, VBO, VAO, cube, orthoProjection);
+		input.Update();
 
 		// Start the ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -121,7 +116,7 @@ int main()
 		SDL_GetWindowSize(window, &camera.viewport.windowWidth, &camera.viewport.windowHeight);
 		SDL_GL_GetDrawableSize(window, &camera.viewport.windowWidth, &camera.viewport.windowHeight);
 		glViewport(0, 0, camera.viewport.windowWidth, camera.viewport.windowHeight);
-		if (orthoProjection)	glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
+		if (CameraManager::orthoProjection)	glClearColor(0.45f, 0.55f, 1.00f, 1.00f);
 		else glClearColor(0.25f, 0.25f, 1.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -133,10 +128,8 @@ int main()
 		//swap window
 		shader.use();
 		camera.Update();
-		input.KeyInput();
-		input.Update();
 
-		if (orthoProjection)
+		if (CameraManager::orthoProjection)
 		{
 			camera.SetTransform(shader);
 			SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -145,14 +138,13 @@ int main()
 		{
 			SDL_SetRelativeMouseMode(SDL_TRUE);
 
-			glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(camera3d.fov), (float)camera.viewport.cameraWidth / (float)camera.viewport.cameraHeight, 0.1f, 10000.0f);
+			glm::mat4 projection = glm::perspectiveRH_NO(glm::radians(camera3d.fov), (float)camera.viewport.cameraWidth / (float)camera.viewport.cameraHeight, 0.1f, 10000.0f);
 			
 			shader.setMat4("projection", projection);
 
 			glm::mat4 view = camera3d.GetViewMatrix();
 			shader.setMat4("view", view);
 		}
-		mouse.Update(camera);
 
 
 		glm::mat4 cubeModel = glm::mat4(1.0f);
@@ -165,7 +157,7 @@ int main()
 
 		if (ConveyorManager::selectedConveyor)
 		{
-			ConveyorManager::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, mouse.position, cube, shader);
+			ConveyorManager::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, input.mouse.position, cube, shader);
 		}
 
 		int axes = 0;
@@ -226,7 +218,7 @@ int main()
 			}
 		}
 
-		UI(overUI, wireframe, deltaTime, mouse, camera, camera3d, camera.viewport.windowWidth, camera.viewport.windowHeight, orthoProjection, showAxes);
+		UI(overUI, wireframe, deltaTime, input.mouse, camera, camera3d, camera.viewport.windowWidth, camera.viewport.windowHeight, CameraManager::orthoProjection, showAxes);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -264,81 +256,6 @@ void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& 
 	if (ImGui::Button("show axes")) showAxes = !showAxes;
 	const char* currentProjection = orthoProjection ? "ortho (2D)" : "perspective (3D)";
 	if (ImGui::Button(currentProjection)) orthoProjection = !orthoProjection;
+
 	ImGui::End();
-}
-
-bool tab = false;
-
-void SDLEvents(SDL_Event& event, SDL_Window* window, Settings& settings, Camera2D& camera, Camera3D& camera3d, Mouse& mouse, float deltaTime, bool& overUI, GLuint& VBO, GLuint& VAO, Mesh& cube, bool& orthoProjection)
-{
-	int mouseX, mouseY;
-	SDL_GetMouseState(&mouseX, &mouseY);
-	mouse.SetScreenPosition(mouseX, mouseY);
-
-	while (SDL_PollEvent(&event))
-	{
-		ImGui_ImplSDL2_ProcessEvent(&event);
-		switch (event.type)
-		{
-		case SDL_QUIT:
-		{
-			settings.appRunning = false;
-		}break;
-		case SDL_MOUSEWHEEL:
-		{
-			if (overUI) break;
-			if (event.wheel.y < 0 && camera.zoom > 0.4f) camera.zoom -= 0.4f;
-			if (event.wheel.y > 0 && camera.zoom < 8) camera.zoom += 0.4f;
-		}break;
-		case SDL_MOUSEBUTTONDOWN:
-		{
-			if (overUI) break;
-			if (event.button.button == SDL_BUTTON_LEFT)
-			{
-				if (!ConveyorManager::selectedConveyor)
-				{
-					Conveyor c;
-					c.mesh = &cube;
-					c.path.push_back(glm::vec3(mouse.position.x, mouse.position.y, -1));
-					c.selectedPoint = &c.path.at(c.path.size() - 1);
-					ConveyorManager::allConveyors.push_back(c);
-					ConveyorManager::selectedConveyor = &ConveyorManager::allConveyors.at(ConveyorManager::allConveyors.size() - 1);
-					ConveyorManager::selectedConveyor->selectedPoint = &ConveyorManager::selectedConveyor->path.at(ConveyorManager::selectedConveyor->path.size() - 1);
-				}
-				else
-				{
-					ConveyorManager::selectedConveyor->path.push_back(glm::vec3(mouse.position.x, mouse.position.y, -1));
-					ConveyorManager::selectedConveyor->selectedPoint = &ConveyorManager::selectedConveyor->path.at(ConveyorManager::selectedConveyor->path.size() - 1);
-				}
-			}
-			if (event.button.button == SDL_BUTTON_RIGHT)
-			{//crashes
-				ConveyorManager::selectedConveyor->selectedPoint = Conveyor::ClosestPoint(ConveyorManager::selectedConveyor->path, mouse.position);
-			}
-		}break;
-		case SDL_MOUSEMOTION:
-		{
-			if (orthoProjection) break;
-			int offsetX = event.motion.xrel;
-			int offsetY = event.motion.yrel;
-
-			camera3d.yaw += mouse.sensitivity * offsetX;
-			camera3d.pitch -= mouse.sensitivity * offsetY;
-
-			if (camera3d.pitch > 89.0f) camera3d.pitch = 89.0f;
-			if (camera3d.pitch < -89.0f) camera3d.pitch = -89.0f;
-
-			glm::vec3 direction;
-			direction.x = cos(glm::radians(camera3d.pitch)) * cos(glm::radians(camera3d.yaw));
-			direction.z = sin(glm::radians(camera3d.pitch));
-			direction.y = -cos(glm::radians(camera3d.pitch)) * sin(glm::radians(camera3d.yaw));
-			camera3d.front = glm::normalize(direction);
-
-			camera3d.right = glm::normalize(glm::cross(camera3d.front, camera3d.up));
-		}break;
-		}
-	}
-
-	
-
 }
