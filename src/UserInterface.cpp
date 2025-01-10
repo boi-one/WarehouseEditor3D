@@ -17,8 +17,9 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 {
 	if (settings->showInfo)
 	{
-		ImGui::Begin("Info");
+		ImGui::Begin("Info", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 		mouse->overUI = ImGui::IsWindowHovered();
+		ImGui::SetWindowPos({10, 10});
 		ImGui::Text("FPS: %.0f", 1 / deltaTime);
 		ImGui::Text("- Mouse position: X %.0f, Y %.0f", mouse->position.x, mouse->position.y);
 		ImGui::Text("- 2D Camera position: X %.0f, Y %.0f", cameraManager->camera2d.position.x, cameraManager->camera2d.position.y);
@@ -31,9 +32,9 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 	{
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 		ImGui::Begin("Settings & Help", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-		ImGui::SetWindowSize({ cameraManager->camera2d.viewport.cameraWidth / 4, cameraManager->camera2d.viewport.cameraWidth / 7 }, ImGuiCond_Once);
-		glm::vec2 centerScreen(cameraManager->camera2d.viewport.cameraWidth / 2, cameraManager->camera2d.viewport.cameraHeight / 2);
-		ImGui::SetWindowPos({ centerScreen.x - ImGui::GetWindowSize().x / 2, centerScreen.y - ImGui::GetWindowSize().y / 2 }, ImGuiCond_Once);
+		ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 4, (float)cameraManager->camera2d.viewport.windowWidth/ 7 });
+		glm::vec2 centerScreen((float)cameraManager->camera2d.viewport.windowWidth / 2, (float)cameraManager->camera2d.viewport.windowHeight / 2);
+		ImGui::SetWindowPos({ centerScreen.x - ImGui::GetWindowSize().x / 2, centerScreen.y - ImGui::GetWindowSize().y / 2 });
 		mouse->overUI = ImGui::IsWindowHovered();
 
 		if (ImGui::Button("Save"));

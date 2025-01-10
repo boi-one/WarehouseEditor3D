@@ -49,4 +49,5 @@ public:
 	}
 	void CreateCube();
 	void Draw(Shader& shader);
+	void RenderAxis(Shader& shader, bool& showAxes);
 };

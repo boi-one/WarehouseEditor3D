@@ -34,7 +34,8 @@ class ConveyorManager
 public:
 	static inline Conveyor* selectedConveyor = 0;
 	static inline std::vector<Conveyor> allConveyors;
-	void SelectConveyor(glm::vec3& mousePosition);
+	static void SelectConveyor(glm::vec3& mousePosition);
+	static void RenderConveyors(Shader& shader, Mesh& cube, bool& orthoProjection, glm::vec3 mousePosition);
 };
 
 

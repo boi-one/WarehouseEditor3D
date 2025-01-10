@@ -12,7 +12,13 @@ enum CameraMovement
 
 struct Viewport
 {
+	/// <summary>
+	/// size of the window (amount of pixels width and height)
+	/// </summary>
 	int windowWidth = 1280;
+	/// /// <summary>
+	/// size of the window (amount of pixels width and height)
+	/// </summary>
 	int windowHeight = 720;
 
 	float cameraWidth, cameraHeight;

@@ -14,6 +14,7 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEWHEEL:
 		{
+			if (settings->openSettings) break;
 			mouse.Scroll(event, cameraManager->camera2d);
 		}break;
 		case SDL_MOUSEBUTTONDOWN:

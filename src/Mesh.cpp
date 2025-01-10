@@ -70,3 +70,44 @@ void Mesh::Draw(Shader& shader)
 	glDrawElements(GL_TRIANGLES, verticesCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
+
+void Mesh::RenderAxis(Shader& shader, bool& showAxes)
+{
+	int axes = 0;
+	if (showAxes) axes = 3;
+	if (axes > 0)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, { 0, 0, 0 });
+		model = glm::scale(model, { 2, 2, 2 });
+		shader.setMat4("model", model);
+		shader.setVec3("mColor", { 1, 1, 1 });
+		Draw(shader);
+		shader.setVec3("mColor", { 1, 0, 0 });
+	}
+	for (int i = 0; i < axes; i++)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+		if (i == 0)
+		{
+			shader.setVec3("mColor", { 1, 0, 0 });
+			model = glm::scale(model, { 9000, 1, 1 });
+			shader.setMat4("model", model);
+		}
+		if (i == 1)
+		{
+			shader.setVec3("mColor", { 0, 1, 0 });
+			model = glm::scale(model, { 1, 9000, 1 });
+			shader.setMat4("model", model);
+		}
+		if (i == 2)
+		{
+			shader.setVec3("mColor", { 0, 0, 1 });
+			model = glm::scale(model, { 1, 1, 9000 });
+			shader.setMat4("model", model);
+		}
+
+		Draw(shader);
+	}
+	shader.setVec3("mColor", { 1, 1, 1 });
+}

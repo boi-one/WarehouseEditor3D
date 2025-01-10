@@ -71,7 +71,7 @@ int main()
 	float currentFrame = 0;
 	float lastFrame = 0;
 	float deltaTime = 0;
-	
+
 #pragma region setup
 	InitReturn r = WindowInitialization(cameraManager.camera2d);
 	if (r.failed == -1) return -1;
@@ -104,7 +104,6 @@ int main()
 		input.Update(deltaTime);
 		ui.NewImGuiFrame();
 
-#pragma region maakanderclass
 		// Rendering
 		SDL_GetWindowSize(window, &cameraManager.camera2d.viewport.windowWidth, &cameraManager.camera2d.viewport.windowHeight);
 		SDL_GL_GetDrawableSize(window, &cameraManager.camera2d.viewport.windowWidth, &cameraManager.camera2d.viewport.windowHeight);
@@ -113,15 +112,13 @@ int main()
 		else glClearColor(0.25f, 0.25f, 1.00f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		//order:
-		// clear color
-		// openGL code
-		// imgui code
-		// imgui render
-		//swap window
+		//order: clear color -> openGL code -> imgui code -> imgui render -> swap window
 		shader.use();
-#pragma endregion maakanderclass
 		cameraManager.camera2d.Update();
+
+		//TODO: - implementeer alle oude features in 2d
+		//		- (misschien ook in 3d met raycast)
+		//		- documentatie (summaries en extern)
 
 		//TODO: lees wat er bij alle pragma regions staan in deze loop
 #pragma region verplaats_naar_cameraManager
@@ -132,93 +129,18 @@ int main()
 		}
 		else
 		{
-			if(!settings.openSettings) SDL_SetRelativeMouseMode(SDL_TRUE);
+			if (!settings.openSettings) SDL_SetRelativeMouseMode(SDL_TRUE);
 
 			glm::mat4 projection = glm::perspectiveRH_NO(glm::radians(cameraManager.camera3d.fov), (float)cameraManager.camera2d.viewport.cameraWidth / (float)cameraManager.camera2d.viewport.cameraHeight, 0.1f, 10000.0f);
-			
+
 			shader.setMat4("projection", projection);
 
 			glm::mat4 view = cameraManager.camera3d.GetViewMatrix();
 			shader.setMat4("view", view);
 		}
-#pragma endregion verplaats_naar_cameraManager
 
-		glm::mat4 cubeModelMatrix = glm::mat4(1.0f);
-		cubeModelMatrix = glm::translate(cubeModelMatrix, { 0, 0, 0 });
-		cubeModelMatrix = glm::scale(cubeModelMatrix, { 2, 2, 2 });
-		shader.setMat4("model", cubeModelMatrix);
-		shader.setVec3("mColor", { 1, 1, 1 });
-		cube.Draw(shader);
-		shader.setVec3("mColor", { 1, 0, 0 });
-
-
-#pragma region verplaats_naar_conveyorManager
-		if (!cameraManager.orthoProjection)
-			ConveyorManager::selectedConveyor = 0;
-		if (ConveyorManager::selectedConveyor && cameraManager.orthoProjection)
-		{
-			Conveyor::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, input.mouse.position, shader);
-		}
-
-		int axes = 0;
-		if (settings.showAxes) axes = 3;
-		for (int i = 0; i < axes; i++)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			if (i == 0)
-			{
-				shader.setVec3("mColor", { 1, 0, 0 });
-				model = glm::scale(model, { 9000, 1, 1 });
-				shader.setMat4("model", model);
-			}
-			if (i == 1)
-			{
-				shader.setVec3("mColor", { 0, 1, 0 });
-				model = glm::scale(model, { 1, 9000, 1 });
-				shader.setMat4("model", model);
-			}
-			if (i == 2)
-			{
-				shader.setVec3("mColor", { 0, 0, 1 });
-				model = glm::scale(model, { 1, 1, 9000 });
-				shader.setMat4("model", model);
-			}
-			
-			cube.Draw(shader);
-		}
-		shader.setVec3("mColor", { 1, 1, 1 });
-
-		for (Conveyor& c : ConveyorManager::allConveyors) //draw lines
-		{
-			glm::vec3 color = { 1, 1, 1 };
-			shader.setVec3("mColor", color);
-			for (int i = 0; i < c.path.size() - 1; i++)
-			{
-				c.DrawLine(c.path.at(i).position, c.path.at(i + 1).position, shader);
-			}
-		}
-		for (Conveyor& c : ConveyorManager::allConveyors)
-		{
-			for (Point& p : c.path) //draw points
-			{
-				glm::vec3 color = { 1, 1, 1 };
-
-				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, p.position);
-				model = glm::scale(model, { 11, 11, 11 });
-				shader.setMat4("model", model);
-
-				if (ConveyorManager::selectedConveyor && ConveyorManager::selectedConveyor->selectedPoint && &p == ConveyorManager::selectedConveyor->selectedPoint)
-				{
-					color = { 1, 0, 0 };
-				}
-
-				shader.setVec3("mColor", color);
-				cube.Draw(shader);
-			}
-		}
-#pragma endregion verplaats_naar_conveyorManager
-
+		cube.RenderAxis(shader, settings.showAxes);
+		ConveyorManager::RenderConveyors(shader, cube, cameraManager.orthoProjection, input.mouse.position);
 		ui.InterfaceInteraction(deltaTime);
 
 		ImGui::Render();

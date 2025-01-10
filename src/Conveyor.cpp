@@ -10,6 +10,46 @@ void ConveyorManager::SelectConveyor(glm::vec3& mousePosition)
 
 }
 
+void ConveyorManager::RenderConveyors(Shader& shader, Mesh& cube, bool& orthoProjection, glm::vec3 mousePosition)
+{
+	if (!orthoProjection)
+		ConveyorManager::selectedConveyor = 0;
+	if (ConveyorManager::selectedConveyor && orthoProjection)
+	{
+		Conveyor::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, mousePosition, shader);
+	}
+
+	for (Conveyor& c : ConveyorManager::allConveyors) //draw lines
+	{
+		glm::vec3 color = { 1, 1, 1 };
+		shader.setVec3("mColor", color);
+		for (int i = 0; i < c.path.size() - 1; i++)
+		{
+			c.DrawLine(c.path.at(i).position, c.path.at(i + 1).position, shader);
+		}
+	}
+	for (Conveyor& c : ConveyorManager::allConveyors)
+	{
+		for (Point& p : c.path) //draw points
+		{
+			glm::vec3 color = { 1, 1, 1 };
+
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, p.position);
+			model = glm::scale(model, { 11, 11, 11 });
+			shader.setMat4("model", model);
+
+			if (ConveyorManager::selectedConveyor && ConveyorManager::selectedConveyor->selectedPoint && &p == ConveyorManager::selectedConveyor->selectedPoint)
+			{
+				color = { 1, 0, 0 };
+			}
+
+			shader.setVec3("mColor", color);
+			cube.Draw(shader);
+		}
+	}
+}
+
 Point* Conveyor::ClosestPoint(std::vector<Point> list, glm::vec3 origin, float range)
 {
 	float closestDistance = range;
