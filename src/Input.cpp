@@ -21,6 +21,7 @@ void Input::SDLEvents()
 			if (mouse.overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
+				if (settings->openSettings || !cameraManager->orthoProjection) break;
 				Conveyor::Place(mouse.position);
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)
@@ -30,6 +31,11 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEMOTION:
 		{
+			if (settings->openSettings)
+			{
+				ConveyorManager::selectedConveyor = 0;
+				break;
+			}
 			mouse.MouseMovement3D(event, cameraManager->camera3d);
 		}break;
 		}
@@ -57,6 +63,32 @@ void Input::Update(float deltaTime)
 	UpdateMouse(mouse);
 	ProcessInput();
 
+	if (!settings->openSettings) Movement(deltaTime);
+
+	if (keys[R].Down() && cameraManager->orthoProjection)
+	{
+		cameraManager->camera2d.position = glm::vec3(0, 0, 3);
+	}
+	if (keys[Z].Down())
+	{
+		ConveyorManager::selectedConveyor = 0;
+	}
+	if (keys[ESC].Down())
+	{
+		settings->openSettings = !settings->openSettings;
+	}
+	if (keys[TAB].Down())
+	{
+		cameraManager->orthoProjection = !cameraManager->orthoProjection;
+	}
+	if (keys[I].Down())
+	{
+		settings->showInfo = !settings->showInfo;
+	}
+}
+
+void Input::Movement(float deltaTime)
+{
 	if (keys[W].Hold())
 	{
 		if (cameraManager->orthoProjection) cameraManager->camera2d.ProcessKeyboard(Up, deltaTime);
@@ -84,22 +116,6 @@ void Input::Update(float deltaTime)
 	if (keys[LSHIFT].Hold() && !cameraManager->orthoProjection)
 	{
 		cameraManager->camera3d.ProcessKeyboard(DOWN, deltaTime);
-	}
-	if (keys[R].Down() && cameraManager->orthoProjection)
-	{
-		cameraManager->camera2d.position = glm::vec3(0, 0, 3);
-	}
-	if (keys[Z].Down())
-	{
-		ConveyorManager::selectedConveyor = 0;
-	}
-	if (keys[ESC].Down())
-	{
-		settings->openSettings = !settings->openSettings;
-	}
-	if (keys[TAB].Down())
-	{
-		cameraManager->orthoProjection = !cameraManager->orthoProjection;
 	}
 }
 

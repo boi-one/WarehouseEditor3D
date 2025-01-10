@@ -19,6 +19,7 @@ enum Keys
 	R,
 	Z,
 	LSHIFT,
+	I,
 };
 
 class Input
@@ -75,6 +76,7 @@ private:
 		Key(Keys::R, SDL_SCANCODE_R),
 		Key(Keys::Z, SDL_SCANCODE_Z),
 		Key(Keys::LSHIFT, SDL_SCANCODE_LSHIFT),
+		Key(Keys::I, SDL_SCANCODE_I),
 	};
 
 public:
@@ -89,4 +91,5 @@ public:
 	void UpdateMouse(Mouse& mouse);
 	void ProcessInput();
 	void Update(float deltaTime);
+	void Movement(float deltaTime);
 };

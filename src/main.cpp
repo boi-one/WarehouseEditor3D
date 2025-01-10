@@ -132,7 +132,7 @@ int main()
 		}
 		else
 		{
-			SDL_SetRelativeMouseMode(SDL_TRUE);
+			if(!settings.openSettings) SDL_SetRelativeMouseMode(SDL_TRUE);
 
 			glm::mat4 projection = glm::perspectiveRH_NO(glm::radians(cameraManager.camera3d.fov), (float)cameraManager.camera2d.viewport.cameraWidth / (float)cameraManager.camera2d.viewport.cameraHeight, 0.1f, 10000.0f);
 			
@@ -153,7 +153,9 @@ int main()
 
 
 #pragma region verplaats_naar_conveyorManager
-		if (ConveyorManager::selectedConveyor)
+		if (!cameraManager.orthoProjection)
+			ConveyorManager::selectedConveyor = 0;
+		if (ConveyorManager::selectedConveyor && cameraManager.orthoProjection)
 		{
 			Conveyor::DrawNewLine(ConveyorManager::selectedConveyor->selectedPoint->position, input.mouse.position, shader);
 		}

@@ -6,4 +6,5 @@ struct Settings
 	bool openSettings = false;
 	bool wireframe = false;
 	bool showAxes = true;
+	bool showInfo = true;
 };

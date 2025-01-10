@@ -22,5 +22,9 @@ public:
 		this->cameraManager = cameraManager;
 	}
 	void NewImGuiFrame();
+	const char* SettingEnabled(bool b, const char* enabled = "enabled", const char* disabled = "disabled");
 	void InterfaceInteraction(float deltaTime);
+
+	void VisualSettings();
+	void Camera3DSettings();
 };
