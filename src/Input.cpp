@@ -23,11 +23,18 @@ void Input::SDLEvents()
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
 				if (settings->openSettings || !cameraManager->orthoProjection) break;
-				Conveyor::Place(mouse.position);
+				if (!layerManager->selectedLayer->selectedConveyor)
+				{
+					layerManager->selectedLayer->selectedConveyor = &layerManager->selectedLayer->allConveyors.emplace_back(Conveyor());
+					layerManager->selectedLayer->selectedConveyor->selected = true;
+				}
+				layerManager->selectedLayer->selectedConveyor->Place(mouse.position);
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{//crashes
-				ConveyorManager::selectedConveyor->selectedPoint = Conveyor::ClosestPoint(ConveyorManager::selectedConveyor->path, mouse.position);
+				if (!layerManager->selectedLayer || !layerManager->selectedLayer->selectedConveyor) break;
+				layerManager->selectedLayer->selectedConveyor->selectedPoint = 
+					layerManager->selectedLayer->selectedConveyor->ClosestPoint(layerManager->selectedLayer->selectedConveyor->path, mouse.position);
 			}
 		}break;
 		case SDL_MOUSEMOTION:
@@ -72,7 +79,10 @@ void Input::Update(float deltaTime)
 	}
 	if (keys[Z].Down())
 	{
-		ConveyorManager::selectedConveyor = 0;
+		if (!layerManager->selectedLayer->selectedConveyor) return;
+		layerManager->selectedLayer->selectedConveyor->selected = false;
+		layerManager->selectedLayer->selectedConveyor = 0;
+		layerManager->selectedLayer->UnselectConveyors();
 	}
 	if (keys[ESC].Down())
 	{

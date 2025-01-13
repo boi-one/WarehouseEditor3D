@@ -111,3 +111,37 @@ void Mesh::RenderAxis(Shader& shader, bool& showAxes)
 	}
 	shader.setVec3("mColor", { 1, 1, 1 });
 }
+
+void Mesh::DrawLine(Shader& shader, glm::vec3& color, glm::vec3& start, glm::vec3& end, bool ortho)
+{
+	shader.setVec3("mColor", color);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::vec3 pivot = (start + end);
+	model = glm::translate(model, pivot / 2.f);
+
+	const double pi = 3.14159265358979323846;
+	float angle = 0;
+	if (ortho) //2d rotation
+	{
+		angle = atan2(start.y - end.y, start.x - end.x);
+		model = glm::rotate(model, angle, { 0, 0, 1 });
+	}
+	else //3d rotation
+	{
+		glm::vec3 direction = glm::normalize(end - start);
+		const glm::vec3 defaultAxis = { 1.0f, 0.0f, 0.0f };
+		glm::vec3 rotationAxis = glm::cross(defaultAxis, direction);
+		angle = acos(glm::dot(defaultAxis, direction));
+		model = glm::rotate(model, angle, glm::normalize(rotationAxis));
+	}
+
+	float length = glm::distance(start, end);
+	scale.x = length / 2.f;
+	model = glm::scale(model, scale);
+
+	shader.setMat4("model", model);
+	Draw(shader);
+
+	shader.setVec3("mColor", { 1, 1, 1 });
+}

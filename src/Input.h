@@ -5,6 +5,7 @@
 #include "CameraManager.h"
 #include "Mouse.h"
 #include "Settings.h"
+#include "LayerManager.h"
 #include "Conveyor.h"
 
 enum Keys
@@ -63,6 +64,7 @@ public:
 private:
 	CameraManager* cameraManager = 0;
 	Settings* settings = 0;
+	LayerManager* layerManager = 0;
 	
 	std::vector<Key> keys =
 	{
@@ -80,11 +82,12 @@ private:
 	};
 
 public:
-	Input(CameraManager* cameraManager, Settings* settings)
+	Input(CameraManager* cameraManager, Settings* settings, LayerManager* layerManager)
 	{
 		this->cameraManager = cameraManager;
 		this->settings = settings;
 		mouse.cameraManager = cameraManager;
+		this->layerManager = layerManager;
 	}
 
 	void SDLEvents();

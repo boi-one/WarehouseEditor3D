@@ -19,7 +19,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 	{
 		ImGui::Begin("Info", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 		mouse->overUI = ImGui::IsWindowHovered();
-		ImGui::SetWindowPos({10, 10});
+		ImGui::SetWindowPos({ 10, 10 });
 		ImGui::Text("FPS: %.0f", 1 / deltaTime);
 		ImGui::Text("- Mouse position: X %.0f, Y %.0f", mouse->position.x, mouse->position.y);
 		ImGui::Text("- 2D Camera position: X %.0f, Y %.0f", cameraManager->camera2d.position.x, cameraManager->camera2d.position.y);
@@ -32,7 +32,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 	{
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 		ImGui::Begin("Settings & Help", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-		ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 4, (float)cameraManager->camera2d.viewport.windowWidth/ 7 });
+		ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 4, (float)cameraManager->camera2d.viewport.windowWidth / 7 });
 		glm::vec2 centerScreen((float)cameraManager->camera2d.viewport.windowWidth / 2, (float)cameraManager->camera2d.viewport.windowHeight / 2);
 		ImGui::SetWindowPos({ centerScreen.x - ImGui::GetWindowSize().x / 2, centerScreen.y - ImGui::GetWindowSize().y / 2 });
 		mouse->overUI = ImGui::IsWindowHovered();
@@ -41,8 +41,8 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		ImGui::SameLine();
 		if (ImGui::Button("Load"));
 		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, {.75f, 0, 0, 1});
-		if (ImGui::Button("Exit")) settings->appRunning = false;
+		ImGui::PushStyleColor(ImGuiCol_Button, { .75f, 0, 0, 1 });
+		if (ImGui::Button("Quit")) settings->appRunning = false;
 		ImGui::PopStyleColor();
 		ImGui::Spacing();
 
@@ -88,6 +88,8 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		}
 		ImGui::End();
 	}
+
+	Layers(*layerManager);
 }
 
 void UserInterface::VisualSettings()
@@ -117,4 +119,87 @@ void UserInterface::Camera3DSettings()
 	float fovMin = 10.f;
 	float fovMax = 130.f;
 	ImGui::SliderFloat("FOV", &cameraManager->camera3d.fov, fovMin, fovMax);
+	float sensMin = 0.01f;
+	float sensMax = 1.f;
+	ImGui::SliderFloat("Sensitivity", &mouse->sensitivity, sensMin, sensMax);
+}
+
+void UserInterface::Layers(LayerManager& layerManager)
+{
+	ImGui::Begin("Layers");
+	mouse->overUI = ImGui::IsWindowHovered();
+
+	if (ImGui::Button("+"))
+	{
+		layerManager.UnselectEverything();
+		layerManager.AddLayer();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("-"))
+	{
+		layerManager.UnselectEverything();
+		layerManager.RemoveLayer();
+	}
+
+	for (int i = 0; i < layerManager.allLayers.size(); i++)
+	{
+		std::vector<Layer>& allLayers = layerManager.allLayers;
+		ImGui::PushID(allLayers[i].id);
+		char layerLabel[128] = {};
+		snprintf(layerLabel, sizeof(layerLabel), "%d. Layer: %d\nconveyor amount: %d", i, (int)allLayers[i].id, (int)allLayers[i].allConveyors.size());
+		if (allLayers[i].selected) ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, .6f, 0, 1));
+		
+		allLayers[i].depth = i * 50;
+		for (Conveyor& c : allLayers[i].allConveyors)
+		{
+			for (Point& p : c.path)
+			{
+				p.depth = i * 50;
+				for (Point& c : p.connections)
+					c.depth = i * 50;
+			}
+		}
+
+		if (ImGui::CollapsingHeader(layerLabel))
+		{
+			for (int j = 0; j < allLayers[i].allConveyors.size(); j++)
+			{
+				std::vector<Conveyor>& allConveyors = allLayers[i].allConveyors;
+				char conveyorLabel[128] = {};
+				snprintf(conveyorLabel, sizeof(conveyorLabel), "%d. Conveyor: %d", j, (int)allConveyors[j].path.size());
+				if (ImGui::CollapsingHeader(conveyorLabel))
+				{
+					for (Point& point : allConveyors[j].path)
+					{
+						char pointLabel[128] = {};
+						snprintf(pointLabel, sizeof(layerLabel), "point: %d X: %0.f Y: %0.f", point.id, point.position.x, point.position.y);
+						if (ImGui::Button(pointLabel))
+						{
+							cameraManager->camera2d.position = point.position;
+						}
+						for (Point& c : point.connections)
+						{
+							snprintf(pointLabel, sizeof(layerLabel), "point: %d X: %0.f Y: %0.f", c.id, c.position.x, c.position.y);
+							if (ImGui::Button(pointLabel))
+							{
+								cameraManager->camera2d.position = c.position;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (allLayers[i].selected) ImGui::PopStyleColor();
+		if (ImGui::Button("select"))
+		{
+			layerManager.UnselectEverything();
+			allLayers[i].selected = true;
+			layerManager.selectedLayer = &allLayers[i];
+		}
+		ImGui::SameLine();
+		ImGui::Checkbox("hide layer", &allLayers[i].hidden);
+		ImGui::PopID();
+	}
+
+	ImGui::End();
 }

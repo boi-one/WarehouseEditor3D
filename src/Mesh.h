@@ -50,4 +50,5 @@ public:
 	void CreateCube();
 	void Draw(Shader& shader);
 	void RenderAxis(Shader& shader, bool& showAxes);
+	void DrawLine(Shader& shader, glm::vec3& color, glm::vec3& start, glm::vec3& end, bool ortho = true);
 };

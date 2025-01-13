@@ -90,10 +90,12 @@ int main()
 	shader.use();
 
 	Settings settings;
-	Input input(&cameraManager, &settings);
-	UserInterface ui(&settings, &input.mouse, &cameraManager);
+	LayerManager layerManager;
+	Input input(&cameraManager, &settings, &layerManager);
+	UserInterface ui(&settings, &input.mouse, &cameraManager, &layerManager);
 	Mesh cube;
 	Conveyor::mesh = &cube;
+	layerManager.LateConstruct(&shader, &cube, &input.mouse);
 	// Main loop
 	while (settings.appRunning)
 	{
@@ -140,7 +142,10 @@ int main()
 		}
 
 		cube.RenderAxis(shader, settings.showAxes);
-		ConveyorManager::RenderConveyors(shader, cube, cameraManager.orthoProjection, input.mouse.position);
+
+		//in layermanager render conveyors per layer
+
+		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection);
 		ui.InterfaceInteraction(deltaTime);
 
 		ImGui::Render();

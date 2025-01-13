@@ -46,7 +46,7 @@ void Camera2D::SetTransform(Shader& shader)
 	viewport.bottom = -viewport.cameraHeight / 2;
 	viewport.top = viewport.cameraHeight / 2;
 
-	projection = glm::ortho(viewport.left + position.x, viewport.right + position.x, viewport.bottom + position.y, viewport.top + position.y, -100.0f, 100.0f);
+	projection = glm::ortho(viewport.left + position.x, viewport.right + position.x, viewport.bottom + position.y, viewport.top + position.y, -1000.0f, 100.0f);	
 	shader.setMat4("projection", projection);
 
 	glm::vec3 worldPosition;
