@@ -122,7 +122,7 @@ int main()
 		//		- (misschien ook in 3d met raycast)
 		//		- documentatie (summaries en extern)
 
-		cameraManager.Projection(shader, settings.openSettings);
+		cameraManager.UpdateProjection(shader, settings.openSettings);
 		cube.RenderAxis(shader, settings.showAxes);
 		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection);
 		ui.InterfaceInteraction(deltaTime);

@@ -10,5 +10,5 @@ public:
 	Camera3D camera3d;
 
 public:
-	void Projection(Shader& shader, bool& openSettings);
+	void UpdateProjection(Shader& shader, bool& openSettings);
 };

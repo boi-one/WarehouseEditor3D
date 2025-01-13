@@ -1,6 +1,6 @@
 #include "CameraManager.h"
 
-void CameraManager::Projection(Shader& shader, bool& openSettings)
+void CameraManager::UpdateProjection(Shader& shader, bool& openSettings)
 {
 	if (orthoProjection)
 	{
