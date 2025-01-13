@@ -23,3 +23,13 @@ void Camera3D::ProcessKeyboard(CameraMovement3D direction, float& deltaTime)
 		position -= up * velocity;
 }
 
+void Camera3D::SetTransform(Shader& shader, float cameraWidth, float cameraHeight)
+{
+	glm::mat4 projection = glm::perspectiveRH_NO(glm::radians(fov), cameraWidth / cameraHeight, 0.1f, 10000.0f);
+
+	shader.setMat4("projection", projection);
+
+	glm::mat4 view = GetViewMatrix();
+	shader.setMat4("view", view);
+}
+

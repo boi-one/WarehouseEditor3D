@@ -35,5 +35,6 @@ public:
 
 	glm::mat4 GetViewMatrix();
 	void ProcessKeyboard(CameraMovement3D direction, float& deltaTime);
+	void SetTransform(Shader& shader, float cameraWidth, float cameraHeight);
 
 };

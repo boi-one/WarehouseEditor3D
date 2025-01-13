@@ -22,7 +22,7 @@ void Conveyor::Draw(Shader& shader, Mesh& cube, glm::vec3& color)
 		p.Draw(color, shader);
 	}
 }
-
+//TODO: verplaats naar Layer zodat er geen null reference meer ontstaat
 Point* Conveyor::ClosestPoint(std::vector<Point> list, glm::vec3 origin, float range)
 {
 	float closestDistance = range;

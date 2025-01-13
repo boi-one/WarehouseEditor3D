@@ -32,9 +32,11 @@ void Input::SDLEvents()
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{//crashes
+				std::cout << layerManager->selectedLayer->selectedConveyor->ClosestPoint(layerManager->selectedLayer->selectedConveyor->path, mouse.position) << std::endl;
 				if (!layerManager->selectedLayer || !layerManager->selectedLayer->selectedConveyor) break;
 				layerManager->selectedLayer->selectedConveyor->selectedPoint = 
-					layerManager->selectedLayer->selectedConveyor->ClosestPoint(layerManager->selectedLayer->selectedConveyor->path, mouse.position);
+					layerManager->selectedLayer->selectedConveyor->ClosestPoint(, mouse.position);
+
 			}
 		}break;
 		case SDL_MOUSEMOTION:

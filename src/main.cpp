@@ -122,29 +122,8 @@ int main()
 		//		- (misschien ook in 3d met raycast)
 		//		- documentatie (summaries en extern)
 
-		//TODO: lees wat er bij alle pragma regions staan in deze loop
-#pragma region verplaats_naar_cameraManager
-		if (cameraManager.orthoProjection)
-		{
-			cameraManager.camera2d.SetTransform(shader);
-			SDL_SetRelativeMouseMode(SDL_FALSE);
-		}
-		else
-		{
-			if (!settings.openSettings) SDL_SetRelativeMouseMode(SDL_TRUE);
-
-			glm::mat4 projection = glm::perspectiveRH_NO(glm::radians(cameraManager.camera3d.fov), (float)cameraManager.camera2d.viewport.cameraWidth / (float)cameraManager.camera2d.viewport.cameraHeight, 0.1f, 10000.0f);
-
-			shader.setMat4("projection", projection);
-
-			glm::mat4 view = cameraManager.camera3d.GetViewMatrix();
-			shader.setMat4("view", view);
-		}
-
+		cameraManager.Projection(shader, settings.openSettings);
 		cube.RenderAxis(shader, settings.showAxes);
-
-		//in layermanager render conveyors per layer
-
 		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection);
 		ui.InterfaceInteraction(deltaTime);
 
