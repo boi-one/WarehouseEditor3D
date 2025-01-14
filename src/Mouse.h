@@ -8,6 +8,9 @@ public:
 	glm::vec3 position;
 	float sensitivity = 0.4f;
 	bool overUI = false;
+	glm::vec3 dragOffset = glm::vec3(0, 0, 0);
+	bool middleMouseFirstPress = false;
+	bool middleMousePressed = false;
 	/// <summary>
 	/// be carefull because this is not set automaticly unlike the rest of the places where the cameraManager is passed as a pointer
 	/// (in this case it is set in the Input constructor)

@@ -131,13 +131,5 @@ void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& or
 		color = { 0.5f, 0.5f, 0.5f };
 		if (layer.selected) color = { 1, 1, 1 };
 		layer.DrawConveyors(shader, cube, mouse, orthoProjection, color);
-
-		//db:
-		for (Conveyor& conv : layer.allConveyors)
-		{
-			for (Point& point : conv.path)
-				pointAmount++;
-		}
 	}
-	std::cout << pointAmount << std::endl;
 }

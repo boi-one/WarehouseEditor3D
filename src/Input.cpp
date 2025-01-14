@@ -43,6 +43,19 @@ void Input::SDLEvents()
 				Conveyor& selectedConveyor = *layerManager->selectedLayer->selectedConveyor;
 				layerManager->selectedLayer->selectedConveyor->selectedPoint = selectedConveyor.ClosestPoint(mouse.position, 99999);
 			}
+			if (event.button.button == SDL_BUTTON_MIDDLE)
+			{
+				mouse.middleMouseFirstPress = true;
+			}
+		}break;
+		case SDL_MOUSEBUTTONUP:
+		{
+			if (event.button.button == SDL_BUTTON_MIDDLE)
+			{
+				mouse.dragOffset = glm::vec3(0, 0, 0);
+				mouse.middleMouseFirstPress = false;
+				mouse.middleMousePressed = false;
+			}
 		}break;
 		case SDL_MOUSEMOTION:
 		{
@@ -95,7 +108,7 @@ void Input::Update(float deltaTime)
 	if (keys[TAB].Down())
 	{
 		cameraManager->orthoProjection = !cameraManager->orthoProjection;
-		
+
 		layerManager->selectedLayer->UnselectConveyors();
 	}
 	if (keys[I].Down())
@@ -105,6 +118,33 @@ void Input::Update(float deltaTime)
 	if (keys[LSHIFT].Down())
 	{
 		layerManager->selectedLayer->EditConveyor(mouse.position);
+	}
+
+	if (mouse.middleMouseFirstPress)
+	{
+		mouse.dragOffset = mouse.position;
+		mouse.middleMouseFirstPress = false;
+		mouse.middleMousePressed = true;
+	}
+	if (mouse.middleMousePressed)
+	{
+		if (layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->selected)
+		{
+			glm::vec3 difference = glm::vec3(mouse.position.x - mouse.dragOffset.x, mouse.position.y - mouse.dragOffset.y, layerManager->selectedLayer->depth);
+			for (Point& basePoint : layerManager->selectedLayer->selectedConveyor->path)
+			{
+				basePoint.position.x += difference.x;
+				basePoint.position.y += difference.y;
+
+				for (Point& p : basePoint.connections)
+				{
+					p.position.x += difference.x;
+					p.position.y += difference.y;
+				}
+			}
+
+			mouse.dragOffset = mouse.position;
+		}
 	}
 }
 
