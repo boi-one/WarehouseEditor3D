@@ -1,18 +1,21 @@
 #include "Conveyor.h"
 
-void ConveyorManager::SelectConveyor(glm::vec3& mousePosition)
-{
-	for (Conveyor& c : allConveyors)
-	{
 
-		Conveyor::ClosestPoint(c.path, mousePosition);
+Point* Conveyor::ClosestPoint(glm::vec3& origin, float range)
+{
+	Point* closestPoint = 0;
+
+	for (Point& p : path)
+	{
+		float distance = glm::distance(p.position, origin);
+		if (distance < range)
+		{
+			range = distance;
+			closestPoint = &p;
+		}
 	}
 
-}
-
-void ConveyorManager::RenderConveyors(Shader& shader, Mesh& cube, bool& orthoProjection, glm::vec3 mousePosition)
-{
-
+	return closestPoint;
 }
 
 void Conveyor::Draw(Shader& shader, Mesh& cube, glm::vec3& color)
@@ -22,31 +25,18 @@ void Conveyor::Draw(Shader& shader, Mesh& cube, glm::vec3& color)
 		p.Draw(color, shader);
 	}
 }
-//TODO: verplaats naar Layer zodat er geen null reference meer ontstaat
-Point* Conveyor::ClosestPoint(std::vector<Point> list, glm::vec3 origin, float range)
-{
-	float closestDistance = range;
-	Point* point = 0;
 
-	for (Point& p : list)
+void Conveyor::NewPoint(glm::vec3 position)
+{
+	if (!selectedPoint)
 	{
-		float distance = glm::distance(p.position, origin);
-		for(Point& c : p.connections)
-			distance = glm::distance(c.position, origin);
-		if (distance < closestDistance)
-		{
-			closestDistance = distance;
-			point = &p;
-		}
+		selectedPoint = &path.emplace_back(Point(position, mesh));
+		return;
 	}
-	return point;
-}
-
-void Conveyor::Place(glm::vec3 position)
-{
-	path.push_back({ position, mesh });
+		
+	Point& temp = selectedPoint->connections.emplace_back(Point(position, mesh));
+	path.emplace_back(temp);
 	selectedPoint = &path[path.size() - 1];
-	if (path.size() > 1) selectedPoint->connections.push_back(path[path.size() - 2]);
 }
 
 void Point::Draw(glm::vec3& color, Shader& shader)

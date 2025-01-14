@@ -45,10 +45,10 @@ public:
 	static inline bool createNewConveyor = true;
 	static inline Mesh* mesh = 0;
 
-	void Draw(Shader& shader, Mesh& cube, glm::vec3& color);
+	Point* ClosestPoint(glm::vec3& origin, float range);
 
-	static Point* ClosestPoint(std::vector<Point> list, glm::vec3 origin, float range = 99999);
-	void Place(glm::vec3 position);
+	void Draw(Shader& shader, Mesh& cube, glm::vec3& color);
+	void NewPoint(glm::vec3 position);
 };
 
 class ConveyorManager
@@ -56,7 +56,6 @@ class ConveyorManager
 public:
 	static inline Conveyor* selectedConveyor = 0;
 	static inline std::vector<Conveyor> allConveyors;
-	static void SelectConveyor(glm::vec3& mousePosition);
 	static void RenderConveyors(Shader& shader, Mesh& cube, bool& orthoProjection, glm::vec3 mousePosition);
 };
 

@@ -28,15 +28,20 @@ void Input::SDLEvents()
 					layerManager->selectedLayer->selectedConveyor = &layerManager->selectedLayer->allConveyors.emplace_back(Conveyor());
 					layerManager->selectedLayer->selectedConveyor->selected = true;
 				}
-				layerManager->selectedLayer->selectedConveyor->Place(mouse.position);
+				layerManager->selectedLayer->selectedConveyor->NewPoint(mouse.position);
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)
-			{//crashes
-				std::cout << layerManager->selectedLayer->selectedConveyor->ClosestPoint(layerManager->selectedLayer->selectedConveyor->path, mouse.position) << std::endl;
-				if (!layerManager->selectedLayer || !layerManager->selectedLayer->selectedConveyor) break;
-				layerManager->selectedLayer->selectedConveyor->selectedPoint = 
-					layerManager->selectedLayer->selectedConveyor->ClosestPoint(, mouse.position);
-
+			{
+				if (!layerManager->selectedLayer) break;
+				if (!layerManager->selectedLayer->selectedConveyor)
+				{
+					layerManager->selectedLayer->selectedConveyor = layerManager->selectedLayer->ReturnClosestConveyor(mouse.position);
+					if (!layerManager->selectedLayer->selectedConveyor) break;
+					layerManager->selectedLayer->selectedConveyor->selected = true;
+					break;
+				}
+				Conveyor& selectedConveyor = *layerManager->selectedLayer->selectedConveyor;
+				layerManager->selectedLayer->selectedConveyor->selectedPoint = selectedConveyor.ClosestPoint(mouse.position, 99999);
 			}
 		}break;
 		case SDL_MOUSEMOTION:
@@ -81,9 +86,6 @@ void Input::Update(float deltaTime)
 	}
 	if (keys[Z].Down())
 	{
-		if (!layerManager->selectedLayer->selectedConveyor) return;
-		layerManager->selectedLayer->selectedConveyor->selected = false;
-		layerManager->selectedLayer->selectedConveyor = 0;
 		layerManager->selectedLayer->UnselectConveyors();
 	}
 	if (keys[ESC].Down())
@@ -93,10 +95,16 @@ void Input::Update(float deltaTime)
 	if (keys[TAB].Down())
 	{
 		cameraManager->orthoProjection = !cameraManager->orthoProjection;
+		
+		layerManager->selectedLayer->UnselectConveyors();
 	}
 	if (keys[I].Down())
 	{
 		settings->showInfo = !settings->showInfo;
+	}
+	if (keys[LSHIFT].Down())
+	{
+		layerManager->selectedLayer->EditConveyor(mouse.position);
 	}
 }
 

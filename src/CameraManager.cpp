@@ -9,7 +9,7 @@ void CameraManager::UpdateProjection(Shader& shader, bool& openSettings)
 	}
 	else
 	{
-		if (openSettings) SDL_SetRelativeMouseMode(SDL_TRUE);
+		if (!openSettings) SDL_SetRelativeMouseMode(SDL_TRUE);
 
 		camera3d.SetTransform(shader, (float)camera2d.viewport.cameraWidth, (float)camera2d.viewport.cameraHeight);
 	}

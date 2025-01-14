@@ -2,6 +2,8 @@
 #include "glm\glm.hpp"
 
 #include "Conveyor.h"
+#include "Tools.h"
+using namespace Tools;
 
 class Layer
 {
@@ -26,16 +28,22 @@ public:
 	}
 
 	void DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color);
-
 	void UnselectConveyors()
 	{
+		if (!selectedConveyor) return;
+		selectedConveyor->selected = false;
+		selectedConveyor = 0;
+
 		for (Conveyor& c : allConveyors)
 		{
 			c.selected = false;
 			c.edit = false;
 			c.selectedPoint = 0;
 		}
-	}
+	};
+	Conveyor* ReturnClosestConveyor(glm::vec3& origin);
+	Conveyor* ReturnClosestConveyor(glm::vec3& origin, Conveyor& selected);
+	bool EditConveyor(glm::vec3& position);
 };
 
 class LayerManager
@@ -79,8 +87,6 @@ public:
 	}
 
 	void UnselectEverything();
-
-
 
 	void DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection);
 };

@@ -119,8 +119,8 @@ int main()
 		cameraManager.camera2d.Update();
 
 		//TODO: - implementeer alle oude features in 2d
-		//		- (misschien ook in 3d met raycast)
 		//		- documentatie (summaries en extern)
+		//		- (misschien ook in 3d met raycast)
 
 		cameraManager.UpdateProjection(shader, settings.openSettings);
 		cube.RenderAxis(shader, settings.showAxes);
