@@ -11,7 +11,7 @@ void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoP
 		cube.DrawLine(shader, localcolor, selectedConveyor->selectedPoint->position, mouse.position);
 	}
 	if (!orthoProjection)
-		ConveyorManager::selectedConveyor = 0;
+		selectedConveyor = 0;
 	localcolor = color;
 	for (Conveyor& conveyor : allConveyors)
 	{

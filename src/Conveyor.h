@@ -63,12 +63,5 @@ public:
 	int ID() const { return id; };
 };
 
-class ConveyorManager
-{
-public:
-	static inline Conveyor* selectedConveyor = 0;
-	static inline std::vector<Conveyor> allConveyors;
-};
-
 
 

@@ -46,11 +46,6 @@ void Point::Draw(glm::vec3& color, Shader& shader)
 	model = glm::scale(model, { 11, 11, 11 });
 	shader.setMat4("model", model);
 
-	if (ConveyorManager::selectedConveyor && ConveyorManager::selectedConveyor->selectedPoint && this == ConveyorManager::selectedConveyor->selectedPoint)
-	{
-		color = { 1, 0, 0 };
-	}
-
 	shader.setVec3("mColor", color);
 	mesh->Draw(shader);
 

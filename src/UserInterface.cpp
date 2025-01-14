@@ -134,7 +134,6 @@ void UserInterface::Layers(LayerManager& layerManager)
 
 	if (ImGui::Button("add layer"))
 	{
-		layerManager.UnselectEverything();
 		layerManager.AddLayer();
 	}
 
@@ -161,6 +160,23 @@ void UserInterface::Layers(LayerManager& layerManager)
 		}
 		if (allLayers[i].selected) ImGui::PopStyleColor();
 		ImGui::PushID(i);
+		if (ImGui::Button("move up") && i > 0)
+		{
+			Layer tempLayer = allLayers[i];
+			Layer tempLayerPrev = allLayers[i - 1];
+			allLayers[i - 1] = tempLayer;
+			allLayers[i] = tempLayerPrev;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("move down") && i < allLayers.size() - 1)
+		{
+			Layer tempLayer = allLayers[i];
+			Layer tempLayerPrev = allLayers[i + 1];
+			allLayers[i + 1] = tempLayer;
+			allLayers[i] = tempLayerPrev;
+
+		}
+		ImGui::SameLine();
 		if (ImGui::Button("select"))
 		{
 			layerManager.UnselectEverything();
@@ -179,7 +195,11 @@ void UserInterface::Layers(LayerManager& layerManager)
 			ImGui::SetTooltip("cannot be deleted because this is currently the selected layer");
 		}
 		ImGui::SameLine();
-		ImGui::Checkbox("hide layer", &allLayers[i].hidden);
+		ImGui::Checkbox("", &allLayers[i].hidden);
+		if (ImGui::IsItemHovered() && allLayers[i].selected)
+		{
+			ImGui::SetTooltip("hide layer");
+		}
 		ImGui::Spacing();
 		ImGui::PopID();
 	}
@@ -191,7 +211,6 @@ void UserInterface::Layers(LayerManager& layerManager)
 
 void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 {
-	//list of CONVEYORS inside the layer
 	std::vector<int> deletions;
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, 0, 0, 0));
 	std::vector<Conveyor>& allConveyors = currentLayer.allConveyors;
@@ -212,7 +231,6 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 					cameraManager->camera2d.position = point.position;
 				}
 			}
-
 		}
 		if (allConveyors[j].selected) ImGui::PopStyleColor();
 		ImGui::PushID(j);

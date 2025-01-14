@@ -29,6 +29,7 @@ void Input::SDLEvents()
 					layerManager->selectedLayer->selectedConveyor->selected = true;
 					layerManager->selectedLayer->selectedConveyor->edit = true;
 				}
+				//TODO: fix dat nadat je switcht in de layers dat de pointers opnieuw worden geassigned
 				if(layerManager->selectedLayer->selectedConveyor->edit)
 					layerManager->selectedLayer->selectedConveyor->NewPoint(mouse.position);
 			}
@@ -65,7 +66,7 @@ void Input::SDLEvents()
 		{
 			if (settings->openSettings)
 			{
-				ConveyorManager::selectedConveyor = 0;
+				layerManager->selectedLayer->selectedConveyor->edit = false;
 				break;
 			}
 			mouse.MouseMovement3D(event, cameraManager->camera3d);

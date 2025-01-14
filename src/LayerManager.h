@@ -79,9 +79,7 @@ public:
 
 	void AddLayer()
 	{
-		UnselectEverything();
-		selectedLayer = &allLayers.emplace_back(Layer());
-		selectedLayer->selected = true;
+		allLayers.emplace_back(Layer());
 	}
 
 	void UnselectEverything();
