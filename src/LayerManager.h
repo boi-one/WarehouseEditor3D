@@ -8,8 +8,7 @@ using namespace Tools;
 class Layer
 {
 public:
-	static inline int layerCount;
-	int id;
+	static inline int layerCount = 0;
 	bool selected = false;
 	bool hidden = false;
 	std::vector<Conveyor> allConveyors;
@@ -17,9 +16,11 @@ public:
 	static inline bool connecting = false;
 	static inline glm::vec3 newLineEnd;
 	/// <summary>
-	/// depth is how high the layer is in 3D, the point class has also a depth, because of the near clip plane of the orthographic camera you can max have 20 layers but if you decrease it to something like -2000 it will display more layers
+	/// depth is how high the layer is in 3D, the point class has also a depth, because of the near clip plane of the orthographic camera you can max have 40 layers (near plane distance/25) but if you decrease it to something like -2000 it will display more layers
 	/// </summary>
 	float depth = 0;
+private:
+	int id;
 
 public:
 	Layer()
@@ -43,7 +44,8 @@ public:
 	};
 	Conveyor* ReturnClosestConveyor(glm::vec3& origin);
 	Conveyor* ReturnClosestConveyor(glm::vec3& origin, Conveyor& selected);
-	bool EditConveyor(glm::vec3& position);
+	bool EditConveyor(glm::vec3& position, bool& orthoProjection);
+	int ID() const { return id; };
 };
 
 class LayerManager
@@ -80,10 +82,6 @@ public:
 		UnselectEverything();
 		selectedLayer = &allLayers.emplace_back(Layer());
 		selectedLayer->selected = true;
-	}
-	void RemoveLayer()
-	{
-
 	}
 
 	void UnselectEverything();

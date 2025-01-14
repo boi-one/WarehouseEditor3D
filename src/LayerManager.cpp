@@ -4,7 +4,7 @@ void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoP
 {
 	glm::vec3 localcolor = { 0, 1, 0 };
 	shader.setVec3("mColor", localcolor);
-	if (selectedConveyor && selectedConveyor->selectedPoint) //draw newline
+	if (selectedConveyor && selectedConveyor->selectedPoint && selectedConveyor->edit) //draw newline
 	{
 		selectedConveyor->selectedPoint->position.z = depth;
 		mouse.position.z = depth;
@@ -17,7 +17,7 @@ void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoP
 	{
 		if (conveyor.edit) localcolor = { 0, 0, 1 };
 		else if (conveyor.selected) localcolor = { 1, 1, 0 };
-		else localcolor = { 1, 1, 1 };
+		else localcolor = color;
 		conveyor.Draw(shader, cube, localcolor);
 	}
 }
@@ -105,9 +105,9 @@ Conveyor* Layer::ReturnClosestConveyor(glm::vec3& origin, Conveyor& selected)
 	return 0;
 }
 
-bool Layer::EditConveyor(glm::vec3& position)
+bool Layer::EditConveyor(glm::vec3& position, bool& orthoProjection)
 {
-	if (allConveyors.size() < 2) return false;
+	if (allConveyors.size() < 2 || !orthoProjection) return false;
 	Conveyor& temp = *ReturnClosestConveyor(position, *selectedConveyor);
 	Point* closest = temp.ClosestPoint(position, 100);
 	if (!closest) return false;

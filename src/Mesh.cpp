@@ -79,7 +79,7 @@ void Mesh::RenderAxis(Shader& shader, bool& showAxes)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, { 0, 0, 0 });
-		model = glm::scale(model, { 2, 2, 2 });
+		model = glm::scale(model, { 3, 3, 3 });
 		shader.setMat4("model", model);
 		shader.setVec3("mColor", { 1, 1, 1 });
 		Draw(shader);
@@ -91,19 +91,19 @@ void Mesh::RenderAxis(Shader& shader, bool& showAxes)
 		if (i == 0)
 		{
 			shader.setVec3("mColor", { 1, 0, 0 });
-			model = glm::scale(model, { 9000, 1, 1 });
+			model = glm::scale(model, { 9000, 2, 2 });
 			shader.setMat4("model", model);
 		}
 		if (i == 1)
 		{
 			shader.setVec3("mColor", { 0, 1, 0 });
-			model = glm::scale(model, { 1, 9000, 1 });
+			model = glm::scale(model, { 2, 9000, 2 });
 			shader.setMat4("model", model);
 		}
 		if (i == 2)
 		{
 			shader.setVec3("mColor", { 0, 0, 1 });
-			model = glm::scale(model, { 1, 1, 9000 });
+			model = glm::scale(model, { 2, 2, 9000 });
 			shader.setMat4("model", model);
 		}
 

@@ -9,6 +9,8 @@
 #include "Time.h"
 #include "CameraManager.h"
 #include "LayerManager.h"
+#include "Tools.h"
+using namespace Tools;
 
 class UserInterface
 {
@@ -33,4 +35,5 @@ public:
 	void Camera3DSettings();
 
 	void Layers(LayerManager& layerManager);
+	void Conveyors(LayerManager& layerManager, Layer& currentLayer);
 };

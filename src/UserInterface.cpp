@@ -20,11 +20,11 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		ImGui::Begin("Info", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 		mouse->overUI = ImGui::IsWindowHovered();
 		ImGui::SetWindowPos({ 10, 10 });
-		ImGui::Text("FPS: %.0f", 1 / deltaTime);
+		ImGui::Text("- FPS: %.0f", 1 / deltaTime);
 		ImGui::Text("- Mouse position: X %.0f, Y %.0f", mouse->position.x, mouse->position.y);
 		ImGui::Text("- 2D Camera position: X %.0f, Y %.0f", cameraManager->camera2d.position.x, cameraManager->camera2d.position.y);
 		ImGui::Text("- 3D Camera position: X %.0f, Y %.0f, Z %.0f", cameraManager->camera3d.position.x, cameraManager->camera3d.position.y, cameraManager->camera3d.position.z);
-		ImGui::Text("- Screen resolution: X %d, Y %d", cameraManager->camera2d.viewport.cameraWidth, cameraManager->camera2d.viewport.cameraHeight);
+		ImGui::Text("- Screen resolution: X %0.f, Y %0.f", cameraManager->camera2d.viewport.cameraWidth, cameraManager->camera2d.viewport.cameraHeight);
 		ImGui::End();
 	}
 
@@ -63,7 +63,6 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("[General Keybindings]");
 			ImGui::Spacing();
 			ImGui::Text("Esc        : Open settings menu");
-			ImGui::Text("Z          : Unselect Conveyor");
 			ImGui::Text("Tab        : Switch projection");
 			ImGui::Text("I          : Show info");
 
@@ -74,7 +73,10 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("A          : Move left");
 			ImGui::Text("S          : Move down");
 			ImGui::Text("D          : Move right");
+			ImGui::Text("Z          : Unselect Conveyor");
 			ImGui::Text("R          : Reset 2D camera position");
+			ImGui::Text("Left Shift : Merge conveyors together");
+			ImGui::Text("X          : Unselect point");
 
 			ImGui::Spacing();
 			ImGui::Text("[3D Keybindings]");
@@ -128,68 +130,37 @@ void UserInterface::Layers(LayerManager& layerManager)
 {
 	ImGui::Begin("Layers");
 	mouse->overUI = ImGui::IsWindowHovered();
+	std::vector<int> deletions;
 
-	if (ImGui::Button("+"))
+	if (ImGui::Button("add layer"))
 	{
 		layerManager.UnselectEverything();
 		layerManager.AddLayer();
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("-"))
-	{
-		layerManager.UnselectEverything();
-		layerManager.RemoveLayer();
 	}
 
 	for (int i = 0; i < layerManager.allLayers.size(); i++)
 	{
 		std::vector<Layer>& allLayers = layerManager.allLayers;
-		ImGui::PushID(allLayers[i].id);
-		char layerLabel[128] = {};
-		snprintf(layerLabel, sizeof(layerLabel), "%d. Layer: %d\nconveyor amount: %d", i, (int)allLayers[i].id, (int)allLayers[i].allConveyors.size());
-		if (allLayers[i].selected) ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, .6f, 0, 1));
-		
-		allLayers[i].depth = i * 50;
+		int multiply = 25;
+		allLayers[i].depth = i * multiply;
 		for (Conveyor& c : allLayers[i].allConveyors)
 		{
 			for (Point& p : c.path)
 			{
-				p.depth = i * 50;
-				for (Point& c : p.connections)
-					c.depth = i * 50;
+				p.depth = i * multiply;
 			}
 		}
 
+		ImGui::PushID(allLayers[i].ID());
+		char layerLabel[128] = {};
+		snprintf(layerLabel, sizeof(layerLabel), "%d. Layer: %d\nconveyor amount: %d", i, (int)allLayers[i].ID(), (int)allLayers[i].allConveyors.size());
+		if (allLayers[i].selected) ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, .75f, 0, 1));
 		if (ImGui::CollapsingHeader(layerLabel))
 		{
-			for (int j = 0; j < allLayers[i].allConveyors.size(); j++)
-			{
-				std::vector<Conveyor>& allConveyors = allLayers[i].allConveyors;
-				char conveyorLabel[128] = {};
-				snprintf(conveyorLabel, sizeof(conveyorLabel), "%d. Conveyor: %d", j, (int)allConveyors[j].path.size());
-				if (ImGui::CollapsingHeader(conveyorLabel))
-				{
-					for (Point& point : allConveyors[j].path)
-					{
-						char pointLabel[128] = {};
-						snprintf(pointLabel, sizeof(layerLabel), "point: %d X: %0.f Y: %0.f", point.id, point.position.x, point.position.y);
-						if (ImGui::Button(pointLabel))
-						{
-							cameraManager->camera2d.position = point.position;
-						}
-						for (Point& c : point.connections)
-						{
-							snprintf(pointLabel, sizeof(layerLabel), "point: %d X: %0.f Y: %0.f", c.id, c.position.x, c.position.y);
-							if (ImGui::Button(pointLabel))
-							{
-								cameraManager->camera2d.position = c.position;
-							}
-						}
-					}
-				}
-			}
+			Conveyors(layerManager, allLayers[i]);
 		}
 		if (allLayers[i].selected) ImGui::PopStyleColor();
+		ImGui::PushID(i);
 		if (ImGui::Button("select"))
 		{
 			layerManager.UnselectEverything();
@@ -197,9 +168,74 @@ void UserInterface::Layers(LayerManager& layerManager)
 			layerManager.selectedLayer = &allLayers[i];
 		}
 		ImGui::SameLine();
+		if (ImGui::Button("delete"))
+		{
+			if(!allLayers[i].selected)
+				deletions.push_back(i);
+		}
+		ImGui::PopID();
+		if (ImGui::IsItemHovered() && allLayers[i].selected)
+		{
+			ImGui::SetTooltip("cannot be deleted because this is currently the selected layer");
+		}
+		ImGui::SameLine();
 		ImGui::Checkbox("hide layer", &allLayers[i].hidden);
+		ImGui::Spacing();
 		ImGui::PopID();
 	}
+	for (int i : deletions)
+		DeleteFromList(layerManager.allLayers, layerManager.allLayers[i]);
 
 	ImGui::End();
+}
+
+void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
+{
+	//list of CONVEYORS inside the layer
+	std::vector<int> deletions;
+	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, 0, 0, 0));
+	std::vector<Conveyor>& allConveyors = currentLayer.allConveyors;
+	for (int j = 0; j < allConveyors.size(); j++)
+	{
+		char layerLabel[128] = {};
+		char conveyorLabel[128] = {};
+		snprintf(conveyorLabel, sizeof(conveyorLabel), "%d. Conveyor: %d", j, (int)allConveyors[j].ID());
+		if (allConveyors[j].selected) ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, 0.4f, 0, 1));
+		if (ImGui::CollapsingHeader(conveyorLabel))
+		{
+			for (Point& point : allConveyors[j].path)
+			{
+				char pointLabel[128] = {};
+				snprintf(pointLabel, sizeof(layerLabel), "point: %d X: %0.f Y: %0.f", point.ID(), point.position.x, point.position.y);
+				if (ImGui::Button(pointLabel))
+				{
+					cameraManager->camera2d.position = point.position;
+				}
+			}
+
+		}
+		if (allConveyors[j].selected) ImGui::PopStyleColor();
+		ImGui::PushID(j);
+		if (ImGui::Button("select") && &currentLayer == layerManager.selectedLayer)
+		{
+			currentLayer.UnselectConveyors();
+			allConveyors[j].selected = true;
+			layerManager.selectedLayer->selectedConveyor = &allConveyors[j];
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("delete"))
+		{
+			if (!allConveyors[j].selected)
+				deletions.push_back(j);
+		}
+		ImGui::PopID();
+		if (ImGui::IsItemHovered() && allConveyors[j].selected)
+		{
+			ImGui::SetTooltip("cannot be deleted because this is currently the selected conveyor");
+		}
+		ImGui::Separator();
+	}
+	ImGui::PopStyleColor();
+	for (int i : deletions)
+		DeleteFromList(currentLayer.allConveyors, currentLayer.allConveyors[i]);
 }

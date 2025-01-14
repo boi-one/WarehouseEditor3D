@@ -21,6 +21,7 @@ enum Keys
 	Z,
 	LSHIFT,
 	I,
+	X,
 };
 
 class Input
@@ -79,6 +80,7 @@ private:
 		Key(Keys::Z, SDL_SCANCODE_Z),
 		Key(Keys::LSHIFT, SDL_SCANCODE_LSHIFT),
 		Key(Keys::I, SDL_SCANCODE_I),
+		Key(Keys::X, SDL_SCANCODE_X),
 	};
 
 public:

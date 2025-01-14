@@ -13,8 +13,6 @@
 #include "Conveyor.h"
 #include "Input.h"
 #include "UserInterface.h"
-#include "Tools.h"
-using namespace Tools;
 
 void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& showAxes);
 
