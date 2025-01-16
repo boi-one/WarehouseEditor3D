@@ -45,12 +45,13 @@ void Point::Draw(glm::vec3& color, Shader& shader)
 	model = glm::translate(model, { position.x, position.y, depth });
 	model = glm::scale(model, { 11, 11, 11 });
 	shader.setMat4("model", model);
-
 	shader.setVec3("mColor", color);
 	mesh->Draw(shader);
 
 	for (Point& connection : connections)
 	{
-		mesh->DrawLine(shader, color, position, connection.position); //lines between points
+		glm::vec3 start = { position.x, position.y, depth};
+		glm::vec3 end = { connection.position.x, connection.position.y, depth };
+		mesh->DrawLine(shader, color, start, end); 
 	}
 }

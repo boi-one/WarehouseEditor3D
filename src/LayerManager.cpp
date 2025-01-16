@@ -110,7 +110,7 @@ bool Layer::EditConveyor(glm::vec3& position, bool& orthoProjection)
 	if (allConveyors.size() < 2 || !orthoProjection) return false;
 	Conveyor& temp = *ReturnClosestConveyor(position, *selectedConveyor);
 	Point* closest = temp.ClosestPoint(position, 100);
-	if (!closest) return false;
+	if (!closest || !selectedConveyor->selectedPoint) return false;
 	if(closest != selectedConveyor->selectedPoint)
 		closest->connections.push_back(*selectedConveyor->selectedPoint);
 	for (Point& p : temp.path)
@@ -119,6 +119,20 @@ bool Layer::EditConveyor(glm::vec3& position, bool& orthoProjection)
 	UnselectConveyors();
 	Tools::DeleteFromList(allConveyors, temp);
 	return true;
+}
+
+void Layer::SetDepth(int layer)
+{
+	int multiply = 25;
+	depth = layer * multiply;
+	for (Conveyor& c : allConveyors)
+	{
+
+		for (Point& p : c.path)
+		{
+			p.depth = layer * multiply;
+		}
+	}
 }
 
 void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection)

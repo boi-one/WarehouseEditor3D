@@ -19,23 +19,30 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEBUTTONDOWN:
 		{
+
+			//TODO: REMAKE THIS SO IT IS COMPATIBLE WITH LAYER SWITCHING!!!!!!
 			if (mouse.overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
-				if (settings->openSettings || !cameraManager->orthoProjection) break;
+				if (settings->openSettings || !cameraManager->orthoProjection || !layerManager->selectedLayer) break;
 				if (!layerManager->selectedLayer->selectedConveyor)
 				{
 					layerManager->selectedLayer->selectedConveyor = &layerManager->selectedLayer->allConveyors.emplace_back(Conveyor());
 					layerManager->selectedLayer->selectedConveyor->selected = true;
 					layerManager->selectedLayer->selectedConveyor->edit = true;
 				}
-				//TODO: fix dat nadat je switcht in de layers dat de pointers opnieuw worden geassigned
-				if(layerManager->selectedLayer->selectedConveyor->edit)
+				std::cout << "selected layer: " << layerManager->selectedLayer << std::endl;
+				std::cout << "selected conveyor: " << layerManager->selectedLayer->selectedConveyor << std::endl;
+				if (layerManager->selectedLayer && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->edit) //TODOL: FIX DEZE LIJN ZIT HET PROBLEEM ALS JE NIEWE LAYER AANMAAKT (add layer en klik)
 					layerManager->selectedLayer->selectedConveyor->NewPoint(mouse.position);
 			}
+			////////////////////////
+
+
+
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{
-				if (!layerManager->selectedLayer) break;
+				if (!layerManager->selectedLayer || !cameraManager->orthoProjection) break;
 				if (!layerManager->selectedLayer->selectedConveyor)
 				{
 					layerManager->selectedLayer->selectedConveyor = layerManager->selectedLayer->ReturnClosestConveyor(mouse.position);
@@ -64,12 +71,8 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEMOTION:
 		{
-			if (settings->openSettings)
-			{
-				layerManager->selectedLayer->selectedConveyor->edit = false;
-				break;
-			}
-			mouse.MouseMovement3D(event, cameraManager->camera3d);
+			if(!settings->openSettings)
+				mouse.MouseMovement3D(event, cameraManager->camera3d);
 		}break;
 		}
 	}
@@ -126,7 +129,7 @@ void Input::Update(float deltaTime)
 	}
 	if (keys[X].Down())
 	{
-		if(layerManager->selectedLayer->selectedConveyor)
+		if (layerManager->selectedLayer->selectedConveyor)
 			layerManager->selectedLayer->selectedConveyor->edit = false;
 	}
 

@@ -31,21 +31,21 @@ public:
 	void DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color);
 	void UnselectConveyors()
 	{
-		if (!selectedConveyor) return;
-		selectedConveyor->selected = false;
-		selectedConveyor = 0;
-
 		for (Conveyor& c : allConveyors)
 		{
-			c.selected = false;
+			c.selected = false; //error soms??? heeft te maken met de layer switching
 			c.edit = false;
 			c.selectedPoint = 0;
 		}
+
+		if (!selectedConveyor) return;
+		selectedConveyor = 0;
 	};
 	Conveyor* ReturnClosestConveyor(glm::vec3& origin);
 	Conveyor* ReturnClosestConveyor(glm::vec3& origin, Conveyor& selected);
 	bool EditConveyor(glm::vec3& position, bool& orthoProjection);
 	int ID() const { return id; };
+	void SetDepth(int layer);
 };
 
 class LayerManager

@@ -140,15 +140,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 	for (int i = 0; i < layerManager.allLayers.size(); i++)
 	{
 		std::vector<Layer>& allLayers = layerManager.allLayers;
-		int multiply = 25;
-		allLayers[i].depth = i * multiply;
-		for (Conveyor& c : allLayers[i].allConveyors)
-		{
-			for (Point& p : c.path)
-			{
-				p.depth = i * multiply;
-			}
-		}
+		allLayers[i].SetDepth(i);
 
 		ImGui::PushID(allLayers[i].ID());
 		char layerLabel[128] = {};
@@ -162,19 +154,24 @@ void UserInterface::Layers(LayerManager& layerManager)
 		ImGui::PushID(i);
 		if (ImGui::Button("move up") && i > 0)
 		{
+			if (&allLayers[i] == layerManager.selectedLayer)
+				allLayers[i].UnselectConveyors();
 			Layer tempLayer = allLayers[i];
 			Layer tempLayerPrev = allLayers[i - 1];
 			allLayers[i - 1] = tempLayer;
 			allLayers[i] = tempLayerPrev;
+			for (Layer& l : allLayers) if (l.selected) layerManager.selectedLayer = &l;
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("move down") && i < allLayers.size() - 1)
 		{
+			if (&allLayers[i] == layerManager.selectedLayer)
+				allLayers[i].UnselectConveyors();
 			Layer tempLayer = allLayers[i];
 			Layer tempLayerPrev = allLayers[i + 1];
 			allLayers[i + 1] = tempLayer;
 			allLayers[i] = tempLayerPrev;
-
+			for (Layer& l : allLayers) if (l.selected) layerManager.selectedLayer = &l;
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("select"))
