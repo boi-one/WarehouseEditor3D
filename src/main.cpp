@@ -13,6 +13,7 @@
 #include "Conveyor.h"
 #include "Input.h"
 #include "UserInterface.h"
+#include "Grid.h"
 
 void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& showAxes);
 
@@ -90,10 +91,13 @@ int main()
 
 	Settings settings;
 	LayerManager layerManager;
-	Input input(&cameraManager, &settings, &layerManager);
-	UserInterface ui(&settings, &input.mouse, &cameraManager, &layerManager);
+	Grid grid;
+	JsonSerialization jsonSerialization;
+	Input input(&cameraManager, &settings, &layerManager, &grid, &jsonSerialization);
+	UserInterface ui(&settings, &input.mouse, &cameraManager, &layerManager, &jsonSerialization);
 	Mesh cube;
 	Conveyor::mesh = &cube;
+	jsonSerialization.LateConstruct(&cube);
 	layerManager.LateConstruct(&shader, &cube, &input.mouse);
 	// Main loop
 	while (settings.appRunning)
@@ -116,14 +120,10 @@ int main()
 		//order: clear color -> openGL code -> imgui code -> imgui render -> swap window
 		shader.use();
 		cameraManager.camera2d.Update();
-
-		//TODO: - implementeer alle oude features in 2d
-		//		- documentatie (summaries en extern)
-		//		- (misschien ook in 3d met raycast)
-
 		cameraManager.UpdateProjection(shader, settings.openSettings);
 		cube.RenderAxis(shader, settings.showAxes);
-		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection);
+		grid.Draw(cube, shader, settings.showGrid);
+		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection, settings.gridSnap);
 		ui.InterfaceInteraction(deltaTime);
 
 		ImGui::Render();

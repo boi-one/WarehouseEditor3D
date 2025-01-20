@@ -19,8 +19,6 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEBUTTONDOWN:
 		{
-
-			//TODO: REMAKE THIS SO IT IS COMPATIBLE WITH LAYER SWITCHING!!!!!!
 			if (mouse.overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
@@ -31,18 +29,18 @@ void Input::SDLEvents()
 					layerManager->selectedLayer->selectedConveyor->selected = true;
 					layerManager->selectedLayer->selectedConveyor->edit = true;
 				}
-				std::cout << "selected layer: " << layerManager->selectedLayer << std::endl;
-				std::cout << "selected conveyor: " << layerManager->selectedLayer->selectedConveyor << std::endl;
-				if (layerManager->selectedLayer && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->edit) //TODOL: FIX DEZE LIJN ZIT HET PROBLEEM ALS JE NIEWE LAYER AANMAAKT (add layer en klik)
-					layerManager->selectedLayer->selectedConveyor->NewPoint(mouse.position);
+				if (layerManager->selectedLayer->selected && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->edit)
+				{
+					if (settings->gridSnap)
+						layerManager->selectedLayer->selectedConveyor->NewPoint(mouse.gridPosition);
+					else
+						layerManager->selectedLayer->selectedConveyor->NewPoint(mouse.position);
+				}
 			}
-			////////////////////////
-
-
 
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{
-				if (!layerManager->selectedLayer || !cameraManager->orthoProjection) break;
+				if (!layerManager->selectedLayer || !cameraManager->orthoProjection || layerManager->selectedLayer->allConveyors.size() < 1) break;
 				if (!layerManager->selectedLayer->selectedConveyor)
 				{
 					layerManager->selectedLayer->selectedConveyor = layerManager->selectedLayer->ReturnClosestConveyor(mouse.position);
@@ -71,7 +69,7 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEMOTION:
 		{
-			if(!settings->openSettings)
+			if (!settings->openSettings)
 				mouse.MouseMovement3D(event, cameraManager->camera3d);
 		}break;
 		}
@@ -83,7 +81,7 @@ void Input::UpdateMouse(Mouse& mouse)
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);
 	mouse.SetScreenPosition(mouseX, mouseY);
-	mouse.Update(cameraManager->camera2d);
+	mouse.Update(cameraManager->camera2d, grid->cellSize);
 }
 
 void Input::ProcessInput()
@@ -131,6 +129,14 @@ void Input::Update(float deltaTime)
 	{
 		if (layerManager->selectedLayer->selectedConveyor)
 			layerManager->selectedLayer->selectedConveyor->edit = false;
+	}
+	if (keys[L].Down())
+	{
+		settings->showLayers = !settings->showLayers;
+	}
+	if (keys[G].Down())
+	{
+		settings->gridSnap = !settings->gridSnap;
 	}
 
 	if (mouse.middleMouseFirstPress)

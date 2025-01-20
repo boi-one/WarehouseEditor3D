@@ -1,8 +1,9 @@
 #include "Mouse.h"
 
-void Mouse::Update(Camera2D& camera2d)
+void Mouse::Update(Camera2D& camera2d, int cellSize)
 {
 	position = { camera2d.ToWorldPosition(screenPosition), 0 };
+	UpdateMouseOnGrid(cellSize);
 }
 
 void Mouse::SetScreenPosition(int x, int y)
@@ -36,4 +37,10 @@ void Mouse::Scroll(SDL_Event& event, Camera2D& camera2d)
 	if (overUI) return;
 	if (event.wheel.y < 0 && camera2d.zoom > 0.4f) camera2d.zoom -= 0.4f;
 	if (event.wheel.y > 0 && camera2d.zoom < 8) camera2d.zoom += 0.4f;
+}
+
+void Mouse::UpdateMouseOnGrid(int cellSize)
+{
+	gridPosition.x = round(position.x / cellSize) * cellSize;
+	gridPosition.y = round(position.y / cellSize) * cellSize;
 }

@@ -11,6 +11,7 @@
 #include "LayerManager.h"
 #include "Tools.h"
 using namespace Tools;
+#include "JsonSerialization.h"
 
 class UserInterface
 {
@@ -19,13 +20,15 @@ public:
 	Mouse* mouse = 0;
 	CameraManager* cameraManager = 0;
 	LayerManager* layerManager = 0;
+	JsonSerialization* jsonSerialization = 0;
 public:
-	UserInterface(Settings* settings, Mouse* mouse, CameraManager* cameraManager, LayerManager* layerManager)
+	UserInterface(Settings* settings, Mouse* mouse, CameraManager* cameraManager, LayerManager* layerManager, JsonSerialization* jsonSerialization)
 	{
 		this->settings = settings;
 		this->mouse = mouse;
 		this->cameraManager = cameraManager;
 		this->layerManager = layerManager;
+		this->jsonSerialization = jsonSerialization;
 	}
 	void NewImGuiFrame();
 	const char* SettingEnabled(bool b, const char* enabled = "enabled", const char* disabled = "disabled");

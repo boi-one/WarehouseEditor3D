@@ -1,5 +1,7 @@
 #pragma once
 #include "glm\glm.hpp"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 #include "Conveyor.h"
 #include "Tools.h"
@@ -19,7 +21,6 @@ public:
 	/// depth is how high the layer is in 3D, the point class has also a depth, because of the near clip plane of the orthographic camera you can max have 40 layers (near plane distance/25) but if you decrease it to something like -2000 it will display more layers
 	/// </summary>
 	float depth = 0;
-private:
 	int id;
 
 public:
@@ -28,7 +29,7 @@ public:
 		this->id = layerCount++;
 	}
 
-	void DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color);
+	void DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color, bool& gridSnap);
 	void UnselectConveyors()
 	{
 		for (Conveyor& c : allConveyors)
@@ -46,7 +47,11 @@ public:
 	bool EditConveyor(glm::vec3& position, bool& orthoProjection);
 	int ID() const { return id; };
 	void SetDepth(int layer);
+
+	friend void to_json(json& j, const Layer& l);
 };
+
+void from_json(const json& j, Layer& l);
 
 class LayerManager
 {
@@ -84,5 +89,9 @@ public:
 
 	void UnselectEverything();
 
-	void DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection);
+	void DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap);
+
+	friend void to_json(json& j, const LayerManager& lm);
 };
+
+void from_json(const json& j, LayerManager& lm);

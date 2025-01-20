@@ -7,6 +7,8 @@
 #include "Settings.h"
 #include "LayerManager.h"
 #include "Conveyor.h"
+#include "Grid.h"
+#include "JsonSerialization.h"
 
 enum Keys
 {
@@ -22,6 +24,8 @@ enum Keys
 	LSHIFT,
 	I,
 	X,
+	L,
+	G,
 };
 
 class Input
@@ -66,7 +70,9 @@ private:
 	CameraManager* cameraManager = 0;
 	Settings* settings = 0;
 	LayerManager* layerManager = 0;
-	
+	Grid* grid = 0;
+	JsonSerialization* jsonSerialization = 0;
+
 	std::vector<Key> keys =
 	{
 		Key(Keys::TAB, SDL_SCANCODE_TAB),
@@ -81,15 +87,19 @@ private:
 		Key(Keys::LSHIFT, SDL_SCANCODE_LSHIFT),
 		Key(Keys::I, SDL_SCANCODE_I),
 		Key(Keys::X, SDL_SCANCODE_X),
+		Key(Keys::L, SDL_SCANCODE_L),
+		Key(Keys::G, SDL_SCANCODE_G),
 	};
 
 public:
-	Input(CameraManager* cameraManager, Settings* settings, LayerManager* layerManager)
+	Input(CameraManager* cameraManager, Settings* settings, LayerManager* layerManager, Grid* grid, JsonSerialization* jsonSerialization)
 	{
 		this->cameraManager = cameraManager;
 		this->settings = settings;
 		mouse.cameraManager = cameraManager;
 		this->layerManager = layerManager;
+		this->grid = grid;
+		this->jsonSerialization = jsonSerialization;
 	}
 
 	void SDLEvents();

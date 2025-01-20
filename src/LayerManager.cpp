@@ -1,6 +1,6 @@
 #include "LayerManager.h"
 
-void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color)
+void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color, bool& gridSnap)
 {
 	glm::vec3 localcolor = { 0, 1, 0 };
 	shader.setVec3("mColor", localcolor);
@@ -8,7 +8,12 @@ void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoP
 	{
 		selectedConveyor->selectedPoint->position.z = depth;
 		mouse.position.z = depth;
-		cube.DrawLine(shader, localcolor, selectedConveyor->selectedPoint->position, mouse.position);
+
+		glm::vec3 mousePos;
+		if (gridSnap) mousePos = mouse.gridPosition;
+		else mousePos = mouse.position;
+
+		cube.DrawLine(shader, localcolor, selectedConveyor->selectedPoint->position, mousePos);
 	}
 	if (!orthoProjection)
 		selectedConveyor = 0;
@@ -135,7 +140,7 @@ void Layer::SetDepth(int layer)
 	}
 }
 
-void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection)
+void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap)
 {
 	glm::vec3 color;
 	int pointAmount = 0;
@@ -144,6 +149,30 @@ void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& or
 		if (layer.hidden) continue;
 		color = { 0.5f, 0.5f, 0.5f };
 		if (layer.selected) color = { 1, 1, 1 };
-		layer.DrawConveyors(shader, cube, mouse, orthoProjection, color);
+		layer.DrawConveyors(shader, cube, mouse, orthoProjection, color, gridSnap);
 	}
+}
+
+void to_json(json& j, const Layer& l)
+{
+	j = json
+	{
+		{"layerCount", l.layerCount},
+		{"id", l.id},
+		{"allConveyors", l.allConveyors},
+		{"depth", l.depth}
+	};
+}
+
+void from_json(const json& j, Layer& l)
+{
+	j.at("allConveyors").get_to(l.allConveyors);
+	l.id = j.at("id").get<int>();
+	l.layerCount = j.at("layerCount").get<int>();
+	l.depth = j.at("depth").get<int>();
+}
+
+void to_json(json& j, const LayerManager& lm)
+{
+
 }

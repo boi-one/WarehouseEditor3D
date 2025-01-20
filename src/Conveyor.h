@@ -1,4 +1,7 @@
 #pragma once
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include "Mesh.h"
 #include "Shader.h"
 #include "Mouse.h"
@@ -15,11 +18,10 @@ public:
 	/// depth is how high the point is in 3D, the layer class has also a depth, because of the near clip plane of the orthographic camera you can max have 40 layers but if you decrease it to something like -2000 it will display more layers
 	/// </summary>
 	float depth = 0;
-
-private:
 	int id;
 
 public:
+	Point() = default;
 	Point(glm::vec3 position, Mesh* mesh)
 	{
 		this->position = position;
@@ -35,7 +37,11 @@ public:
 	/// <param name="thickness"> is how thick the lines between the points are </param>
 	void Draw(glm::vec3& color, Shader& shader);
 	int ID() const { return id; };
+
+	friend void to_json(json& j, const Point& p);
 };
+
+void from_json(const json& j, Point& p);
 
 class Conveyor
 {
@@ -45,10 +51,7 @@ public:
 	bool selected = false;
 	bool edit = false;
 	Point* selectedPoint = 0;
-	static inline bool createNewConveyor = true;
 	static inline Mesh* mesh = 0;
-
-private:
 	int id;
 
 public:
@@ -61,7 +64,11 @@ public:
 	void Draw(Shader& shader, Mesh& cube, glm::vec3& color);
 	void NewPoint(glm::vec3 position);
 	int ID() const { return id; };
+
+	friend void to_json(json& j, const Conveyor& c);
 };
+
+void from_json(const json& j, Conveyor& c);
 
 
 

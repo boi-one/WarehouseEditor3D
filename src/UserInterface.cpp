@@ -15,31 +15,39 @@ const char* UserInterface::SettingEnabled(bool b, const char* enabled, const cha
 
 void UserInterface::InterfaceInteraction(float deltaTime)
 {
+	mouse->overUI = false;
 	if (settings->showInfo)
 	{
-		ImGui::Begin("Info", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-		mouse->overUI = ImGui::IsWindowHovered();
+		ImGui::Begin("Info", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+		mouse->overUI |= ImGui::IsWindowHovered();
 		ImGui::SetWindowPos({ 10, 10 });
 		ImGui::Text("- FPS: %.0f", 1 / deltaTime);
 		ImGui::Text("- Mouse position: X %.0f, Y %.0f", mouse->position.x, mouse->position.y);
 		ImGui::Text("- 2D Camera position: X %.0f, Y %.0f", cameraManager->camera2d.position.x, cameraManager->camera2d.position.y);
 		ImGui::Text("- 3D Camera position: X %.0f, Y %.0f, Z %.0f", cameraManager->camera3d.position.x, cameraManager->camera3d.position.y, cameraManager->camera3d.position.z);
-		ImGui::Text("- Screen resolution: X %0.f, Y %0.f", cameraManager->camera2d.viewport.cameraWidth, cameraManager->camera2d.viewport.cameraHeight);
+		ImGui::Text("- Screen resolution: X %d, Y %d", cameraManager->camera2d.viewport.windowWidth, cameraManager->camera2d.viewport.windowHeight);
 		ImGui::End();
 	}
 
 	if (settings->openSettings)
 	{
 		SDL_SetRelativeMouseMode(SDL_FALSE);
-		ImGui::Begin("Settings & Help", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+		ImGui::Begin("Settings & Help", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+		mouse->overUI |= ImGui::IsWindowHovered();
 		ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 4, (float)cameraManager->camera2d.viewport.windowWidth / 7 });
 		glm::vec2 centerScreen((float)cameraManager->camera2d.viewport.windowWidth / 2, (float)cameraManager->camera2d.viewport.windowHeight / 2);
 		ImGui::SetWindowPos({ centerScreen.x - ImGui::GetWindowSize().x / 2, centerScreen.y - ImGui::GetWindowSize().y / 2 });
-		mouse->overUI = ImGui::IsWindowHovered();
 
-		if (ImGui::Button("Save"));
+		if (ImGui::Button("Save"))
+		{
+			jsonSerialization->Serialize(layerManager->allLayers);
+		}
 		ImGui::SameLine();
-		if (ImGui::Button("Load"));
+		if (ImGui::Button("Load"))
+		{
+			std::string path = "save.json";
+			jsonSerialization->Deserialize(path, *layerManager);
+		}
 		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, { .75f, 0, 0, 1 });
 		if (ImGui::Button("Quit")) settings->appRunning = false;
@@ -48,11 +56,13 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 
 		if (ImGui::CollapsingHeader("Settings", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::Text("[Visuals]");
+			ImGui::SeparatorText("Visuals");
+
 			ImGui::Spacing();
 			VisualSettings();
 			ImGui::Spacing();
-			ImGui::Text("[3D Camera]");
+			ImGui::SeparatorText("3D Camera");
+
 			ImGui::Spacing();
 			Camera3DSettings();
 			ImGui::Spacing();
@@ -60,14 +70,15 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 
 		if (ImGui::CollapsingHeader("Keybindings", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::Text("[General Keybindings]");
+			ImGui::SeparatorText("General Keybindings");
 			ImGui::Spacing();
 			ImGui::Text("Esc        : Open settings menu");
 			ImGui::Text("Tab        : Switch projection");
 			ImGui::Text("I          : Show info");
+			ImGui::Text("L          : Show layers");
 
 			ImGui::Spacing();
-			ImGui::Text("[2D Keybindings]");
+			ImGui::SeparatorText("2D Keybindings");
 			ImGui::Spacing();
 			ImGui::Text("W          : Move up");
 			ImGui::Text("A          : Move left");
@@ -77,9 +88,10 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("R          : Reset 2D camera position");
 			ImGui::Text("Left Shift : Merge conveyors together");
 			ImGui::Text("X          : Unselect point");
+			ImGui::Text("G          : Enable grid snapping");
 
 			ImGui::Spacing();
-			ImGui::Text("[3D Keybindings]");
+			ImGui::SeparatorText("3D Keybindings");
 			ImGui::Spacing();
 			ImGui::Text("W          : Move forward");
 			ImGui::Text("A          : Strafe left");
@@ -99,6 +111,12 @@ void UserInterface::VisualSettings()
 	if (ImGui::Button("Show Axes")) settings->showAxes = !settings->showAxes;
 	ImGui::SameLine();
 	ImGui::Text(SettingEnabled(settings->showAxes));
+	if (ImGui::Button("Show Grid")) settings->showGrid = !settings->showGrid;
+	ImGui::SameLine();
+	ImGui::Text(SettingEnabled(settings->showGrid));
+	if (ImGui::Button("Snap to Grid")) settings->gridSnap = !settings->gridSnap;
+	ImGui::SameLine();
+	ImGui::Text(SettingEnabled(settings->gridSnap));
 
 	if (ImGui::Button("Wireframe"))
 	{
@@ -128,8 +146,11 @@ void UserInterface::Camera3DSettings()
 
 void UserInterface::Layers(LayerManager& layerManager)
 {
-	ImGui::Begin("Layers");
-	mouse->overUI = ImGui::IsWindowHovered();
+	if (!settings->showLayers) return;
+	ImGui::Begin("Layers", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+	mouse->overUI |= ImGui::IsWindowHovered();
+	ImGui::SetWindowPos({ 10, (float)cameraManager->camera2d.viewport.windowHeight - ImGui::GetWindowSize().y - 10});
+	ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 8.2f, (float)cameraManager->camera2d.viewport.windowHeight / 2 });
 	std::vector<int> deletions;
 
 	if (ImGui::Button("add layer"))

@@ -33,7 +33,7 @@ void Conveyor::NewPoint(glm::vec3 position)
 		selectedPoint = &path.emplace_back(Point(position, mesh));
 		return;
 	}
-		
+
 	Point& temp = selectedPoint->connections.emplace_back(Point(position, mesh));
 	path.emplace_back(temp);
 	selectedPoint = &path[path.size() - 1];
@@ -50,8 +50,48 @@ void Point::Draw(glm::vec3& color, Shader& shader)
 
 	for (Point& connection : connections)
 	{
-		glm::vec3 start = { position.x, position.y, depth};
+		glm::vec3 start = { position.x, position.y, depth };
 		glm::vec3 end = { connection.position.x, connection.position.y, depth };
-		mesh->DrawLine(shader, color, start, end); 
+		mesh->DrawLine(shader, color, start, end);
 	}
+}
+
+void to_json(json& j, const Point& p)
+{
+	j = json
+	{
+		{"x", p.position.x}, {"y", p.position.y},
+		{"connections", p.connections},
+		{"depth", p.depth}
+	};
+}
+
+void from_json(const json& j, Point& p)
+{
+	p.position.x = j.at("x").get<float>();
+	p.position.y = j.at("y").get<float>();
+	p.depth = j.at("depth").get<int>();
+
+	//deserialize the connections vector
+	if (j.contains("connections"))
+	{
+		j.at("connections").get_to(p.connections);
+	}
+}
+
+void to_json(json& j, const Conveyor& c)
+{
+	j = json
+	{
+		{"alltimeConveyorCount", c.alltimeConveyorCount},
+		{"path", c.path},
+		{"id", c.id},
+	};
+}
+
+void from_json(const json& j, Conveyor& c)
+{
+	c.alltimeConveyorCount = j.at("alltimeConveyorCount").get<int>();
+	c.id = j.at("id").get<int>();
+	j.at("path").get_to<std::vector<Point>>(c.path);
 }
