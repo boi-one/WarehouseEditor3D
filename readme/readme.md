@@ -1,11 +1,11 @@
 The warehouse editor 3D is made so you can create, edit and view conveyor setups in 2D and 3D space.
 
 #### Index
-[Layers](#Layers)
-[Conveyors](#Conveyors)
-[Settings](#Settings%20Menu)
-[Camera Projection](#Camera%20Projection)
-[Info Window](#Info%20Window)
+[Layers](#Layers)  
+[Conveyors](#Conveyors)  
+[Settings](#Settings%20Menu)  
+[Camera Projection](#Camera%20Projection)  
+[Info Window](#Info%20Window)  
 ### Layers
 When you open the program you'll see something like this:
 
