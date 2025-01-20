@@ -13,6 +13,9 @@
 using namespace Tools;
 #include "JsonSerialization.h"
 
+/// <summary>
+/// handles the interface using ImGui
+/// </summary>
 class UserInterface
 {
 public:
@@ -30,13 +33,41 @@ public:
 		this->layerManager = layerManager;
 		this->jsonSerialization = jsonSerialization;
 	}
+	/// <summary>
+	/// handles some imgui functions
+	/// </summary>
 	void NewImGuiFrame();
+	/// <summary>
+	/// displays if the specific setting is enabled or disabled
+	/// </summary>
+	/// <param name="b">the bool to check if the setting is enabled or disabled</param>
+	/// <param name="enabled">text you want to display when setting is enabled</param>
+	/// <param name="disabled">text you want to display when setting is disabled</param>
+	/// <returns>the 'string' you want to display</returns>
 	const char* SettingEnabled(bool b, const char* enabled = "enabled", const char* disabled = "disabled");
+	/// <summary>
+	/// displays the imgui windows
+	/// </summary>
+	/// <param name="deltaTime">used for the FPS counter</param>
 	void InterfaceInteraction(float deltaTime);
 
+	/// <summary>
+	/// renders the elements for the visual settings
+	/// </summary>
 	void VisualSettings();
+	/// <summary>
+	/// renders the elements for the camera settings
+	/// </summary>
 	void Camera3DSettings();
-
+	/// <summary>
+	/// renders the layer panel
+	/// </summary>
+	/// <param name="layerManager">used to pass the layers vector</param>
 	void Layers(LayerManager& layerManager);
+	/// <summary>
+	/// used to render the list of conveyors pers layer
+	/// </summary>
+	/// <param name="layerManager">used to pass the layers vector</param>
+	/// <param name="currentLayer">the layer currently being looped over</param>
 	void Conveyors(LayerManager& layerManager, Layer& currentLayer);
 };

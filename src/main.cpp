@@ -15,8 +15,9 @@
 #include "UserInterface.h"
 #include "Grid.h"
 
-void UI(bool& overUI, bool& wireframe, float deltaTime, Mouse& mouse, Camera2D& camera, Camera3D& camera3d, int display_w, int display_h, bool& orthoProjection, bool& showAxes);
-
+/// <summary>
+/// used to return multiple values needed for windowInitialization
+/// </summary>
 struct InitReturn
 {
 	int failed;
@@ -29,6 +30,12 @@ struct InitReturn
 		this->gl_context = 0;
 	}
 };
+
+/// <summary>
+/// Initialize the SDL window
+/// </summary>
+/// <param name="camera">used for the width and height of the window</param>
+/// <returns>the SDL window and gl_context </returns>
 static InitReturn WindowInitialization(Camera2D& camera)
 {
 	InitReturn r;

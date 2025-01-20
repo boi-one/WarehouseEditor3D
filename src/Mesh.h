@@ -9,7 +9,9 @@ enum Shape
 {
 	CUBE,
 };
-
+/// <summary>
+/// the mesh being rendered
+/// </summary>
 class Mesh
 {
 public:
@@ -47,8 +49,28 @@ public:
 			break;
 		}
 	}
+	/// <summary>
+	/// sets the shape of the mesh to a cube
+	/// </summary>
 	void CreateCube();
+	/// <summary>
+	/// renders the mesh
+	/// </summary>
+	/// <param name="shader">used for the transforms</param>
 	void Draw(Shader& shader);
+	/// <summary>
+	/// renders the xyz axes so you can orient yourself in the 3D world
+	/// </summary>
+	/// <param name="shader">used for the transforms</param>
+	/// <param name="showAxes">if the axes should be shown or not</param>
 	void RenderAxis(Shader& shader, bool& showAxes);
+	/// <summary>
+	/// draws a line between two points
+	/// </summary>
+	/// <param name="shader">used for the transform</param>
+	/// <param name="color">the color of the line</param>
+	/// <param name="start">the start position of the line </param>
+	/// <param name="end">the end position of the line</param>
+	/// <param name="ortho">if the line should be rotated in 2D or 3D</param>
 	void DrawLine(Shader& shader, glm::vec3& color, glm::vec3& start, glm::vec3& end, bool ortho = true);
 };

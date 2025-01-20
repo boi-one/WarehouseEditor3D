@@ -27,7 +27,7 @@ struct Viewport
 };
 
 /// <summary>
-/// Z omhoog en Y de diepte in met de huidige coordinaten
+/// Z is up and Y is depth in the current coordinate system
 /// </summary>
 class Camera2D 
 {
@@ -46,11 +46,25 @@ public:
 	{
 		this->position = position;
 	}
-
+	/// <summary>
+	/// makes the camera move in 2D
+	/// </summary>
+	/// <param name="direction">the direction the camera should move in</param>
+	/// <param name="deltaTime">used for smooth movement across different computers</param>
 	void ProcessKeyboard(CameraMovement direction, float& deltaTime);
-	glm::mat4 GetViewMatrix(); //voor 3d
+	/// <summary>
+	/// Update viewport width and height for when you resize the window
+	/// </summary>
 	void Update();
+	/// <summary>
+	/// updates the projection based on the viewport
+	/// </summary>
+	/// <param name="shader"></param>
 	void SetTransform(Shader& shader);
-
+	/// <summary>
+	/// converts a point from screen position to world position
+	/// </summary>
+	/// <param name="position">screen position</param>
+	/// <returns>world position</returns>
 	glm::vec2 ToWorldPosition(glm::vec2 position);
 };

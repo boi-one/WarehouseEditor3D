@@ -43,10 +43,16 @@ public:
 
 void from_json(const json& j, Point& p);
 
+/// <summary>
+/// visualizes a conveyor
+/// </summary>
 class Conveyor
 {
 public:
 	static inline int alltimeConveyorCount = 0;
+	/// <summary>
+	/// these points make up the conveyor
+	/// </summary>
 	std::vector<Point> path;
 	bool selected = false;
 	bool edit = false;
@@ -59,10 +65,29 @@ public:
 	{
 		id = alltimeConveyorCount++;
 	}
+	/// <summary>
+	/// returns the closest point of the conveyor, a conveyor is a list of points with lines rendered between them
+	/// </summary>
+	/// <param name="origin">position to check which point is closest to it</param>
+	/// <param name="range">the range around the origin so you won't have to check every point</param>
+	/// <returns>a pointer to the closest point in the conveyor</returns>
 	Point* ClosestPoint(glm::vec3& origin, float range);
-
+	/// <summary>
+	/// draws the conveyor onto the screen
+	/// </summary>
+	/// <param name="shader">used for transforms</param>
+	/// <param name="cube">used to render the conveyor</param>
+	/// <param name="color">used for the color of the conveyor</param>
 	void Draw(Shader& shader, Mesh& cube, glm::vec3& color);
+	/// <summary>
+	/// adds a point to the conveyor
+	/// </summary>
+	/// <param name="position">place where you want the point to be</param>
 	void NewPoint(glm::vec3 position);
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns> the ID of the conveyor </returns>
 	int ID() const { return id; };
 
 	friend void to_json(json& j, const Conveyor& c);

@@ -10,6 +10,9 @@
 #include "Grid.h"
 #include "JsonSerialization.h"
 
+/// <summary>
+/// all the keys you can use, when adding extra keys, keep the order the same as in the keys vector in the input class (THIS IS IMPORTANT!)
+/// </summary>
 enum Keys
 {
 	TAB,
@@ -28,9 +31,15 @@ enum Keys
 	G,
 };
 
+/// <summary>
+/// handles all the input in the program
+/// </summary>
 class Input
 {
 public:
+	/// <summary>
+	/// a key on your keyboard
+	/// </summary>
 	struct Key
 	{
 		Keys id;
@@ -62,6 +71,10 @@ public:
 		/// </summary>
 		/// <returns></returns>
 		bool Up();
+		/// <summary>
+		/// checks if the key is pressed
+		/// </summary>
+		/// <param name="key">which key you want to check</param>
 		void RegisterInput(const Uint8* key);
 	};
 	Mouse mouse;
@@ -73,6 +86,9 @@ private:
 	Grid* grid = 0;
 	JsonSerialization* jsonSerialization = 0;
 
+	/// <summary>
+	/// the list of all the keys being used, this has to be the same order as in the enum (IMPORTANT!)
+	/// </summary>
 	std::vector<Key> keys =
 	{
 		Key(Keys::TAB, SDL_SCANCODE_TAB),
@@ -101,10 +117,27 @@ public:
 		this->grid = grid;
 		this->jsonSerialization = jsonSerialization;
 	}
-
+	/// <summary>
+	/// polls all of the SDL events like exiting the window
+	/// </summary>
 	void SDLEvents();
+	/// <summary>
+	/// updates the mouse so it has the correct position
+	/// </summary>
+	/// <param name="mouse"></param>
 	void UpdateMouse(Mouse& mouse);
+	/// <summary>
+	/// read which keys you press and perform the according action
+	/// </summary>
 	void ProcessInput();
+	/// <summary>
+	/// update all of the input
+	/// </summary>
+	/// <param name="deltaTime">used for the camera movement so it is smooth on all computers</param>
 	void Update(float deltaTime);
+	/// <summary>
+	/// the movement code
+	/// </summary>
+	/// <param name="deltaTime">used for the camera movement so it is smooth on all computers</param>
 	void Movement(float deltaTime);
 };

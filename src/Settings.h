@@ -1,5 +1,8 @@
 #pragma once
 
+/// <summary>
+/// a place to keep settings organized in one place
+/// </summary>
 struct Settings
 {
 	bool appRunning = true;
