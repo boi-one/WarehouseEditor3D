@@ -1,5 +1,14 @@
 The warehouse editor 3D is made so you can create, edit and view conveyor setups in 2D and 3D space.
 
+### How To Build
+
+1. install cmake
+
+2. create a new directory in the root called `build`
+
+3. go to the build directory in the commandline and type `cmake ..`
+
+
 #### Index
 [Layers](#Layers)  
 [Conveyors](#Conveyors)  
