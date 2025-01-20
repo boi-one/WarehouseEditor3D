@@ -26,11 +26,6 @@ void Camera2D::ProcessKeyboard(CameraMovement direction, float& deltaTime)
 	}
 }
 
-glm::mat4 Camera2D::GetViewMatrix()
-{
-	return glm::lookAt(position, position + front, up);
-}
-
 void Camera2D::Update()
 {
 	viewport.cameraWidth = viewport.windowWidth / zoom;

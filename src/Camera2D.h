@@ -59,7 +59,7 @@ public:
 	/// <summary>
 	/// updates the projection based on the viewport
 	/// </summary>
-	/// <param name="shader"></param>
+	/// <param name="shader">used for transforms</param>
 	void SetTransform(Shader& shader);
 	/// <summary>
 	/// converts a point from screen position to world position
