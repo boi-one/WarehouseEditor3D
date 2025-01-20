@@ -19,21 +19,21 @@ Each layer has some  information and options. you could move the layer up and do
 
 When opening one of the layers you can see its content, you can see the current selected layer has a conveyor amount of 3 and when its open you can see information about those conveyors in more detail:
 
-!(conveyors in layer.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/conveyors%20in%20layer.png]
+![conveyors in layer.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/conveyors%20in%20layer.png)
 
 Each conveyor itself can also be selected, the selected conveyor will be dark green and also can't be deleted.
 A conveyor exist out of points, when you open the conveyor, you can view all the points and their positions. When clicking on one of the points the 2D camera centers on the point.
 
-!(points in conveyor.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/points%20in%20conveyor.png]
+![points in conveyor.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/points%20in%20conveyor.png)
 ### Conveyors
 
 When clicking with the mouse somewhere on the screen a blue point will appear, this is the start of a conveyor. The green line is a line which isn't placed yet but it shows you how it would look like if you placed a line there.
 
-!(place step 1.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/place%20step%201.png]
+![place step 1.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/place%20step%201.png)
 
 when clicking again a second point is added and a line is rendered between them.
 
-!(place step 2.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/place%20step%202.png]
+![place step 2.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/place%20step%202.png)
 
 The conveyor is color coded, there are four different colors, blue, yellow, white and gray. 
 **Blue:** meaning the conveyor is currently being edited.
@@ -41,15 +41,15 @@ The conveyor is color coded, there are four different colors, blue, yellow, whit
 **White:** meaning the conveyor is in the selected layer.
 **Gray:** meaning the conveyor is in another layer which is not selected.
 
-!(conveyor color codes.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/conveyor%20color%20codes.png]
+![conveyor color codes.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/conveyor%20color%20codes.png)
 
 When right-clicking close to a point in the selected conveyor the green line will start at that point. This way you can make branching conveyors.
 
-!(change selected point.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/change%20selected%20point.png]
+![change selected point.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/change%20selected%20point.png)
 
 When there are multiple conveyors in a layer you can merge the two conveyors creating one big conveyor. You can do this by pressing shift close to the desired connection point. The second conveyor will disappear from the list and merge with the selected conveyor.
 
-!(connect conveyors.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/connect%20conveyors.png]
+![connect conveyors.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/connect%20conveyors.png)
 
 You can unselect a conveyor by pressing "Z" and to go out of edit mode you can press "X". when you press "X" you get into selection mode, in this mode you can only move the conveyor, you do this by dragging it while holding the middle mouse button. When you want to exit selection mode you can press "Z" to unselect the conveyor or right-click close to a point in the selected conveyor to go back into edit mode.
 ### Settings Menu
@@ -61,12 +61,13 @@ The camera projection setting will toggle between the orthographic projection (m
 
 One thing to note is that the 2D camera and the 3D camera have seperate position so when you move to a specific point in 3D space and you want to see it in 2D you'll have to manually go there in 2D.
 
-!(2D 3D comparision.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/2D%203D%20comparision.png]
+![2D 3D comparision.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/2D%203D%20comparision.png)
 
 If you still remember the layer explanation you'll probably remember me telling you about that the position of the layer in the list affects the position of the layer in 3D, so layer 2 is lower than layer 8.
 
-!(3D layer view 1.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/3D%20layer%20view%201.png]
-!(3D layer view 2.png)[https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/3D%20layer%20view%202.png]
+![3D layer view 1.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/3D%20layer%20view%201.png)  
+![3D layer view 2.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/3D%20layer%20view%202.png)
+
 ### Info Window
 
 The info window contains miscellaneous info about the fps, the important positions and the screen resulotion. This window can be toggled off using "I". 
