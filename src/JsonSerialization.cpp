@@ -49,3 +49,38 @@ void JsonSerialization::Deserialize(std::string& filePath, LayerManager& layerMa
 	}
 	else std::cout << "deserialization failed, can't open file" << std::endl;
 }
+
+void JsonSerialization::SerializeMouse(float& mouseSensitivity, float& camera3dfov)
+{
+	json jsonFile;
+
+	jsonFile = {
+		{"mouseSensitivity", mouseSensitivity},
+		{"camera3dfov", camera3dfov}
+	};
+
+	std::ofstream file("mouse.json");
+
+	if (file.is_open())
+	{
+		file << jsonFile.dump(4);
+		file.close();
+		std::cout << "mouse serialization success" << std::endl;
+	}
+	else std::cout << "mouse failed serialization" << std::endl;
+}
+
+void JsonSerialization::DeserializeMouse(std::string& filePath, float& mouseSensitivity, float& camera3dfov)
+{
+	std::ifstream file(filePath);
+
+	if (file.is_open())
+	{
+		json data;
+		file >> data;
+		mouseSensitivity = data.at("mouseSensitivity").get<float>();
+		camera3dfov = data.at("camera3dfov").get<float>();
+		std::cout << "deserialization success" << std::endl;
+	}
+	else std::cout << "deserialization failed, can't open file" << std::endl;
+}

@@ -150,7 +150,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 	ImGui::Begin("Layers", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 	mouse->overUI |= ImGui::IsWindowHovered();
 	ImGui::SetWindowPos({ 10, (float)cameraManager->camera2d.viewport.windowHeight - ImGui::GetWindowSize().y - 10});
-	ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 8.2f, (float)cameraManager->camera2d.viewport.windowHeight / 2 });
+	ImGui::SetWindowSize({ 300, (float)cameraManager->camera2d.viewport.windowHeight / 2 });
 	std::vector<int> deletions;
 
 	if (ImGui::Button("add layer"))

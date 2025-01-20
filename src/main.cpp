@@ -105,6 +105,8 @@ int main()
 	Mesh cube;
 	Conveyor::mesh = &cube;
 	jsonSerialization.LateConstruct(&cube);
+	std::string mousePath = "mouse.json";
+	jsonSerialization.DeserializeMouse(mousePath, input.mouse.sensitivity, cameraManager.camera3d.fov);
 	layerManager.LateConstruct(&shader, &cube, &input.mouse);
 	// Main loop
 	while (settings.appRunning)

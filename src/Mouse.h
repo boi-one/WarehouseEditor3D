@@ -7,7 +7,7 @@ class Mouse
 {
 public:
 	glm::vec3 position = glm::vec3(0);
-	glm::vec3 gridPosition = glm::vec3(0); //TODO: FIX GRID POSITION NOT SHOWING
+	glm::vec3 gridPosition = glm::vec3(0);
 	float sensitivity = 0.4f;
 	bool overUI = false;
 	glm::vec3 dragOffset = glm::vec3(0, 0, 0);

@@ -34,4 +34,8 @@ public:
 	/// <param name="filePath">the place where the data is saved, relative to the exe</param>
 	/// <param name="layerManager">used to set the returned vector as the layer vector used by the layerManager</param>
 	void Deserialize(std::string& filePath, LayerManager& layerManager);
+
+	void SerializeMouse(float& mouseSensitivity, float& camera3dfov);
+
+	void DeserializeMouse(std::string& filePath, float& mouseSensitivity, float& camera3dfov);
 };
