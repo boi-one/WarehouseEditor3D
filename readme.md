@@ -45,7 +45,7 @@ when clicking again a second point is added and a line is rendered between them.
 
 ![place step 2.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/place%20step%202.png)
 
-The conveyor is color coded, there are four different colors, blue, yellow, white and gray. 
+The conveyor is color coded, there are four different colors, blue, yellow, white and gray.  
 **Blue:** meaning the conveyor is currently being edited.  
 **Yellow:** meaning the conveyor is selected but you can't edit it, only move it.  
 **White:** meaning the conveyor is in the selected layer.  
