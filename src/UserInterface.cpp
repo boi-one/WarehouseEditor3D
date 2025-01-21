@@ -223,6 +223,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 	}
 	for (int i : deletions)
 		DeleteFromList(layerManager.allLayers, layerManager.allLayers[i]);
+	for (Layer& l : layerManager.allLayers) if (l.selected) layerManager.selectedLayer = &l;
 
 	ImGui::End();
 }
