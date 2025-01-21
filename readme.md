@@ -8,6 +8,7 @@ The warehouse editor 3D is made so you can create, edit and view conveyor setups
 
 3. go to the build directory in the commandline and type `cmake ..`
 
+[Link to the previous version of the warehouse editor](https://github.com/boi-one/WarehouseEditor)
 
 #### Index
 [Layers](#Layers)  
