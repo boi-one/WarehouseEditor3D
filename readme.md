@@ -1,4 +1,8 @@
-The warehouse editor 3D is made so you can create, edit and view conveyor setups in 2D and 3D space.
+# Warehouse Editor 3D
+The warehouse editor 3D is made so you can create, edit and view conveyor setups in 2D and 3D space.  
+[Link to the previous version of the warehouse editor](https://github.com/boi-one/WarehouseEditor)
+
+---  
 
 ### How To Build
 
@@ -7,14 +11,15 @@ The warehouse editor 3D is made so you can create, edit and view conveyor setups
 2. create a new directory in the root called `build`
 
 3. go to the build directory in the commandline and type `cmake ..`
+###### If this didn't work change the location of vcpkg inside of the cmakelist.txt
 
-[Link to the previous version of the warehouse editor](https://github.com/boi-one/WarehouseEditor)
+---  
 
-#### Index
-[Layers](#Layers)  
-[Conveyors](#Conveyors)  
-[Settings](#Settings-Menu)  
-[Camera Projection](#Camera-Projection)  
+#### Index  
+[Layers](#Layers)   
+[Conveyors](#Conveyors)    
+[Settings](#Settings-Menu)    
+[Camera Projection](#Camera-Projection)    
 [Info Window](#Info-Window)  
 ### Layers
 When you open the program you'll see something like this:
