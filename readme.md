@@ -37,7 +37,7 @@ A conveyor exist out of points, when you open the conveyor, you can view all the
 ![points in conveyor.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/points%20in%20conveyor.png)
 ### Conveyors
 
-When clicking with the mouse somewhere on the screen a blue point will appear, this is the start of a conveyor. The green line is a line which isn't placed yet but it shows you how it would look like if you placed a line there.
+When clicking with the mouse somewhere on the screen a blue point will appear, this is the start of a conveyor. The green line is a part of the conveyor which isn't placed yet but it shows you how it would look like if you placed it there.
 
 ![place step 1.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/place%20step%201.png)
 
