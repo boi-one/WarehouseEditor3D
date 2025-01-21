@@ -25,7 +25,7 @@ public:
 	LayerManager* layerManager = 0;
 	JsonSerialization* jsonSerialization = 0;
 	bool saved = false;
-	int popupTime;
+	int popupTime = 0;
 public:
 	UserInterface(Settings* settings, Mouse* mouse, CameraManager* cameraManager, LayerManager* layerManager, JsonSerialization* jsonSerialization)
 	{

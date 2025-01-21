@@ -84,7 +84,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("I          : Show info");
 			ImGui::Text("L          : Show layers");
 			ImGui::Text("R          : Resets the active camera to the default position");
-			ImGui::Text("Left Ctrl  : Increases the active camera movement speed");
+			ImGui::Text("Left Ctrl  : Increase the movement speed of the active camera");
 
 			ImGui::Spacing();
 			ImGui::SeparatorText("2D Keybindings");
