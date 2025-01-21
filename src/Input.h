@@ -30,6 +30,7 @@ enum Keys
 	L,
 	G,
 	LCTRL,
+	DEL,
 };
 
 /// <summary>
@@ -107,6 +108,7 @@ private:
 		Key(Keys::L, SDL_SCANCODE_L),
 		Key(Keys::G, SDL_SCANCODE_G),
 		Key(Keys::LCTRL, SDL_SCANCODE_LCTRL),
+		Key(Keys::DEL, SDL_SCANCODE_DELETE),
 	};
 
 public:

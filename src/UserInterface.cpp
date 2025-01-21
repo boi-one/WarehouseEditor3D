@@ -58,6 +58,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, { .75f, 0, 0, 1 });
 		if (ImGui::Button("Quit")) settings->appRunning = false;
+		if (ImGui::IsItemHovered()) ImGui::SetTooltip("Quit the application, progress won't be saved");
 		ImGui::PopStyleColor();
 		ImGui::Spacing();
 
@@ -68,11 +69,10 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Spacing();
 			VisualSettings();
 			ImGui::Spacing();
-			ImGui::SeparatorText("3D Camera");
 
+			CameraSettings();
 			ImGui::Spacing();
-			Camera3DSettings();
-			ImGui::Spacing();
+
 		}
 
 		if (ImGui::CollapsingHeader("Keybindings", ImGuiTreeNodeFlags_DefaultOpen))
@@ -84,6 +84,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("I          : Show info");
 			ImGui::Text("L          : Show layers");
 			ImGui::Text("R          : Resets the active camera to the default position");
+			ImGui::Text("Left Ctrl  : Increases the active camera movement speed");
 
 			ImGui::Spacing();
 			ImGui::SeparatorText("2D Keybindings");
@@ -141,14 +142,40 @@ void UserInterface::VisualSettings()
 	ImGui::Text(SettingEnabled(cameraManager->orthoProjection, "Orthographic", "Perspective"));
 }
 
-void UserInterface::Camera3DSettings()
+void UserInterface::CameraSettings()
 {
+	ImGui::SeparatorText("3D Camera");
+	ImGui::Spacing();
+
 	float fovMin = 10.f;
 	float fovMax = 130.f;
-	ImGui::SliderFloat("FOV", &cameraManager->camera3d.fov, fovMin, fovMax);
+	float sliderWidth = 220;
+
+	ImGui::PushID("fov");
+	if (ImGui::Button("Default")) cameraManager->camera3d.fov = 45.f;
+	ImGui::PopID();
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(sliderWidth);
+	ImGui::SliderFloat("FOV        ", &cameraManager->camera3d.fov, fovMin, fovMax);
 	float sensMin = 0.01f;
 	float sensMax = 1.f;
+	ImGui::PushID("sens");
+	if (ImGui::Button("Default")) mouse->sensitivity = 0.4f;
+	ImGui::PopID();
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(sliderWidth);
 	ImGui::SliderFloat("Sensitivity", &mouse->sensitivity, sensMin, sensMax);
+	ImGui::SeparatorText("2D Camera");
+	ImGui::Spacing();
+
+	ImGui::PushID("zoom");
+	if (ImGui::Button("Default")) cameraManager->camera2d.zoom = 1;
+	ImGui::PopID();
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(sliderWidth);
+	ImGui::SliderFloat("Zoom       ", &cameraManager->camera2d.zoom, cameraManager->camera2d.zoomMin, cameraManager->camera2d.zoomMax);
+
+	ImGui::Spacing();
 }
 
 void UserInterface::Layers(LayerManager& layerManager)
@@ -156,7 +183,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 	if (!settings->showLayers) return;
 	ImGui::Begin("Layers", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 	mouse->overUI |= ImGui::IsWindowHovered();
-	ImGui::SetWindowPos({ 10, (float)cameraManager->camera2d.viewport.windowHeight - ImGui::GetWindowSize().y - 10});
+	ImGui::SetWindowPos({ 10, (float)cameraManager->camera2d.viewport.windowHeight - ImGui::GetWindowSize().y - 10 });
 	ImGui::SetWindowSize({ 300, (float)cameraManager->camera2d.viewport.windowHeight / 2 });
 	std::vector<int> deletions;
 
@@ -211,7 +238,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 		ImGui::SameLine();
 		if (ImGui::Button("delete"))
 		{
-			if(!allLayers[i].selected)
+			if (!allLayers[i].selected)
 				deletions.push_back(i);
 		}
 		ImGui::PopID();

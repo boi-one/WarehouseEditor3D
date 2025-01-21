@@ -140,6 +140,11 @@ void Input::Update(float deltaTime)
 	{
 		settings->gridSnap = !settings->gridSnap;
 	}
+	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor)
+	{
+		Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
+		layerManager->selectedLayer->UnselectConveyors();
+	}
 
 	if (mouse.middleMouseFirstPress)
 	{

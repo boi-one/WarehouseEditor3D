@@ -60,7 +60,7 @@ public:
 	/// <summary>
 	/// renders the elements for the camera settings
 	/// </summary>
-	void Camera3DSettings();
+	void CameraSettings();
 	/// <summary>
 	/// renders the layer panel
 	/// </summary>
