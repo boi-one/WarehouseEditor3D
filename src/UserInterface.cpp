@@ -21,6 +21,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		ImGui::Begin("Info", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 		mouse->overUI |= ImGui::IsWindowHovered();
 		ImGui::SetWindowPos({ 10, 10 });
+		ImGui::SetWindowSize({ 310, 150 });
 		ImGui::Text("- FPS: %.0f", 1 / deltaTime);
 		ImGui::Text("- Mouse position: X %.0f, Y %.0f", mouse->position.x, mouse->position.y);
 		ImGui::Text("- 2D Camera position: X %.0f, Y %.0f", cameraManager->camera2d.position.x, cameraManager->camera2d.position.y);
@@ -34,7 +35,10 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 		ImGui::Begin("Settings & Help", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 		mouse->overUI |= ImGui::IsWindowHovered();
-		ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 4, (float)cameraManager->camera2d.viewport.windowWidth / 7 });
+		/*if ((float)cameraManager->camera2d.viewport.windowWidth > 800)
+			ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 4, (float)cameraManager->camera2d.viewport.windowWidth / 7 });
+		else*/
+			ImGui::SetWindowSize({ 600, 300});
 		glm::vec2 centerScreen((float)cameraManager->camera2d.viewport.windowWidth / 2, (float)cameraManager->camera2d.viewport.windowHeight / 2);
 		ImGui::SetWindowPos({ centerScreen.x - ImGui::GetWindowSize().x / 2, centerScreen.y - ImGui::GetWindowSize().y / 2 });
 
@@ -185,7 +189,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 	ImGui::Begin("Layers", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 	mouse->overUI |= ImGui::IsWindowHovered();
 	ImGui::SetWindowPos({ 10, (float)cameraManager->camera2d.viewport.windowHeight - ImGui::GetWindowSize().y - 10 });
-	ImGui::SetWindowSize({ 300, (float)cameraManager->camera2d.viewport.windowHeight / 2 });
+	ImGui::SetWindowSize({ 310, (float)cameraManager->camera2d.viewport.windowHeight / 2 });
 	std::vector<int> deletions;
 
 	if (ImGui::Button("add layer"))
