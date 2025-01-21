@@ -97,6 +97,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("Left Shift : Merge conveyors together");
 			ImGui::Text("X          : Unselect point");
 			ImGui::Text("G          : Enable grid snapping");
+			ImGui::Text("Delete     : Deletes the selected conveyor");
 
 			ImGui::Spacing();
 			ImGui::SeparatorText("3D Keybindings");

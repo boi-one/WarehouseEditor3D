@@ -1,15 +1,18 @@
 #pragma once
 #include <vector>
 
+/// <summary>
+/// A collection of handy functions
+/// </summary>
 namespace Tools
 {
 	/// <summary>
-		/// Finds anything in a vector independent of the type of the vector
-		/// </summary>
-		/// <typeparam name="T"> is the type of the vector and the item being searched for</typeparam>
-		/// <param name="list"> the list is a list where the item possibly could be in</param>
-		/// <param name="item"> is the instance being looked for</param>
-		/// <returns> the position in the list, if -1 is being returned that means the instance is not present in the vector</returns>
+	/// Finds anything in a vector independent of the type of the vector
+	/// </summary>
+	/// <typeparam name="T"> is the type of the vector and the item being searched for</typeparam>
+	/// <param name="list"> the list is a list where the item possibly could be in</param>
+	/// <param name="item"> is the instance being looked for</param>
+	/// <returns> the position in the list, if -1 is being returned that means the instance is not present in the vector</returns>
 	template<typename T> static int FindInList(std::vector<T>& list, const T& item)
 	{
 		for (int i = 0; i < list.size(); i++)
