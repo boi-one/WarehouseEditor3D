@@ -99,9 +99,10 @@ void Input::Update(float deltaTime)
 
 	if (!settings->openSettings) Movement(deltaTime);
 
-	if (keys[R].Down() && cameraManager->orthoProjection)
+	if (keys[R].Down())
 	{
-		cameraManager->camera2d.position = glm::vec3(0, 0, 3);
+		if (cameraManager->orthoProjection)	cameraManager->camera2d.position = glm::vec3(0, 0, 3);
+		else cameraManager->camera3d.position = glm::vec3(-100.0f, 0.0f, 100.0f);
 	}
 	if (keys[Z].Down())
 	{
@@ -197,6 +198,16 @@ void Input::Movement(float deltaTime)
 	if (keys[LSHIFT].Hold() && !cameraManager->orthoProjection)
 	{
 		cameraManager->camera3d.ProcessKeyboard(DOWN, deltaTime);
+	}
+	if (keys[LCTRL].Hold())
+	{
+		if (cameraManager->orthoProjection)	cameraManager->camera2d.movementSpeed = cameraManager->camera2d.baseMovementSpeed * 2;
+		else cameraManager->camera3d.movementSpeed = cameraManager->camera3d.baseMovementSpeed * 20;
+	}
+	else
+	{
+		if (cameraManager->orthoProjection) cameraManager->camera2d.movementSpeed = cameraManager->camera2d.baseMovementSpeed;
+		else cameraManager->camera3d.movementSpeed = cameraManager->camera3d.baseMovementSpeed;
 	}
 }
 

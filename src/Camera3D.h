@@ -24,6 +24,7 @@ public:
 	glm::vec3 front = glm::vec3();
 	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
+	float baseMovementSpeed = 0;
 	float movementSpeed = 150.f;
 	float fov = 45.f;
 	float pitch = 0.f;
@@ -33,6 +34,7 @@ public:
 	{
 		this->front = front;
 		this->position = position;
+		baseMovementSpeed = movementSpeed;
 	}
 	/// <summary>
 	/// used for looking around

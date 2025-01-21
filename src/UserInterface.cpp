@@ -38,9 +38,16 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		glm::vec2 centerScreen((float)cameraManager->camera2d.viewport.windowWidth / 2, (float)cameraManager->camera2d.viewport.windowHeight / 2);
 		ImGui::SetWindowPos({ centerScreen.x - ImGui::GetWindowSize().x / 2, centerScreen.y - ImGui::GetWindowSize().y / 2 });
 
+		if (SDL_GetTicks() < popupTime && saved)
+		{
+			ImGui::Text("Successfully saved!");
+		}
+		else saved = false;
 		if (ImGui::Button("Save"))
 		{
 			jsonSerialization->Serialize(layerManager->allLayers);
+			saved = true;
+			popupTime = SDL_GetTicks() + 1000;
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load"))
@@ -76,6 +83,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("Tab        : Switch projection");
 			ImGui::Text("I          : Show info");
 			ImGui::Text("L          : Show layers");
+			ImGui::Text("R          : Resets the active camera to the default position");
 
 			ImGui::Spacing();
 			ImGui::SeparatorText("2D Keybindings");
@@ -85,7 +93,6 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("S          : Move down");
 			ImGui::Text("D          : Move right");
 			ImGui::Text("Z          : Unselect Conveyor");
-			ImGui::Text("R          : Reset 2D camera position");
 			ImGui::Text("Left Shift : Merge conveyors together");
 			ImGui::Text("X          : Unselect point");
 			ImGui::Text("G          : Enable grid snapping");

@@ -29,6 +29,7 @@ enum Keys
 	X,
 	L,
 	G,
+	LCTRL,
 };
 
 /// <summary>
@@ -105,6 +106,7 @@ private:
 		Key(Keys::X, SDL_SCANCODE_X),
 		Key(Keys::L, SDL_SCANCODE_L),
 		Key(Keys::G, SDL_SCANCODE_G),
+		Key(Keys::LCTRL, SDL_SCANCODE_LCTRL),
 	};
 
 public:

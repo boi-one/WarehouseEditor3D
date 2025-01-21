@@ -37,6 +37,7 @@ public:
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 right = glm::vec3();
 	glm::vec3 worldUp = glm::vec3();
+	float baseMovementSpeed = 0;
 	float movementSpeed = 500.f;
 	Viewport viewport;
 	float zoom = 1;
@@ -46,6 +47,7 @@ public:
 	Camera2D(glm::vec3 position = { 0.0f, 0.0f, 1.0f })
 	{
 		this->position = position;
+		baseMovementSpeed = movementSpeed;
 	}
 	/// <summary>
 	/// makes the camera move in 2D
