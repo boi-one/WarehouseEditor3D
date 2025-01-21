@@ -73,7 +73,7 @@ One thing to note is that the 2D camera and the 3D camera have seperate position
 
 ![2D 3D comparision.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/2D%203D%20comparision.png)
 
-If you still remember the layer explanation you'll probably remember me telling you about that the position of the layer in the list affects the position of the layer in 3D, so layer 2 is lower than layer 8.
+If you still remember the layer explanation you'll probably remember me telling you about that the position of the layer in the list affects the position of the layer in 3D, so layer 2 is lower than layer 8. This will create a more immersive experience (probably).
 
 ![3D layer view 1.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/3D%20layer%20view%201.png)  
 ![3D layer view 2.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/3D%20layer%20view%202.png)
