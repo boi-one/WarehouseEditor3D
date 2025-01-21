@@ -10,7 +10,7 @@ enum Shape
 	CUBE,
 };
 /// <summary>
-/// the mesh being rendered
+/// A shape in the world you can render
 /// </summary>
 class Mesh
 {

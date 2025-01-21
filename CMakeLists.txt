@@ -27,5 +27,4 @@ configure_file(src/shader.frag ${CMAKE_BINARY_DIR}/shader.frag COPYONLY)
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
 
-
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2 GLEW::GLEW OpenGL::GL imgui::imgui nlohmann_json::nlohmann_json)
