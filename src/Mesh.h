@@ -63,7 +63,7 @@ public:
 	/// </summary>
 	/// <param name="shader">used for the transforms</param>
 	/// <param name="showAxes">if the axes should be shown or not</param>
-	void RenderAxis(Shader& shader, bool& showAxes);
+	void RenderAxis(Shader& shader, bool& showAxes, float pixelSize);
 	/// <summary>
 	/// draws a line between two points
 	/// </summary>

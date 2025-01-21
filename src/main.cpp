@@ -130,8 +130,10 @@ int main()
 		shader.use();
 		cameraManager.camera2d.Update();
 		cameraManager.UpdateProjection(shader, settings.openSettings);
-		cube.RenderAxis(shader, settings.showAxes);
-		grid.Draw(cube, shader, settings.showGrid);
+		float lineSize = 1;
+		if (cameraManager.orthoProjection) lineSize = cameraManager.camera2d.pixelSize;
+		cube.RenderAxis(shader, settings.showAxes, lineSize * 2);
+		grid.Draw(cube, shader, settings.showGrid, lineSize);
 		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection, settings.gridSnap);
 		ui.InterfaceInteraction(deltaTime);
 

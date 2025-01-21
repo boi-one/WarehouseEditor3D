@@ -18,5 +18,5 @@ public:
 	/// <param name="mesh"> used to render the grid lines</param>
 	/// <param name="shader">used to set the transforms of the lines</param>
 	/// <param name="showGrid">if it should be drawn</param>
-	void Draw(Mesh& mesh, Shader& shader, bool& showGrid);
+	void Draw(Mesh& mesh, Shader& shader, bool& showGrid, float lineSize);
 };

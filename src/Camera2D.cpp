@@ -30,8 +30,7 @@ void Camera2D::Update()
 {
 	viewport.cameraWidth = viewport.windowWidth / zoom;
 	viewport.cameraHeight = viewport.windowHeight / zoom;
-	//
-	//movementSpeed  zoom;
+	pixelSize = 1 / zoom;
 }
 
 void Camera2D::SetTransform(Shader& shader)
