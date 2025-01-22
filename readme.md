@@ -85,4 +85,4 @@ If you still remember the layer explanation you'll probably remember me telling 
 
 ### Info Window
 
-The info window contains miscellaneous info about the fps, the important positions and the screen resulotion. This window can be toggled off using "I". 
+The info window contains miscellaneous info about the fps, the important positions and the screen resolution. This window can be toggled off using "I". 
