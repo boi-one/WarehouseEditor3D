@@ -74,7 +74,16 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			CameraSettings();
 			ImGui::Spacing();
 
-			ImGui::SliderInt("grid size", &grid->gridSize, 1, 1000);
+			ImGui::SeparatorText("Grid size");
+			ImGui::Spacing();
+			ImGui::PushID("grid");
+			if (ImGui::Button("Default")) grid->gridSize = 45;
+			ImGui::PopID();
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(220);
+			ImGui::SliderInt("grid size", &grid->gridSize, 4, 1000);
+			if (ImGui::IsItemHovered()) ImGui::SetTooltip("use this when the current grid is too small for your project");
+			ImGui::Spacing();
 		}
 
 		if (ImGui::CollapsingHeader("Keybindings", ImGuiTreeNodeFlags_DefaultOpen))
