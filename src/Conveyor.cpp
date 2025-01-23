@@ -7,7 +7,7 @@ Point* Conveyor::ClosestPoint(glm::vec3& origin, float range)
 
 	for (Point& p : path)
 	{
-		float distance = glm::distance(p.position, origin);
+		float distance = glm::distance(glm::vec2(p.position.x, p.position.y), glm::vec2(origin.x, origin.y));
 		if (distance < range)
 		{
 			range = distance;

@@ -56,7 +56,7 @@ Conveyor* Layer::ReturnClosestConveyor(glm::vec3& origin)
 		for (int p = 0; p < allConveyors[c].path.size(); p++)
 		{
 			Point& point = conveyor.path[p];
-			float distance = glm::distance(point.position, origin);
+			float distance = glm::distance(glm::vec2(point.position.x, point.position.y), glm::vec2(origin.x, origin.y));
 			if (distance < smallestDistance)
 			{
 				smallestDistance = distance;
@@ -88,7 +88,7 @@ Conveyor* Layer::ReturnClosestConveyor(glm::vec3& origin, Conveyor& selected)
 		{
 			Point& point = conveyor.path[p];
 
-			float distance = glm::distance(point.position, origin);
+			float distance = glm::distance(glm::vec2(point.position.x, point.position.y), glm::vec2(origin.x, origin.y));
 			if (distance < smallestDistance)
 			{
 				smallestDistance = distance;
@@ -116,11 +116,11 @@ bool Layer::EditConveyor(glm::vec3& position, bool& orthoProjection)
 	Conveyor& temp = *ReturnClosestConveyor(position, *selectedConveyor);
 	Point* closest = temp.ClosestPoint(position, 100);
 	if (!closest || !selectedConveyor->selectedPoint) return false;
-	if(closest != selectedConveyor->selectedPoint)
+	if (closest != selectedConveyor->selectedPoint)
 		closest->connections.push_back(*selectedConveyor->selectedPoint);
 	for (Point& p : temp.path)
 		selectedConveyor->path.push_back(p);
-	
+
 	UnselectConveyors();
 	Tools::DeleteFromList(allConveyors, temp);
 	return true;
