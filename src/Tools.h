@@ -87,4 +87,17 @@ namespace Tools
 		}
 		return arr;
 	}
+	/// <summary>
+	/// clamps the value between the min and max range
+	/// </summary>
+	/// <param name="value:">the value you want to clamp</param>
+	/// <param name="min:">the minimum</param>
+	/// <param name="max:">the maximum</param>
+	/// <returns>the clamped value</returns>
+	static float Clamp(float value, float min, float max)
+	{
+		if (value < min) return min;
+		if (value > max) return max;
+		return value;
+	}
 }

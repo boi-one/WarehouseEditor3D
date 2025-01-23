@@ -36,7 +36,8 @@ void Mouse::Scroll(SDL_Event& event, Camera2D& camera2d)
 {
 	if (overUI) return;
 
-	camera2d.zoom /= powf(0.6f, event.wheel.preciseY);
+	camera2d.zoom /= powf(0.9f, event.wheel.preciseY);
+	camera2d.zoom = Tools::Clamp(camera2d.zoom, camera2d.zoomMin, camera2d.zoomMax);
 	
 	//if (event.wheel.y < 0 && camera2d.zoom > camera2d.zoomMin) camera2d.zoom -= 0.1f * camera2d.zoom;
 	//if (event.wheel.y > 0 && camera2d.zoom < camera2d.zoomMax) camera2d.zoom += 0.1f * camera2d.zoom;

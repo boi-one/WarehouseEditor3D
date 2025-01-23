@@ -3,7 +3,7 @@
 
 void Camera2D::ProcessKeyboard(CameraMovement direction, float& deltaTime)
 {
-	float velocity = movementSpeed * deltaTime;
+	float velocity = movementSpeed / zoom * 2 * deltaTime;
 
 	switch (direction)
 	{

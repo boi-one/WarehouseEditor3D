@@ -1,6 +1,7 @@
 #pragma once
 #include "CameraManager.h"
 #include "math.h"
+#include "Tools.h"
 #include <SDL.h>
 
 class Mouse
