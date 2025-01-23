@@ -95,14 +95,14 @@ void Mesh::RenderAxis(Shader& shader, bool& showAxes, float pixelSize, glm::vec3
 			model = glm::scale(model, { 9000, pixelSize, pixelSize });
 			shader.setMat4("model", model);
 		}
-		if (i == 1)
+		else if (i == 1)
 		{
 			shader.setVec3("mColor", { 0, 1, 0 });
 			model = glm::translate(model, { 0, position.y, 0 });
 			model = glm::scale(model, { pixelSize, 9000, pixelSize });
 			shader.setMat4("model", model);
 		}
-		if (i == 2)
+		else if (i == 2)
 		{
 			shader.setVec3("mColor", { 0, 0, 1 });
 			model = glm::translate(model, { 0, 0, position.z });

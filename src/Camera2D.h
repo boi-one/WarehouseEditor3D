@@ -40,7 +40,7 @@ public:
 	float baseMovementSpeed = 0;
 	float movementSpeed = 500.f;
 	Viewport viewport;
-	float zoomMin = 0.5f;
+	float zoomMin = 0.25f;
 	float zoomMax = 2.0f;
 	float zoom = 1;
 	glm::mat4 projection = glm::mat4();
