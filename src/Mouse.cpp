@@ -35,8 +35,11 @@ void Mouse::MouseMovement3D(SDL_Event& event, Camera3D& camera3d)
 void Mouse::Scroll(SDL_Event& event, Camera2D& camera2d)
 {
 	if (overUI) return;
-	if (event.wheel.y < 0 && camera2d.zoom > camera2d.zoomMin) camera2d.zoom -= 0.1f * camera2d.zoom;
-	if (event.wheel.y > 0 && camera2d.zoom < camera2d.zoomMax) camera2d.zoom += 0.1f * camera2d.zoom;
+
+	camera2d.zoom /= powf(0.6f, event.wheel.preciseY);
+	
+	//if (event.wheel.y < 0 && camera2d.zoom > camera2d.zoomMin) camera2d.zoom -= 0.1f * camera2d.zoom;
+	//if (event.wheel.y > 0 && camera2d.zoom < camera2d.zoomMax) camera2d.zoom += 0.1f * camera2d.zoom;
 }
 
 void Mouse::UpdateMouseOnGrid(int cellSize)
