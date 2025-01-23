@@ -150,8 +150,4 @@ public:
 	/// <param name="orthoProjection">used to check which projection is being used</param>
 	/// <param name="gridSnap">used to determine if the mouse should snap to the grid</param>
 	void DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap);
-
-	friend void to_json(json& j, const LayerManager& lm);
 };
-
-void from_json(const json& j, LayerManager& lm);
