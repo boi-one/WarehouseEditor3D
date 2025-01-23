@@ -35,10 +35,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 		ImGui::Begin("Settings & Help", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 		mouse->overUI |= ImGui::IsWindowHovered();
-		/*if ((float)cameraManager->camera2d.viewport.windowWidth > 800)
-			ImGui::SetWindowSize({ (float)cameraManager->camera2d.viewport.windowWidth / 4, (float)cameraManager->camera2d.viewport.windowWidth / 7 });
-		else*/
-			ImGui::SetWindowSize({ 600, 300});
+		ImGui::SetWindowSize({ 600, 300 });
 		glm::vec2 centerScreen((float)cameraManager->camera2d.viewport.windowWidth / 2, (float)cameraManager->camera2d.viewport.windowHeight / 2);
 		ImGui::SetWindowPos({ centerScreen.x - ImGui::GetWindowSize().x / 2, centerScreen.y - ImGui::GetWindowSize().y / 2 });
 
@@ -77,6 +74,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			CameraSettings();
 			ImGui::Spacing();
 
+			ImGui::SliderInt("grid size", &grid->gridSize, 1, 1000);
 		}
 
 		if (ImGui::CollapsingHeader("Keybindings", ImGuiTreeNodeFlags_DefaultOpen))

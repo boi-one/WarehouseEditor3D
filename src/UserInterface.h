@@ -12,6 +12,7 @@
 #include "Tools.h"
 using namespace Tools;
 #include "JsonSerialization.h"
+#include "Grid.h"
 
 /// <summary>
 /// handles the interface using ImGui
@@ -24,16 +25,18 @@ public:
 	CameraManager* cameraManager = 0;
 	LayerManager* layerManager = 0;
 	JsonSerialization* jsonSerialization = 0;
+	Grid* grid = 0;
 	bool saved = false;
 	int popupTime = 0;
 public:
-	UserInterface(Settings* settings, Mouse* mouse, CameraManager* cameraManager, LayerManager* layerManager, JsonSerialization* jsonSerialization)
+	UserInterface(Settings* settings, Mouse* mouse, CameraManager* cameraManager, LayerManager* layerManager, JsonSerialization* jsonSerialization, Grid* grid)
 	{
 		this->settings = settings;
 		this->mouse = mouse;
 		this->cameraManager = cameraManager;
 		this->layerManager = layerManager;
 		this->jsonSerialization = jsonSerialization;
+		this->grid = grid;
 	}
 	/// <summary>
 	/// handles some imgui functions
@@ -62,9 +65,8 @@ public:
 	/// </summary>
 	void CameraSettings();
 	/// <summary>
-	/// renders the layer panel
+	/// renders the elements for the grid settings
 	/// </summary>
-	/// <param name="layerManager">used to pass the layers vector</param>
 	void Layers(LayerManager& layerManager);
 	/// <summary>
 	/// used to render the list of conveyors pers layer

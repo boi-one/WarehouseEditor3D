@@ -71,7 +71,7 @@ void Mesh::Draw(Shader& shader)
 	glBindVertexArray(0);
 }
 
-void Mesh::RenderAxis(Shader& shader, bool& showAxes, float pixelSize)
+void Mesh::RenderAxis(Shader& shader, bool& showAxes, float pixelSize, glm::vec3 position)
 {
 	int axes = 0;
 	if (showAxes) axes = 3;
@@ -91,18 +91,21 @@ void Mesh::RenderAxis(Shader& shader, bool& showAxes, float pixelSize)
 		if (i == 0)
 		{
 			shader.setVec3("mColor", { 1, 0, 0 });
+			model = glm::translate(model, { position.x, 0, 0 });
 			model = glm::scale(model, { 9000, pixelSize, pixelSize });
 			shader.setMat4("model", model);
 		}
 		if (i == 1)
 		{
 			shader.setVec3("mColor", { 0, 1, 0 });
+			model = glm::translate(model, { 0, position.y, 0 });
 			model = glm::scale(model, { pixelSize, 9000, pixelSize });
 			shader.setMat4("model", model);
 		}
 		if (i == 2)
 		{
 			shader.setVec3("mColor", { 0, 0, 1 });
+			model = glm::translate(model, { 0, 0, position.z });
 			model = glm::scale(model, { pixelSize, pixelSize, 9000 });
 			shader.setMat4("model", model);
 		}

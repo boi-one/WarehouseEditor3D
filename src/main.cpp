@@ -101,7 +101,7 @@ int main()
 	Grid grid;
 	JsonSerialization jsonSerialization;
 	Input input(&cameraManager, &settings, &layerManager, &grid, &jsonSerialization);
-	UserInterface ui(&settings, &input.mouse, &cameraManager, &layerManager, &jsonSerialization);
+	UserInterface ui(&settings, &input.mouse, &cameraManager, &layerManager, &jsonSerialization, &grid);
 	Mesh cube;
 	Conveyor::mesh = &cube;
 	jsonSerialization.LateConstruct(&cube);
@@ -132,7 +132,8 @@ int main()
 		cameraManager.UpdateProjection(shader, settings.openSettings);
 		float lineSize = 1;
 		if (cameraManager.orthoProjection) lineSize = cameraManager.camera2d.pixelSize;
-		cube.RenderAxis(shader, settings.showAxes, lineSize * 2);
+		glm::vec3 axispos = cameraManager.orthoProjection ? cameraManager.camera2d.position : cameraManager.camera3d.position;
+		cube.RenderAxis(shader, settings.showAxes, lineSize * 2, axispos);
 		grid.Draw(cube, shader, settings.showGrid, lineSize);
 		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection, settings.gridSnap);
 		ui.InterfaceInteraction(deltaTime);
