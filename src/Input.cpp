@@ -111,7 +111,8 @@ void Input::Update(float deltaTime)
 	if (keys[ESC].Down())
 	{
 		settings->openSettings = !settings->openSettings;
-		jsonSerialization->SerializeMouse(mouse.sensitivity, cameraManager->camera3d.fov);
+		if(!settings->openSettings)
+			jsonSerialization->SerializeMouse(mouse.sensitivity, cameraManager->camera3d.fov);
 	}
 	if (keys[TAB].Down())
 	{

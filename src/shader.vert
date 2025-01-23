@@ -8,10 +8,6 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-//oude uniforms
-//uniform mat4 model;
-//uniform mat4 transform; //transform = projection * view
-////projection is the camera and view the position 
 void main()
 {
     gl_Position = projection * view * model * vec4(aPos, 1.0);
