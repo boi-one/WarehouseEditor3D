@@ -35,7 +35,7 @@ public:
 	/// <param name="color"> is the color of this point</param>
 	/// <param name="camera"> is used to convert to world position</param>
 	/// <param name="thickness"> is how thick the lines between the points are </param>
-	void Draw(glm::vec3& color, Shader& shader);
+	void Draw(glm::vec3& color, Shader& shader, float angle, glm::vec3 averagePos = {0, 0, 0});
 	int ID() const { return id; };
 
 	friend void to_json(json& j, const Point& p);
@@ -58,8 +58,8 @@ public:
 	bool edit = false;
 	Point* selectedPoint = 0;
 	static inline Mesh* mesh = 0;
+	float angle = 0;
 	int id;
-
 public:
 	Conveyor()
 	{
@@ -89,6 +89,13 @@ public:
 	/// </summary>
 	/// <returns> the ID of the conveyor </returns>
 	int ID() const { return id; };
+
+	glm::vec3 GetAveragePosition();
+	/// <summary>
+	/// Rotate the conveyor in worldspace
+	/// </summary>
+	/// <param name="direction:"> the direction you want to rotate in </param>
+	void Rotate(int direction);
 
 	friend void to_json(json& j, const Conveyor& c);
 };

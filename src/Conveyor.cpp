@@ -22,7 +22,7 @@ void Conveyor::Draw(Shader& shader, Mesh& cube, glm::vec3& color)
 {
 	for (Point& p : path)
 	{
-		p.Draw(color, shader);
+		p.Draw(color, shader, angle, path[0].position);
 	}
 }
 
@@ -39,7 +39,44 @@ void Conveyor::NewPoint(glm::vec3 position)
 	selectedPoint = &path[path.size() - 1];
 }
 
-void Point::Draw(glm::vec3& color, Shader& shader)
+glm::vec3 Conveyor::GetAveragePosition()
+{
+	int amount = 0;
+	float totalX = 0;
+	float totalY = 0;
+	for (Point& p : this->path)
+	{
+		amount++;
+		totalX += p.position.x;
+		totalY += p.position.y;
+	}
+
+	return glm::vec3(totalX / amount, totalY / amount, path[0].position.z);
+}
+
+void Conveyor::Rotate(int direction)
+{
+	if (!this) return;
+
+	glm::vec3 pivot = GetAveragePosition();
+
+	for (Point& p : path)
+	{
+		glm::vec4 tempPos = { p.position - pivot, 1 };
+		glm::mat4 rotation = glm::mat4(1.0f);
+		rotation = glm::rotate(rotation, glm::radians((float)direction), { 0, 0, 1 });
+		glm::vec4 result = tempPos * rotation;
+		for (Point& pc : p.connections)
+		{
+			glm::vec4 tempPospc = { pc.position - pivot, 1 };
+			glm::vec4 resultpc = tempPospc * rotation;
+			pc.position = glm::vec3(resultpc.x, resultpc.y, pc.position.z) + pivot;
+		}
+		p.position = glm::vec3(result.x, result.y, p.position.z) + pivot;
+	}
+}
+
+void Point::Draw(glm::vec3& color, Shader& shader, float angle, glm::vec3 averagePos)
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, { position.x, position.y, depth });

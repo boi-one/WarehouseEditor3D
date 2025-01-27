@@ -146,6 +146,14 @@ void Input::Update(float deltaTime)
 		Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
 		layerManager->selectedLayer->UnselectConveyors();
 	}
+	if (keys[ALEFT].Hold())
+	{
+		layerManager->selectedLayer->selectedConveyor->Rotate(-1);
+	}
+	if (keys[ARIGHT].Hold())
+	{
+		layerManager->selectedLayer->selectedConveyor->Rotate(1);
+	}
 
 	if (mouse.middleMouseFirstPress)
 	{

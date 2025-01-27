@@ -2,6 +2,7 @@
 
 void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color, bool& gridSnap)
 {
+
 	glm::vec3 localcolor = { 0, 1, 0 };
 	shader.setVec3("mColor", localcolor);
 	if (selectedConveyor && selectedConveyor->selectedPoint && selectedConveyor->edit) //draw newline
@@ -117,7 +118,10 @@ bool Layer::EditConveyor(glm::vec3& position, bool& orthoProjection)
 	Point* closest = temp.ClosestPoint(position, 100);
 	if (!closest || !selectedConveyor->selectedPoint) return false;
 	if (closest != selectedConveyor->selectedPoint)
+	{
 		closest->connections.push_back(*selectedConveyor->selectedPoint);
+		temp.angle = selectedConveyor->angle;
+	}
 	for (Point& p : temp.path)
 		selectedConveyor->path.push_back(p);
 
@@ -132,7 +136,6 @@ void Layer::SetDepth(int layer)
 	depth = layer * multiply;
 	for (Conveyor& c : allConveyors)
 	{
-
 		for (Point& p : c.path)
 		{
 			p.depth = layer * multiply;

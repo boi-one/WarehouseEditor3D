@@ -11,7 +11,7 @@
 #include "JsonSerialization.h"
 
 /// <summary>
-/// all the keys you can use, when adding extra keys, keep the order the same as in the keys vector in the input class (THIS IS IMPORTANT!)
+/// all the keys you can use, when adding extra keys, keep the order the same as in the keys vector in the input class (THIS IS IMPORTANT!) (or atleast map the enums to the position they have in the keys vector)
 /// </summary>
 enum Keys
 {
@@ -31,6 +31,10 @@ enum Keys
 	G,
 	LCTRL,
 	DEL,
+	AUP,
+	ADOWN,
+	ALEFT,
+	ARIGHT,
 };
 
 /// <summary>
@@ -109,6 +113,10 @@ private:
 		Key(Keys::G, SDL_SCANCODE_G),
 		Key(Keys::LCTRL, SDL_SCANCODE_LCTRL),
 		Key(Keys::DEL, SDL_SCANCODE_DELETE),
+		Key(Keys::AUP, SDL_SCANCODE_UP),
+		Key(Keys::ADOWN, SDL_SCANCODE_DOWN),
+		Key(Keys::ALEFT, SDL_SCANCODE_LEFT),
+		Key(Keys::ARIGHT, SDL_SCANCODE_RIGHT),
 	};
 
 public:
