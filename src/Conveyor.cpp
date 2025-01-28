@@ -22,7 +22,7 @@ void Conveyor::Draw(Shader& shader, Mesh& cube, glm::vec3& color)
 {
 	for (Point& p : path)
 	{
-		p.Draw(color, shader, angle, path[0].position);
+		p.Draw(color, shader, angle, width, path[0].position);
 	}
 }
 
@@ -76,11 +76,11 @@ void Conveyor::Rotate(int direction)
 	}
 }
 
-void Point::Draw(glm::vec3& color, Shader& shader, float angle, glm::vec3 averagePos)
+void Point::Draw(glm::vec3& color, Shader& shader, float angle, float width, glm::vec3 averagePos)
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, { position.x, position.y, depth });
-	model = glm::scale(model, { 11, 11, 11 });
+	model = glm::scale(model, { width, width, 10});
 	shader.setMat4("model", model);
 	shader.setVec3("mColor", color);
 	mesh->Draw(shader);
@@ -89,7 +89,7 @@ void Point::Draw(glm::vec3& color, Shader& shader, float angle, glm::vec3 averag
 	{
 		glm::vec3 start = { position.x, position.y, depth };
 		glm::vec3 end = { connection.position.x, connection.position.y, depth };
-		mesh->DrawLine(shader, color, start, end);
+		mesh->DrawLine(shader, color, start, end, width);
 	}
 }
 

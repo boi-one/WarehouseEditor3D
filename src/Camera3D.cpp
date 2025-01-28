@@ -25,7 +25,7 @@ void Camera3D::ProcessKeyboard(CameraMovement3D direction, float& deltaTime)
 
 void Camera3D::SetTransform(Shader& shader, float cameraWidth, float cameraHeight)
 {
-	glm::mat4 projection = glm::perspectiveRH_NO(glm::radians(fov), cameraWidth / cameraHeight, 0.1f, 10000.0f);
+	projection = glm::perspectiveRH_NO(glm::radians(fov), cameraWidth / cameraHeight, 0.1f, 10000.0f);
 
 	shader.setMat4("projection", projection);
 

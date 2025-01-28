@@ -32,7 +32,6 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 
 	if (settings->openSettings)
 	{
-		SDL_SetRelativeMouseMode(SDL_FALSE);
 		ImGui::Begin("Settings & Help", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 		mouse->overUI |= ImGui::IsWindowHovered();
 		ImGui::SetWindowSize({ 600, 300 });
@@ -109,6 +108,9 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("X          : Unselect point");
 			ImGui::Text("G          : Enable grid snapping");
 			ImGui::Text("Delete     : Deletes the selected conveyor");
+			ImGui::Text("Left Arrow : Rotates the conveyor counter clockwise");
+			ImGui::Text("Right Arrow: Rotates the conveyor clockwise");
+
 
 			ImGui::Spacing();
 			ImGui::SeparatorText("3D Keybindings");
@@ -219,6 +221,11 @@ void UserInterface::Layers(LayerManager& layerManager)
 		}
 		if (allLayers[i].selected) ImGui::PopStyleColor();
 		ImGui::PushID(i);
+		if (ImGui::CollapsingHeader("edit conveyor width") && allLayers[i].allConveyors.size() > 0)
+		{
+			ImGui::SliderFloat("width", &allLayers[i].width, allLayers[i].allConveyors[0].widthMin, allLayers[i].allConveyors[0].widthMax);
+			if (ImGui::Button("set width")) for (Conveyor& c : allLayers[i].allConveyors) c.width = allLayers[i].width;
+		}
 		if (ImGui::Button("move up") && i > 0)
 		{
 			if (&allLayers[i] == layerManager.selectedLayer)
@@ -311,11 +318,14 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 			if (!allConveyors[j].selected)
 				deletions.push_back(j);
 		}
-		ImGui::PopID();
 		if (ImGui::IsItemHovered() && allConveyors[j].selected)
 		{
 			ImGui::SetTooltip("cannot be deleted because this is currently the selected conveyor");
 		}
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(100);
+		ImGui::SliderFloat("width", &allConveyors[j].width, allConveyors[j].widthMin, allConveyors[j].widthMax);
+		ImGui::PopID();
 		ImGui::Separator();
 	}
 	ImGui::PopStyleColor();

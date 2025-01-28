@@ -21,6 +21,9 @@ struct Viewport
 	/// </summary>
 	int windowHeight = 720;
 
+	/// <summary>
+	/// size of the virtual camera, not the actual pixel size
+	/// </summary>
 	float cameraWidth, cameraHeight;
 	float left{0}, right{0}, top{0}, bottom{0};
 

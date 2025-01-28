@@ -14,6 +14,7 @@
 #include "Input.h"
 #include "UserInterface.h"
 #include "Grid.h"
+#include "Raycast.h"
 
 /// <summary>
 /// used to return multiple values needed for windowInitialization
@@ -108,6 +109,8 @@ int main()
 	std::string mousePath = "mouse.json";
 	jsonSerialization.DeserializeMouse(mousePath, input.mouse.sensitivity, cameraManager.camera3d.fov);
 	layerManager.LateConstruct(&shader, &cube, &input.mouse);
+	Raycast raycast({ 0, 1, 0 }, &input.mouse, &cameraManager);
+
 	// Main loop
 	while (settings.appRunning)
 	{
@@ -130,13 +133,33 @@ int main()
 		shader.use();
 		cameraManager.camera2d.Update();
 		cameraManager.UpdateProjection(shader, settings.openSettings);
+		if (cameraManager.orthoProjection || cameraManager.camera3d.cast || settings.openSettings) SDL_SetRelativeMouseMode(SDL_FALSE);
+		else SDL_SetRelativeMouseMode(SDL_TRUE);
 		float lineSize = 1;
 		if (cameraManager.orthoProjection) lineSize = cameraManager.camera2d.pixelSize;
 		glm::vec3 axispos = cameraManager.orthoProjection ? cameraManager.camera2d.position : cameraManager.camera3d.position;
 		cube.RenderAxis(shader, settings.showAxes, lineSize * 2, axispos);
 		grid.Draw(cube, shader, settings.showGrid, lineSize);
-		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection, settings.gridSnap);
+		glm::vec3 mousePos;
+
+		if (cameraManager.orthoProjection)
+		{
+			if (settings.gridSnap) mousePos = input.mouse.gridPosition;
+			else mousePos = input.mouse.position;
+		}
+		else
+		{
+			mousePos = raycast.intersection;
+		}
+		layerManager.DrawLayers(shader, cube, input.mouse, cameraManager.orthoProjection, settings.gridSnap, cameraManager.camera3d.cast, mousePos);
 		ui.InterfaceInteraction(deltaTime);
+
+		if (cameraManager.camera3d.cast)
+		{
+			raycast.Ray();
+			raycast.Intersection(layerManager.selectedLayer->depth);
+			cameraManager.camera3d.raycastIntersection = raycast.intersection;
+		}
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

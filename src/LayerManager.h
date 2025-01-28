@@ -24,6 +24,7 @@ public:
 	/// depth is how high the layer is in 3D, the point class has also a depth, because of the near clip plane of the orthographic camera you can max have 40 layers (near plane distance/25) but if you decrease it to something like -2000 it will display more layers
 	/// </summary>
 	float depth = 0;
+	float width = 10;
 	int id;
 
 public:
@@ -40,7 +41,7 @@ public:
 	/// <param name="orthoProjection">used to check if orthographic projection is enabled</param>
 	/// <param name="color">the color of the conveyor being rendered</param>
 	/// <param name="gridSnap">if the mouse should snap to the grid</param>
-	void DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color, bool& gridSnap);
+	void DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color, bool& gridSnap, bool& cast, glm::vec3& mousePos);
 	/// <summary>
 	/// sets all the related pointers to 0 and sets all the bools related to false
 	/// </summary>
@@ -149,5 +150,5 @@ public:
 	/// <param name="mouse">used for positions</param>
 	/// <param name="orthoProjection">used to check which projection is being used</param>
 	/// <param name="gridSnap">used to determine if the mouse should snap to the grid</param>
-	void DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap);
+	void DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap, bool& cast, glm::vec3& mousePos);
 };

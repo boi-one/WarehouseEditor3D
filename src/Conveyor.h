@@ -35,7 +35,7 @@ public:
 	/// <param name="color"> is the color of this point</param>
 	/// <param name="camera"> is used to convert to world position</param>
 	/// <param name="thickness"> is how thick the lines between the points are </param>
-	void Draw(glm::vec3& color, Shader& shader, float angle, glm::vec3 averagePos = {0, 0, 0});
+	void Draw(glm::vec3& color, Shader& shader, float angle, float width = 10, glm::vec3 averagePos = {0, 0, 0});
 	int ID() const { return id; };
 
 	friend void to_json(json& j, const Point& p);
@@ -59,11 +59,15 @@ public:
 	Point* selectedPoint = 0;
 	static inline Mesh* mesh = 0;
 	float angle = 0;
+	float widthMin = 1;
+	float widthMax = 60;
+	float width = 0;
 	int id;
 public:
-	Conveyor()
+	Conveyor(float width = 10)
 	{
 		id = alltimeConveyorCount++;
+		this->width = width;
 	}
 	/// <summary>
 	/// returns the closest point of the conveyor, a conveyor is a list of points with lines rendered between them

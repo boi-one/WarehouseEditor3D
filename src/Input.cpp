@@ -22,28 +22,32 @@ void Input::SDLEvents()
 			if (mouse.overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
-				if (settings->openSettings || !cameraManager->orthoProjection || !layerManager->selectedLayer) break;
+				glm::vec3 position = { 0, 0, 0 };
+				if (cameraManager->orthoProjection)
+					position = settings->gridSnap ? mouse.gridPosition : mouse.position;
+				else position = cameraManager->camera3d.raycastIntersection;
+
 				if (!layerManager->selectedLayer->selectedConveyor)
 				{
-					layerManager->selectedLayer->selectedConveyor = &layerManager->selectedLayer->allConveyors.emplace_back(Conveyor());
+					layerManager->selectedLayer->selectedConveyor = &layerManager->selectedLayer->allConveyors.emplace_back(Conveyor(layerManager->selectedLayer->width));
 					layerManager->selectedLayer->selectedConveyor->selected = true;
 					layerManager->selectedLayer->selectedConveyor->edit = true;
 				}
 				if (layerManager->selectedLayer->selected && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->edit)
-				{
-					if (settings->gridSnap)
-						layerManager->selectedLayer->selectedConveyor->NewPoint(mouse.gridPosition);
-					else
-						layerManager->selectedLayer->selectedConveyor->NewPoint(mouse.position);
-				}
+					layerManager->selectedLayer->selectedConveyor->NewPoint(position);
 			}
 
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{
-				if (!layerManager->selectedLayer || !cameraManager->orthoProjection || layerManager->selectedLayer->allConveyors.size() < 1) break;
+				glm::vec3 position = { 0,0,0 };
+				if (cameraManager->orthoProjection)
+					position = settings->gridSnap ? mouse.gridPosition : mouse.position;
+				else position = cameraManager->camera3d.raycastIntersection;
+
+				if (!layerManager->selectedLayer || layerManager->selectedLayer->allConveyors.size() < 1) break;
 				if (!layerManager->selectedLayer->selectedConveyor)
 				{
-					layerManager->selectedLayer->selectedConveyor = layerManager->selectedLayer->ReturnClosestConveyor(mouse.position);
+					layerManager->selectedLayer->selectedConveyor = layerManager->selectedLayer->ReturnClosestConveyor(position);
 					if (!layerManager->selectedLayer->selectedConveyor) break;
 					layerManager->selectedLayer->selectedConveyor->selected = true;
 					layerManager->selectedLayer->selectedConveyor->edit = true;
@@ -51,8 +55,9 @@ void Input::SDLEvents()
 				}
 				if (!layerManager->selectedLayer->selectedConveyor->edit) layerManager->selectedLayer->selectedConveyor->edit = true;
 				Conveyor& selectedConveyor = *layerManager->selectedLayer->selectedConveyor;
-				layerManager->selectedLayer->selectedConveyor->selectedPoint = selectedConveyor.ClosestPoint(mouse.position, 99999);
+				layerManager->selectedLayer->selectedConveyor->selectedPoint = selectedConveyor.ClosestPoint(position, 99999);
 			}
+
 			if (event.button.button == SDL_BUTTON_MIDDLE)
 			{
 				mouse.middleMouseFirstPress = true;
@@ -111,14 +116,14 @@ void Input::Update(float deltaTime)
 	if (keys[ESC].Down())
 	{
 		settings->openSettings = !settings->openSettings;
-		if(!settings->openSettings)
+		if (!settings->openSettings)
 			jsonSerialization->SerializeMouse(mouse.sensitivity, cameraManager->camera3d.fov);
 	}
 	if (keys[TAB].Down())
 	{
 		cameraManager->orthoProjection = !cameraManager->orthoProjection;
 
-		layerManager->selectedLayer->UnselectConveyors();
+		//layerManager->selectedLayer->UnselectConveyors();
 	}
 	if (keys[I].Down())
 	{
@@ -157,15 +162,24 @@ void Input::Update(float deltaTime)
 
 	if (mouse.middleMouseFirstPress)
 	{
-		mouse.dragOffset = mouse.position;
+		glm::vec3 position = { 0, 0, 0 };
+		if (cameraManager->orthoProjection)
+			position = mouse.position;
+		else
+			position = cameraManager->camera3d.raycastIntersection;
+		mouse.dragOffset = position;
 		mouse.middleMouseFirstPress = false;
 		mouse.middleMousePressed = true;
 	}
 	if (mouse.middleMousePressed)
 	{
+		glm::vec3 position = { 0, 0, 0 };
+		if (cameraManager->orthoProjection)
+			position = mouse.position;
+		else position = cameraManager->camera3d.raycastIntersection;
 		if (layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->selected)
 		{
-			glm::vec3 difference = glm::vec3(mouse.position.x - mouse.dragOffset.x, mouse.position.y - mouse.dragOffset.y, layerManager->selectedLayer->depth);
+			glm::vec3 difference = glm::vec3(position.x - mouse.dragOffset.x, position.y - mouse.dragOffset.y, layerManager->selectedLayer->depth);
 			for (Point& basePoint : layerManager->selectedLayer->selectedConveyor->path)
 			{
 				basePoint.position.x += difference.x;
@@ -178,7 +192,7 @@ void Input::Update(float deltaTime)
 				}
 			}
 
-			mouse.dragOffset = mouse.position;
+			mouse.dragOffset = position;
 		}
 	}
 }
@@ -223,6 +237,7 @@ void Input::Movement(float deltaTime)
 		if (cameraManager->orthoProjection) cameraManager->camera2d.movementSpeed = cameraManager->camera2d.baseMovementSpeed;
 		else cameraManager->camera3d.movementSpeed = cameraManager->camera3d.baseMovementSpeed;
 	}
+	if (keys[C].Down()) cameraManager->camera3d.cast = !cameraManager->camera3d.cast;
 }
 
 

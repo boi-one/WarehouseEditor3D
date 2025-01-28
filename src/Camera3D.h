@@ -24,11 +24,14 @@ public:
 	glm::vec3 front = glm::vec3();
 	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
+	glm::mat4 projection = glm::mat4(1.f);
+	glm::vec3 raycastIntersection;
 	float baseMovementSpeed = 0;
 	float movementSpeed = 150.f;
 	float fov = 45.f;
 	float pitch = 0.f;
 	float yaw = 0.f;
+	bool cast = false;
 public:
 	Camera3D(glm::vec3 position = glm::vec3(-100.0f, 0.0f, 100.0f), glm::vec3 front = glm::vec3(0.0f, 1.0f, 0.0f))
 	{
@@ -54,5 +57,4 @@ public:
 	/// <param name="cameraWidth">the width of the camera</param>
 	/// <param name="cameraHeight">the height of the camera</param>
 	void SetTransform(Shader& shader, float cameraWidth, float cameraHeight);
-
 };

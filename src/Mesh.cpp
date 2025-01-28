@@ -115,7 +115,7 @@ void Mesh::RenderAxis(Shader& shader, bool& showAxes, float pixelSize, glm::vec3
 	shader.setVec3("mColor", { 1, 1, 1 });
 }
 
-void Mesh::DrawLine(Shader& shader, glm::vec3& color, glm::vec3& start, glm::vec3& end)
+void Mesh::DrawLine(Shader& shader, glm::vec3 color, glm::vec3& start, glm::vec3& end, float width)
 {
 	shader.setVec3("mColor", color);
 
@@ -128,7 +128,7 @@ void Mesh::DrawLine(Shader& shader, glm::vec3& color, glm::vec3& start, glm::vec
 	float angle = atan2(start.y - end.y, start.x - end.x);
 	
 	model = glm::rotate(model, angle, { 0, 0, 1 });
-
+	scale.y = width;
 	model = glm::scale(model, scale);
 
 	shader.setMat4("model", model);

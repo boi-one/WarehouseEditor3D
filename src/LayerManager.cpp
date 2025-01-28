@@ -1,6 +1,6 @@
 #include "LayerManager.h"
 
-void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color, bool& gridSnap)
+void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, glm::vec3& color, bool& gridSnap, bool& cast, glm::vec3& mousePos)
 {
 
 	glm::vec3 localcolor = { 0, 1, 0 };
@@ -10,14 +10,13 @@ void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoP
 		selectedConveyor->selectedPoint->position.z = depth;
 		mouse.position.z = depth;
 
-		glm::vec3 mousePos;
-		if (gridSnap) mousePos = mouse.gridPosition;
-		else mousePos = mouse.position;
-
-		cube.DrawLine(shader, localcolor, selectedConveyor->selectedPoint->position, mousePos);
+		if (orthoProjection || cast)
+		{
+			glm::vec3 start = { selectedConveyor->selectedPoint->position.x, selectedConveyor->selectedPoint->position.y, depth };
+			glm::vec3 end = { mousePos.x, mousePos.y, depth };
+			cube.DrawLine(shader, localcolor, start, end, selectedConveyor->width);
+		}
 	}
-	if (!orthoProjection)
-		selectedConveyor = 0;
 	localcolor = color;
 	for (Conveyor& conveyor : allConveyors)
 	{
@@ -143,7 +142,7 @@ void Layer::SetDepth(int layer)
 	}
 }
 
-void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap)
+void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap, bool& cast, glm::vec3& mousePos)
 {
 	glm::vec3 color;
 	int pointAmount = 0;
@@ -152,7 +151,7 @@ void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& or
 		if (layer.hidden) continue;
 		color = { 0.5f, 0.5f, 0.5f };
 		if (layer.selected) color = { 1, 1, 1 };
-		layer.DrawConveyors(shader, cube, mouse, orthoProjection, color, gridSnap);
+		layer.DrawConveyors(shader, cube, mouse, orthoProjection, color, gridSnap, cast, mousePos);
 	}
 }
 
