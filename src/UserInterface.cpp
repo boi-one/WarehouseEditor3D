@@ -1,4 +1,5 @@
 #include "UserInterface.h"
+#include "imgui_stdlib.h"
 
 void UserInterface::NewImGuiFrame()
 {
@@ -325,6 +326,36 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(100);
 		ImGui::SliderFloat("width", &allConveyors[j].width, allConveyors[j].widthMin, allConveyors[j].widthMax);
+		if (ImGui::CollapsingHeader("Attributes"))
+		{
+			std::vector<Attribute>& attributesList = allConveyors[j].attributes;
+			if (ImGui::Button("new attribute")) attributesList.push_back(Attribute());
+			std::vector<int> deletionsList;
+			for (Attribute& a : attributesList)
+			{
+
+				ImGui::SetNextItemWidth(130);
+				ImGui::PushID(a.id);
+				ImGui::InputText("##name", &a.name);
+				bool name = ImGui::IsItemActive();
+				std::cout << (settings->typing ? "true" : "false") << std::endl;
+				ImGui::SameLine();
+				ImGui::Text(":");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(130);
+				ImGui::InputText("##value", &a.value);
+				bool value = ImGui::IsItemActive();
+				settings->typing = name || value;
+				if (ImGui::Button("delete"))
+				{
+					int test = Tools::FindInList(attributesList, a);
+					deletionsList.push_back(test);
+				}
+				ImGui::PopID();
+			}
+			for (int i : deletionsList) Tools::DeleteFromList(attributesList, attributesList[deletionsList[i]]);
+
+		}
 		ImGui::PopID();
 		ImGui::Separator();
 	}

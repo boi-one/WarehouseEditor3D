@@ -6,6 +6,21 @@ using json = nlohmann::json;
 #include "Shader.h"
 #include "Mouse.h"
 
+struct Attribute
+{
+	int id = 0;
+	static inline int alltimeID = 0;
+	std::string name;
+	std::string value;
+
+	Attribute(std::string name = "name", std::string value = "value")
+	{
+		id = alltimeID++;
+		this->name = name;
+		this->value = value;
+	}
+};
+
 class Point
 {
 public:
@@ -54,6 +69,7 @@ public:
 	/// these points make up the conveyor
 	/// </summary>
 	std::vector<Point> path;
+	std::vector<Attribute> attributes;
 	bool selected = false;
 	bool edit = false;
 	Point* selectedPoint = 0;

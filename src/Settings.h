@@ -13,4 +13,5 @@ struct Settings
 	bool showGrid = true;
 	bool gridSnap = false;
 	bool showLayers = true;
+	bool typing = false;
 };

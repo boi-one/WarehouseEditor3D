@@ -102,6 +102,15 @@ void Input::Update(float deltaTime)
 	UpdateMouse(mouse);
 	ProcessInput();
 
+	if (keys[ESC].Down())
+	{
+		settings->openSettings = !settings->openSettings;
+		if (!settings->openSettings)
+			jsonSerialization->SerializeMouse(mouse.sensitivity, cameraManager->camera3d.fov);
+	}
+
+	if (settings->typing) return;
+
 	if (!settings->openSettings) Movement(deltaTime);
 
 	if (keys[R].Down())
@@ -113,17 +122,9 @@ void Input::Update(float deltaTime)
 	{
 		layerManager->selectedLayer->UnselectConveyors();
 	}
-	if (keys[ESC].Down())
-	{
-		settings->openSettings = !settings->openSettings;
-		if (!settings->openSettings)
-			jsonSerialization->SerializeMouse(mouse.sensitivity, cameraManager->camera3d.fov);
-	}
 	if (keys[TAB].Down())
 	{
 		cameraManager->orthoProjection = !cameraManager->orthoProjection;
-
-		//layerManager->selectedLayer->UnselectConveyors();
 	}
 	if (keys[I].Down())
 	{
