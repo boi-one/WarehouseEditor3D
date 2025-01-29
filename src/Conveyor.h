@@ -16,7 +16,11 @@ struct Attribute
 		this->name = name;
 		this->value = value;
 	}
+
+	friend void to_json(json& j, const Attribute& a);
 };
+
+void from_json(const json& j, Attribute& a);
 
 class Point
 {

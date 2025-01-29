@@ -93,6 +93,21 @@ void Point::Draw(glm::vec3& color, Shader& shader, float angle, float width, glm
 	}
 }
 
+void to_json(json& j, const Attribute& a)
+{
+	j = json
+	{
+		{"name", a.name},
+		{"value", a.value}
+	};
+}
+
+void from_json(const json& j, Attribute& a)
+{
+	a.name = j.at("name").get<std::string>();
+	a.value = j.at("value").get<std::string>();
+}
+
 void to_json(json& j, const Point& p)
 {
 	j = json
@@ -121,6 +136,7 @@ void to_json(json& j, const Conveyor& c)
 	j = json
 	{
 		{"alltimeConveyorCount", c.alltimeConveyorCount},
+		{"attributes", c.attributes},
 		{"path", c.path},
 		{"id", c.id},
 	};
@@ -131,4 +147,5 @@ void from_json(const json& j, Conveyor& c)
 	c.alltimeConveyorCount = j.at("alltimeConveyorCount").get<int>();
 	c.id = j.at("id").get<int>();
 	j.at("path").get_to<std::vector<Point>>(c.path);
+	j.at("attributes").get_to<std::vector<Attribute>>(c.attributes);
 }
