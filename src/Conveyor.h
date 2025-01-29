@@ -8,14 +8,11 @@ using json = nlohmann::json;
 
 struct Attribute
 {
-	int id = 0;
-	static inline int alltimeID = 0;
 	std::string name;
 	std::string value;
 
 	Attribute(std::string name = "name", std::string value = "value")
 	{
-		id = alltimeID++;
 		this->name = name;
 		this->value = value;
 	}

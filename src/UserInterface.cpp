@@ -196,7 +196,7 @@ void UserInterface::CameraSettings()
 void UserInterface::Layers(LayerManager& layerManager)
 {
 	if (!settings->showLayers) return;
-	ImGui::Begin("Layers", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+	ImGui::Begin("Layers", 0, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav);
 	mouse->overUI |= ImGui::IsWindowHovered();
 	ImGui::SetWindowPos({ 10, (float)cameraManager->camera2d.viewport.windowHeight - ImGui::GetWindowSize().y - 10 });
 	ImGui::SetWindowSize({ 310, (float)cameraManager->camera2d.viewport.windowHeight / 2 });
@@ -293,6 +293,7 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 		char conveyorLabel[128] = {};
 		snprintf(conveyorLabel, sizeof(conveyorLabel), "%d. Conveyor: %d", j, (int)allConveyors[j].ID());
 		if (allConveyors[j].selected) ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, 0.4f, 0, 1));
+		ImGui::PushID(&allConveyors[j]);
 		if (ImGui::CollapsingHeader(conveyorLabel))
 		{
 			for (Point& point : allConveyors[j].path)
@@ -306,7 +307,6 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 			}
 		}
 		if (allConveyors[j].selected) ImGui::PopStyleColor();
-		ImGui::PushID(j);
 		if (ImGui::Button("select") && &currentLayer == layerManager.selectedLayer)
 		{
 			currentLayer.UnselectConveyors();
@@ -335,7 +335,7 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 			{
 
 				ImGui::SetNextItemWidth(130);
-				ImGui::PushID(a.id);
+				ImGui::PushID(&a);
 				ImGui::InputText("##name", &a.name);
 				bool name = ImGui::IsItemActive();
 				std::cout << (settings->typing ? "true" : "false") << std::endl;
@@ -362,4 +362,5 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 	ImGui::PopStyleColor();
 	for (int i : deletions)
 		DeleteFromList(currentLayer.allConveyors, currentLayer.allConveyors[i]);
+
 }

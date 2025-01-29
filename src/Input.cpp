@@ -19,6 +19,7 @@ void Input::SDLEvents()
 		}break;
 		case SDL_MOUSEBUTTONDOWN:
 		{
+			settings->typing = false;
 			if (mouse.overUI) break;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
@@ -39,7 +40,7 @@ void Input::SDLEvents()
 
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{
-				glm::vec3 position = { 0,0,0 };
+				glm::vec3 position = { 0, 0, 0 };
 				if (cameraManager->orthoProjection)
 					position = settings->gridSnap ? mouse.gridPosition : mouse.position;
 				else position = cameraManager->camera3d.raycastIntersection;

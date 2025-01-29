@@ -80,7 +80,7 @@ void Point::Draw(glm::vec3& color, Shader& shader, float angle, float width, glm
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, { position.x, position.y, depth });
-	model = glm::scale(model, { width, width, 10});
+	model = glm::scale(model, { width, width, 11});
 	shader.setMat4("model", model);
 	shader.setVec3("mColor", color);
 	mesh->Draw(shader);
