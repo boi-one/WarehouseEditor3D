@@ -169,22 +169,30 @@ void Input::Update(float deltaTime)
 		}
 		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
 		{
-			if (!deletePoint) break;
-
 			if (Tools::ContainsInList(p.connections, *deletePoint))
 			{
-				for (Point& cp : deletePoint->connections)
-					p.connections.push_back(cp);
-				Tools::DeleteFromList(p.connections, *deletePoint);
-				layerManager->selectedLayer->selectedConveyor->selectedPoint = &p;
+				for(Point& cp : deletePoint->connections) p.connections.push_back(cp);
+				std::cout << "move to new point" << std::endl;
+				break;
+			}
+		}
+
+		Point* parentPoint = 0; // the point which has deletePoint in connections
+		Point* childPoint = 0;  // the same point as deletePoint but in one of the point connections
+		//TODO: - zorg ervoor dat de 2 punten allebij worden verwijderd zodat er niet nog een lijn naar een "niet bestaand" punt gaat.
+		//		- verbind conveyors tussen 2 lagen
+		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
+		{
+			if (!deletePoint) break;
+			for (Point& cp : p.connections) if (cp.position.x == deletePoint->position.x && cp.position.y == deletePoint->position.y)
+			{
+				parentPoint = &p;
+				childPoint = &cp;
+				break;
 			}
 		}
 		Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *deletePoint);
-		if (layerManager->selectedLayer->selectedConveyor->path.size() < 1)
-		{
-			Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
-			layerManager->selectedLayer->UnselectConveyors();
-		}
+		if (parentPoint && childPoint) Tools::DeleteNonIdenticalFromList(parentPoint->connections, *deletePoint);
 	}
 	if (keys[ALEFT].Hold())
 	{
