@@ -52,6 +52,7 @@ public:
 			c.selected = false; //error soms??? heeft te maken met de layer switching
 			c.edit = false;
 			c.selectedPoint = 0;
+			for (Point& p : c.path) p.selected = false;
 		}
 
 		if (!selectedConveyor) return;

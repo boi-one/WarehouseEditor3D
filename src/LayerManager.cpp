@@ -14,7 +14,7 @@ void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoP
 		{
 			glm::vec3 start = { selectedConveyor->selectedPoint->position.x, selectedConveyor->selectedPoint->position.y, depth };
 			glm::vec3 end = { mousePos.x, mousePos.y, depth };
-			cube.DrawLine(shader, localcolor, start, end, selectedConveyor->width);
+			cube.DrawLine(shader, localcolor, start, end, selectedConveyor->width, orthoProjection);
 		}
 	}
 	localcolor = color;
@@ -23,7 +23,7 @@ void Layer::DrawConveyors(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoP
 		if (conveyor.edit) localcolor = { 0, 0, 1 };
 		else if (conveyor.selected) localcolor = { 1, 1, 0 };
 		else localcolor = color;
-		conveyor.Draw(shader, cube, localcolor);
+		conveyor.Draw(shader, cube, localcolor, orthoProjection);
 	}
 }
 
@@ -36,6 +36,7 @@ void LayerManager::UnselectEverything()
 			c.edit = false;
 			c.selected = false;
 			c.selectedPoint = 0;
+			for (Point& p : c.path) p.selected = false;
 		}
 		l.selected = false;
 		l.selectedConveyor = 0;

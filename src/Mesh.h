@@ -72,5 +72,5 @@ public:
 	/// <param name="start">the start position of the line </param>
 	/// <param name="end">the end position of the line</param>
 	/// <param name="ortho">if the line should be rotated in 2D or 3D</param>
-	void DrawLine(Shader& shader, glm::vec3 color, glm::vec3& start, glm::vec3& end, float width);
+	void DrawLine(Shader& shader, glm::vec3 color, glm::vec3& start, glm::vec3& end, float width, bool ortho);
 };

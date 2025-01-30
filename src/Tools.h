@@ -22,6 +22,15 @@ namespace Tools
 		return -1;
 	}
 
+	template<typename T> static int FindNonIdenticalInList(std::vector<T>& list, const T& item)
+	{
+		for (int i = 0; i < list.size(); i++)
+		{
+			if (list[i] == item) return i;
+		}
+		return -1;
+	}
+
 	template<typename T> static bool ContainsInList(std::vector<T>& list, const T& item)
 	{
 		for (int i = 0; i < list.size(); i++)
@@ -40,6 +49,14 @@ namespace Tools
 	template<typename T> static void DeleteFromList(std::vector<T>& list, const T& item)
 	{
 		int placeInList = FindInList<T>(list, item);
+		if (placeInList == -1) return;
+		if (list.size() > 0)
+			list.erase(list.begin() + placeInList);
+	}
+
+	template<typename T> static void DeleteNonIdenticalFromList(std::vector<T>& list, const T& item)
+	{
+		int placeInList = FindNonIdenticalInList<T>(list, item);
 		if (placeInList == -1) return;
 		if (list.size() > 0)
 			list.erase(list.begin() + placeInList);

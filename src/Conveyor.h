@@ -46,13 +46,19 @@ public:
 		id = alltimePointCount++;
 	}
 
+	bool operator==(const Point& other) const
+	{
+		if (!&other) return false;
+		return this->id == other.id;
+	}
+
 	/// <summary>
 	/// Draws the point and all of the connections of this specific point
 	/// </summary>
 	/// <param name="color"> is the color of this point</param>
 	/// <param name="camera"> is used to convert to world position</param>
 	/// <param name="thickness"> is how thick the lines between the points are </param>
-	void Draw(glm::vec3& color, Shader& shader, float angle, float width = 10, glm::vec3 averagePos = {0, 0, 0});
+	void Draw(glm::vec3& color, Shader& shader, float angle, bool& ortho, float width = 10, glm::vec3 averagePos = {0, 0, 0});
 	int ID() const { return id; };
 
 	friend void to_json(json& j, const Point& p);
@@ -100,7 +106,7 @@ public:
 	/// <param name="shader">used for transforms</param>
 	/// <param name="cube">used to render the conveyor</param>
 	/// <param name="color">used for the color of the conveyor</param>
-	void Draw(Shader& shader, Mesh& cube, glm::vec3& color);
+	void Draw(Shader& shader, Mesh& cube, glm::vec3& color, bool& ortho);
 	/// <summary>
 	/// adds a point to the conveyor
 	/// </summary>

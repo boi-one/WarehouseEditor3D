@@ -18,11 +18,11 @@ Point* Conveyor::ClosestPoint(glm::vec3& origin, float range)
 	return closestPoint;
 }
 
-void Conveyor::Draw(Shader& shader, Mesh& cube, glm::vec3& color)
+void Conveyor::Draw(Shader& shader, Mesh& cube, glm::vec3& color, bool& ortho)
 {
 	for (Point& p : path)
 	{
-		p.Draw(color, shader, angle, width, path[0].position);
+		p.Draw(color, shader, angle, ortho, width, path[0].position);
 	}
 }
 
@@ -37,6 +37,8 @@ void Conveyor::NewPoint(glm::vec3 position)
 	Point& temp = selectedPoint->connections.emplace_back(Point(position, mesh));
 	path.emplace_back(temp);
 	selectedPoint = &path[path.size() - 1];
+	for (Point& p : path) p.selected = false;
+	selectedPoint->selected = true;
 }
 
 glm::vec3 Conveyor::GetAveragePosition()
@@ -76,7 +78,7 @@ void Conveyor::Rotate(int direction)
 	}
 }
 
-void Point::Draw(glm::vec3& color, Shader& shader, float angle, float width, glm::vec3 averagePos)
+void Point::Draw(glm::vec3& color, Shader& shader, float angle, bool& ortho, float width, glm::vec3 averagePos)
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, { position.x, position.y, depth });
@@ -89,7 +91,7 @@ void Point::Draw(glm::vec3& color, Shader& shader, float angle, float width, glm
 	{
 		glm::vec3 start = { position.x, position.y, depth };
 		glm::vec3 end = { connection.position.x, connection.position.y, depth };
-		mesh->DrawLine(shader, color, start, end, width);
+		mesh->DrawLine(shader, color, start, end, width, ortho);
 	}
 }
 

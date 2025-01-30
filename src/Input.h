@@ -36,6 +36,7 @@ enum Keys
 	ALEFT,
 	ARIGHT,
 	C,
+	LALT,
 };
 
 /// <summary>
@@ -119,6 +120,7 @@ private:
 		Key(Keys::ALEFT, SDL_SCANCODE_LEFT),
 		Key(Keys::ARIGHT, SDL_SCANCODE_RIGHT),
 		Key(Keys::C, SDL_SCANCODE_C),
+		Key(Keys::LALT, SDL_SCANCODE_LALT),
 	};
 
 public:

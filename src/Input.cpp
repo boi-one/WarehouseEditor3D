@@ -57,6 +57,9 @@ void Input::SDLEvents()
 				if (!layerManager->selectedLayer->selectedConveyor->edit) layerManager->selectedLayer->selectedConveyor->edit = true;
 				Conveyor& selectedConveyor = *layerManager->selectedLayer->selectedConveyor;
 				layerManager->selectedLayer->selectedConveyor->selectedPoint = selectedConveyor.ClosestPoint(position, 99999);
+				for (Point& p : layerManager->selectedLayer->selectedConveyor->path) p.selected = false;
+				layerManager->selectedLayer->selectedConveyor->selectedPoint->selected = true;
+				layerManager->selectedLayer->selectedConveyor->selected = true;
 			}
 
 			if (event.button.button == SDL_BUTTON_MIDDLE)
@@ -148,10 +151,40 @@ void Input::Update(float deltaTime)
 	{
 		settings->gridSnap = !settings->gridSnap;
 	}
-	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor)
+	if (keys[DEL].Down() && keys[LALT].Hold() && layerManager->selectedLayer->selectedConveyor)
 	{
 		Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
 		layerManager->selectedLayer->UnselectConveyors();
+	}
+	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor)
+	{
+		Point* deletePoint = 0;
+		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
+		{
+			if (p.selected)
+			{
+				deletePoint = &p;
+				break;
+			}
+		}
+		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
+		{
+			if (!deletePoint) break;
+
+			if (Tools::ContainsInList(p.connections, *deletePoint))
+			{
+				for (Point& cp : deletePoint->connections)
+					p.connections.push_back(cp);
+				Tools::DeleteFromList(p.connections, *deletePoint);
+				layerManager->selectedLayer->selectedConveyor->selectedPoint = &p;
+			}
+		}
+		Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *deletePoint);
+		if (layerManager->selectedLayer->selectedConveyor->path.size() < 1)
+		{
+			Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
+			layerManager->selectedLayer->UnselectConveyors();
+		}
 	}
 	if (keys[ALEFT].Hold())
 	{
@@ -182,6 +215,7 @@ void Input::Update(float deltaTime)
 		if (layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->selected)
 		{
 			glm::vec3 difference = glm::vec3(position.x - mouse.dragOffset.x, position.y - mouse.dragOffset.y, layerManager->selectedLayer->depth);
+
 			for (Point& basePoint : layerManager->selectedLayer->selectedConveyor->path)
 			{
 				basePoint.position.x += difference.x;
