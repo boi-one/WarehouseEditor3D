@@ -9,6 +9,7 @@ using json = nlohmann::json;
 struct Attribute
 {
 	std::string name;
+	bool isNumber = false;
 	std::string value;
 
 	Attribute(std::string name = "name", std::string value = "value")

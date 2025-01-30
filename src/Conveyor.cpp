@@ -80,7 +80,7 @@ void Point::Draw(glm::vec3& color, Shader& shader, float angle, float width, glm
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, { position.x, position.y, depth });
-	model = glm::scale(model, { width, width, 11});
+	model = glm::scale(model, { width, width, 11 });
 	shader.setMat4("model", model);
 	shader.setVec3("mColor", color);
 	mesh->Draw(shader);
@@ -98,14 +98,19 @@ void to_json(json& j, const Attribute& a)
 	j = json
 	{
 		{"name", a.name},
-		{"value", a.value}
+		{"isNumber", a.isNumber}
 	};
+	if (a.isNumber)	j["value"] = std::stod(a.value);
+	else j["value"] = a.value;
+
 }
 
 void from_json(const json& j, Attribute& a)
 {
 	a.name = j.at("name").get<std::string>();
-	a.value = j.at("value").get<std::string>();
+	a.isNumber = j.at("isNumber").get<bool>();
+	if(a.isNumber) a.value = j.at("value").get<double>();
+	else a.value = j.at("value").get<std::string>();
 }
 
 void to_json(json& j, const Point& p)

@@ -338,7 +338,6 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 				ImGui::PushID(&a);
 				ImGui::InputText("##name", &a.name);
 				bool name = ImGui::IsItemActive();
-				std::cout << (settings->typing ? "true" : "false") << std::endl;
 				ImGui::SameLine();
 				ImGui::Text(":");
 				ImGui::SameLine();
@@ -346,11 +345,20 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 				ImGui::InputText("##value", &a.value);
 				bool value = ImGui::IsItemActive();
 				settings->typing = name || value;
+				if (a.isNumber && Tools::ContainsLetters(a.value))
+				{
+					a.value = "";
+					std::cout << "set empty" << std::endl;
+				}
 				if (ImGui::Button("delete"))
 				{
 					int test = Tools::FindInList(attributesList, a);
 					deletionsList.push_back(test);
 				}
+				ImGui::SameLine();
+				ImGui::Checkbox("", &a.isNumber);
+				if (ImGui::IsItemHovered()) ImGui::SetTooltip("check this when the value is a number");
+
 				ImGui::PopID();
 			}
 			for (int i : deletionsList) Tools::DeleteFromList(attributesList, attributesList[deletionsList[i]]);

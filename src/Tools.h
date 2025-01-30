@@ -22,6 +22,15 @@ namespace Tools
 		return -1;
 	}
 
+	template<typename T> static bool ContainsInList(std::vector<T>& list, const T& item)
+	{
+		for (int i = 0; i < list.size(); i++)
+		{
+			if (list[i] == item) return true;
+		}
+		return false;
+	}
+
 	/// <summary>
 	/// Deletes anything in a vector independent of the type of the vector
 	/// </summary>
@@ -99,5 +108,19 @@ namespace Tools
 		if (value < min) return min;
 		if (value > max) return max;
 		return value;
+	}
+
+	static bool ContainsLetters(std::string input)
+	{
+		std::vector<char> valid = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ','};
+		for (char c : input)
+		{
+			std::cout << input << std::endl;
+			if (!Tools::ContainsInList(valid, c))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
