@@ -173,15 +173,21 @@ void Input::Update(float deltaTime)
 		{
 			for (Point& cp : p.connections) if (cp.id == deletePoint->id)
 			{
+				layerManager->selectedLayer->selectedConveyor->selectedPoint = &p;
+				layerManager->selectedLayer->selectedConveyor->selectedPoint->selected = true;
 				deletePointParent = &p;
 				deletePointChild = &cp;
 			}
 		}
-		for (Point& p : deletePoint->connections)				//
-		{														// TODO:
-			p.connections.clear();								//
-			deletePointParent->connections.push_back(p);		// ZORG ERVOOR DAT DIT OVER KOPIEERD ZONDER DAT DE CONNECTIONS DE OUDE POSITIES TONEN
-		}														//
+		for (Point& p : deletePoint->connections)				
+		{														
+			p.connections.clear();								
+			deletePointParent->connections.push_back(p);		
+		}
+		for (Point& p : deletePointParent->connections)
+		{
+			if (p.id == deletePoint->id) Tools::DeleteNonIdenticalFromList(deletePointParent->connections, p);
+		}
 
 		Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *deletePoint);
 		Tools::DeleteNonIdenticalFromList(deletePointParent->connections, *deletePointChild);
