@@ -156,7 +156,7 @@ void Input::Update(float deltaTime)
 		Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
 		layerManager->selectedLayer->UnselectConveyors();
 	}
-	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor)
+	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->path.size() > 0)
 	{
 		Point* deletePoint = 0;
 		Point* deletePointParent = 0;
@@ -169,28 +169,36 @@ void Input::Update(float deltaTime)
 				break;
 			}
 		}
-		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
+		if (deletePoint)
 		{
-			for (Point& cp : p.connections) if (cp.id == deletePoint->id)
+			for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
 			{
-				layerManager->selectedLayer->selectedConveyor->selectedPoint = &p;
-				layerManager->selectedLayer->selectedConveyor->selectedPoint->selected = true;
-				deletePointParent = &p;
-				deletePointChild = &cp;
+				for (Point& cp : p.connections) if (cp.id == deletePoint->id)
+				{
+					layerManager->selectedLayer->selectedConveyor->selectedPoint = &p;
+					layerManager->selectedLayer->selectedConveyor->selectedPoint->selected = true;
+					deletePointParent = &p;
+					deletePointChild = &cp;
+				}
 			}
+			for (Point& p : deletePoint->connections)
+			{
+				if (!deletePoint || !deletePointParent || !deletePointChild) break;
+				deletePointParent->connections.push_back(p);
+			}
+			if (deletePoint && deletePointParent) for (Point& p : deletePointParent->connections)
+			{
+				if (p.id == deletePoint->id) Tools::DeleteNonIdenticalFromList(deletePointParent->connections, p);
+			}
+			if (deletePoint)	Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *deletePoint);
+			if (deletePointParent && deletePointChild) Tools::DeleteNonIdenticalFromList(deletePointParent->connections, *deletePointChild);
 		}
-		for (Point& p : deletePoint->connections)				
-		{														
-			p.connections.clear();								
-			deletePointParent->connections.push_back(p);		
-		}
-		for (Point& p : deletePointParent->connections)
+		if (layerManager->selectedLayer->selectedConveyor->path.size() < 1)
 		{
-			if (p.id == deletePoint->id) Tools::DeleteNonIdenticalFromList(deletePointParent->connections, p);
+			Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
+			layerManager->selectedLayer->selectedConveyor = 0;
+			layerManager->selectedLayer->UnselectConveyors();
 		}
-
-		Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *deletePoint);
-		Tools::DeleteNonIdenticalFromList(deletePointParent->connections, *deletePointChild);
 	}
 	if (keys[ALEFT].Hold())
 	{
