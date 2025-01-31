@@ -159,6 +159,8 @@ void Input::Update(float deltaTime)
 	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor)
 	{
 		Point* deletePoint = 0;
+		Point* deletePointParent = 0;
+		Point* deletePointChild = 0;
 		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
 		{
 			if (p.selected)
@@ -169,30 +171,20 @@ void Input::Update(float deltaTime)
 		}
 		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
 		{
-			if (Tools::ContainsInList(p.connections, *deletePoint))
+			for (Point& cp : p.connections) if (cp.id == deletePoint->id)
 			{
-				for(Point& cp : deletePoint->connections) p.connections.push_back(cp);
-				std::cout << "move to new point" << std::endl;
-				break;
+				deletePointParent = &p;
+				deletePointChild = &cp;
 			}
 		}
+		for (Point& p : deletePoint->connections)				//
+		{														// TODO:
+			p.connections.clear();								//
+			deletePointParent->connections.push_back(p);		// ZORG ERVOOR DAT DIT OVER KOPIEERD ZONDER DAT DE CONNECTIONS DE OUDE POSITIES TONEN
+		}														//
 
-		Point* parentPoint = 0; // the point which has deletePoint in connections
-		Point* childPoint = 0;  // the same point as deletePoint but in one of the point connections
-		//TODO: - zorg ervoor dat de 2 punten allebij worden verwijderd zodat er niet nog een lijn naar een "niet bestaand" punt gaat.
-		//		- verbind conveyors tussen 2 lagen
-		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
-		{
-			if (!deletePoint) break;
-			for (Point& cp : p.connections) if (cp.position.x == deletePoint->position.x && cp.position.y == deletePoint->position.y)
-			{
-				parentPoint = &p;
-				childPoint = &cp;
-				break;
-			}
-		}
 		Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *deletePoint);
-		if (parentPoint && childPoint) Tools::DeleteNonIdenticalFromList(parentPoint->connections, *deletePoint);
+		Tools::DeleteNonIdenticalFromList(deletePointParent->connections, *deletePointChild);
 	}
 	if (keys[ALEFT].Hold())
 	{

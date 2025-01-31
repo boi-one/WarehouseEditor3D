@@ -80,6 +80,7 @@ public:
 	std::vector<Attribute> attributes;
 	bool selected = false;
 	bool edit = false;
+	Point* previousSelectedPoint = 0;
 	Point* selectedPoint = 0;
 	static inline Mesh* mesh = 0;
 	float angle = 0;

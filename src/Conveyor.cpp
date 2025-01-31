@@ -33,10 +33,11 @@ void Conveyor::NewPoint(glm::vec3 position)
 		selectedPoint = &path.emplace_back(Point(position, mesh));
 		return;
 	}
-
-	Point& temp = selectedPoint->connections.emplace_back(Point(position, mesh));
-	path.emplace_back(temp);
+	Point newPoint(position, mesh);
+	selectedPoint->connections.push_back(newPoint);
+	path.push_back(newPoint);
 	selectedPoint = &path[path.size() - 1];
+
 	for (Point& p : path) p.selected = false;
 	selectedPoint->selected = true;
 }
