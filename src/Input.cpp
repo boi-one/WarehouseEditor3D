@@ -176,20 +176,25 @@ void Input::Update(float deltaTime)
 			{
 				for (Point& cp : p.connections)
 				{
-					if (cp.id == deletePoint->id)
+					if (cp.id == deletePoint->id) //checks if the deleted point is in the connections of p
 					{
 						layerManager->selectedLayer->selectedConveyor->selectedPoint = &p;
 						layerManager->selectedLayer->selectedConveyor->selectedPoint->selected = true;
 						std::cout << "selected point connections " << layerManager->selectedLayer->selectedConveyor->selectedPoint->connections.size() << std::endl;
 						deletePointParent = &p;
 						deletePointChild = &cp;
+						break;
 					}
 				}
 			}
 			for (Point& p : deletePoint->connections)
 			{
-				layerManager->selectedLayer->selectedConveyor->selectedPoint->connections.push_back(p);
+				std::cout << "dpc " << p.id << std::endl;
+
+				if(p.id != layerManager->selectedLayer->selectedConveyor->selectedPoint->id)
+					layerManager->selectedLayer->selectedConveyor->selectedPoint->connections.push_back(p);
 			}
+			for (Point& p : layerManager->selectedLayer->selectedConveyor->path) std::cout << p.id << std::endl;
 			if (deletePoint && deletePointParent) for (Point& p : deletePointParent->connections)
 			{
 				if (p.id == deletePoint->id) Tools::DeleteNonIdenticalFromList(deletePointParent->connections, p);
