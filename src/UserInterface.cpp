@@ -55,6 +55,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		{
 			std::string path = "save.json";
 			jsonSerialization->Deserialize(path, *layerManager);
+			settings->openSettings = false;
 		}
 		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, { .75f, 0, 0, 1 });
@@ -90,39 +91,39 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		{
 			ImGui::SeparatorText("General Keybindings");
 			ImGui::Spacing();
-			ImGui::Text("Esc        : Open settings menu");
-			ImGui::Text("Tab        : Switch projection");
-			ImGui::Text("I          : Show info");
-			ImGui::Text("L          : Show layers");
-			ImGui::Text("R          : Resets the active camera to the default position");
-			ImGui::Text("Left Ctrl  : Increase the movement speed of the active camera");
+			ImGui::Text("Esc         : Open settings menu");
+			ImGui::Text("Tab         : Switch projection");
+			ImGui::Text("I           : Show info");
+			ImGui::Text("L           : Show layers");
+			ImGui::Text("R           : Resets the active camera to the default position");
+			ImGui::Text("Left Ctrl   : Increase the movement speed of the active camera");
+			ImGui::Text("Z           : Unselect Conveyor");
+			ImGui::Text("Left Shift  : Merge conveyors together");
+			ImGui::Text("X           : Unselect point");
+			ImGui::Text("G           : Enable grid snapping");
+			ImGui::Text("Alt + Delete: Deletes the selected conveyor");
+			ImGui::Text("Delete      : Deletes the selected point in a conveyor");
+			ImGui::Text("Left Arrow  : Rotates the conveyor counter clockwise");
+			ImGui::Text("Right Arrow : Rotates the conveyor clockwise");
 
 			ImGui::Spacing();
 			ImGui::SeparatorText("2D Keybindings");
 			ImGui::Spacing();
-			ImGui::Text("W          : Move up");
-			ImGui::Text("A          : Move left");
-			ImGui::Text("S          : Move down");
-			ImGui::Text("D          : Move right");
-			ImGui::Text("Z          : Unselect Conveyor");
-			ImGui::Text("Left Shift : Merge conveyors together");
-			ImGui::Text("X          : Unselect point");
-			ImGui::Text("G          : Enable grid snapping");
-			ImGui::Text("Delete     : Deletes the selected conveyor");
-			ImGui::Text("Left Arrow : Rotates the conveyor counter clockwise");
-			ImGui::Text("Right Arrow: Rotates the conveyor clockwise");
-
+			ImGui::Text("W           : Move up");
+			ImGui::Text("A           : Move left");
+			ImGui::Text("S           : Move down");
+			ImGui::Text("D           : Move right");
 
 			ImGui::Spacing();
 			ImGui::SeparatorText("3D Keybindings");
 			ImGui::Spacing();
-			ImGui::Text("W          : Move forward");
-			ImGui::Text("A          : Strafe left");
-			ImGui::Text("S          : Move backwards");
-			ImGui::Text("D          : Strafe right");
-			ImGui::Text("Left Shift : Move down");
-			ImGui::Text("Space      : Move up");
-		}
+			ImGui::Text("W           : Move forward");
+			ImGui::Text("A           : Strafe left");
+			ImGui::Text("S           : Move backwards");
+			ImGui::Text("D           : Strafe right");
+			ImGui::Text("Left Shift  : Move down");
+			ImGui::Text("Space       : Move up");
+		}							 
 		ImGui::End();
 	}
 
