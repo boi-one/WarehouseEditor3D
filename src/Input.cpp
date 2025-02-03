@@ -159,7 +159,14 @@ void Input::Update(float deltaTime)
 	}
 	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->path.size() > 0)
 	{
-		//TODO: delete point if it has no parent and no children
+		Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *layerManager->selectedLayer->selectedConveyor->selectedPoint);
+		if (layerManager->selectedLayer->selectedConveyor->path.size() > 0)
+			layerManager->selectedLayer->selectedConveyor->selectedPoint = &layerManager->selectedLayer->selectedConveyor->path[0];
+		else
+		{
+			Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
+			layerManager->selectedLayer->UnselectConveyors();
+		}
 	}
 	if (keys[ALEFT].Hold())
 	{
