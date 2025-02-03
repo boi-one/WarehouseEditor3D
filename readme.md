@@ -11,7 +11,7 @@ The warehouse editor 3D is made so you can create, edit and view conveyor setups
 2. create a new directory in the root called `build`
 
 3. go to the build directory in the commandline and type `cmake ..`
-###### If this didn't work change the path of vcpkg.cmake inside of the cmakelist.txt
+###### If this didn't work change the path to vcpkg.cmake inside of the cmakelist.txt
 
 ---  
 ### Overview
