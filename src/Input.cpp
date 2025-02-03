@@ -159,75 +159,7 @@ void Input::Update(float deltaTime)
 	}
 	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->path.size() > 0)
 	{
-		int deleteID = layerManager->selectedLayer->selectedConveyor->selectedPoint->id;
-		Point* deletePoint = 0;
-		Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *layerManager->selectedLayer->selectedConveyor->selectedPoint);
-		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
-		{
-			for (Point& cp : p.connections)
-			{
-				if (cp.id == deleteID)
-				{
-					deletePoint = &cp;
-				}
-			}
-		}
-
-		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
-		{
-			if (Tools::ContainsInList(p.connections, *deletePoint))
-			{
-				for (Point& dp : deletePoint->connections) p.connections.push_back(dp);
-				break;
-			}
-		}
-		int deletePosition = 0;
-		if (deletePoint)
-		{
-			for (Point& p : layerManager->selectedLayer->selectedConveyor->path) for (Point& cp : p.connections) if (deletePoint->id == cp.id) deletePosition = cp.id;
-			if (layerManager->selectedLayer->selectedConveyor->path.size() > 0)	layerManager->selectedLayer->selectedConveyor->selectedPoint = &layerManager->selectedLayer->selectedConveyor->path[0];
-
-			bool removed = false;
-			std::vector<int> deleteIDs;
-			do
-			{
-				for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
-				{
-					if (p.connections.size() > 0) continue;
-
-					bool referenced = false;
-					for (Point& other : layerManager->selectedLayer->selectedConveyor->path)
-					{
-						if (other.id == p.id) continue;
-						referenced = Tools::ContainsInList(other.connections, p);
-						break;
-					}
-					if (!referenced) deleteIDs.push_back(p.id);
-				}
-				removed = false;
-
-			} while (removed);
-
-
-
-
-
-			//delete the points which arent connected to anything
-			for (int id : deleteIDs) for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
-			{
-				if (p.id == id) Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, p);
-				for (Point& cp : p.connections)
-				{
-					if (cp.id == id) Tools::DeleteNonIdenticalFromList(cp.connections, p);
-				}
-			}
-		}
-
-		if (layerManager->selectedLayer->selectedConveyor->path.size() < 1)
-		{
-			Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
-			layerManager->selectedLayer->UnselectConveyors();
-		}
+		//TODO: delete point if it has no parent and no children
 	}
 	if (keys[ALEFT].Hold())
 	{
