@@ -349,7 +349,6 @@ void UserInterface::Conveyors(LayerManager& layerManager, Layer& currentLayer)
 				if (a.isNumber && Tools::ContainsLetters(a.value))
 				{
 					a.value = "";
-					std::cout << "set empty" << std::endl;
 				}
 				if (ImGui::Button("delete"))
 				{

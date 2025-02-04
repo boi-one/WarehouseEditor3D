@@ -60,7 +60,6 @@ void Input::SDLEvents()
 				for (Point& p : layerManager->selectedLayer->selectedConveyor->path) p.selected = false;
 				layerManager->selectedLayer->selectedConveyor->selectedPoint->selected = true;
 				layerManager->selectedLayer->selectedConveyor->selected = true;
-				std::cout << " selected point connections " << selectedConveyor.selectedPoint->connections.size() << " id " << selectedConveyor.selectedPoint->id << std::endl;
 			}
 
 			if (event.button.button == SDL_BUTTON_MIDDLE)
@@ -159,6 +158,11 @@ void Input::Update(float deltaTime)
 	}
 	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->path.size() > 0)
 	{
+		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
+		{
+			Tools::DeleteNonIdenticalFromList(p.connections, *layerManager->selectedLayer->selectedConveyor->selectedPoint);
+		}
+
 		Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *layerManager->selectedLayer->selectedConveyor->selectedPoint);
 		if (layerManager->selectedLayer->selectedConveyor->path.size() > 0)
 			layerManager->selectedLayer->selectedConveyor->selectedPoint = &layerManager->selectedLayer->selectedConveyor->path[0];
