@@ -1,12 +1,13 @@
 #include "JsonSerialization.h"
 
-void JsonSerialization::Serialize(std::vector<Layer>& allLayers)
+void JsonSerialization::Serialize(std::vector<Layer>& allLayers, std::vector<BridgeConveyor>& allBridgeConveyors)
 {
 	json jsonFile;
 
 	jsonFile =
 	{
-		{"allLayers", allLayers}
+		{"allLayers", allLayers},
+		{"allBridgeConveyors", allBridgeConveyors}
 	};
 
 	std::ofstream file("save.json");
@@ -44,7 +45,37 @@ void JsonSerialization::Deserialize(std::string& filePath, LayerManager& layerMa
 		layerManager.UnselectEverything();
 		layerManager.selectedLayer = &layerManager.allLayers[0];
 		layerManager.selectedLayer->selected = true;
-		layerManager.selectedLayer->selectedConveyor = 0;
+		layerManager.selectedLayer->selectedConveyor = nullptr;
+
+		std::vector<BridgeConveyor> allBridgeConveyors = data.at("allBridgeConveyors").get<std::vector<BridgeConveyor>>();
+		for (BridgeConveyor& bg : allBridgeConveyors)
+		{
+			for (Layer& l : layerManager.allLayers)
+			{
+				bg.mesh = layerManager.cube;
+				bg.shader = layerManager.shader;
+				for (Conveyor& c : l.allConveyors)
+				{
+					for (Point& p : c.path)
+					{
+						if (bg.startPointID == p.id)
+						{
+							bg.startPoint = &p;
+							bg.startPoint->position.z = l.depth;
+						}
+						if (bg.endPointID == p.id)
+						{
+							bg.endPoint = &p;
+							bg.endPoint->position.z = l.depth;
+						}
+						if (bg.startPoint && bg.endPoint) break;
+					}
+					if (bg.startPoint && bg.endPoint) break;
+				}
+				if (bg.startPoint && bg.endPoint) break;
+			}
+		}
+		layerManager.allBridgeConveyors = allBridgeConveyors;
 		std::cout << "deserialization success" << std::endl;
 	}
 	else std::cout << "deserialization failed, can't open file" << std::endl;

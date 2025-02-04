@@ -1,22 +1,37 @@
 #pragma once
 #include "Mesh.h"
+#include "Conveyor.h"
+#include "Shader.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class BridgeConveyor 
 {
 public:
-	glm::vec3 start = glm::vec3();
-	glm::vec3 end = glm::vec3();
+	int startPointID = 0;
+	Point* startPoint = nullptr;
+	int endPointID = 0;
+	Point* endPoint = nullptr;
 	float width = 0;
 	Mesh* mesh = nullptr;
 	Shader* shader = nullptr;
 
-	BridgeConveyor(glm::vec3 start, glm::vec3 end, float width = 10, Shader* shader = nullptr)
+	BridgeConveyor() = default;
+
+	BridgeConveyor(Point* startPoint, Point* endPoint, float width, Mesh* mesh, Shader* shader)
 	{
-		this->start = start;
-		this->end = end;
-		this->shader = shader;
+		this->startPoint = startPoint;
+		this->startPointID = startPoint->id;
+		this->endPoint = endPoint;
+		this->endPointID = endPoint->id;
 		this->width = width;
+		this->mesh = mesh;
+		this->shader = shader;
 	}
 
 	void Draw();
+
+	friend void to_json(json& j, const BridgeConveyor& bg);
 };
+
+void from_json(const json& j, BridgeConveyor& bg);

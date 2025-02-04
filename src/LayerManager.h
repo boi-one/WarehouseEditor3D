@@ -18,7 +18,7 @@ public:
 	bool selected = false;
 	bool hidden = false;
 	std::vector<Conveyor> allConveyors;
-	Conveyor* selectedConveyor = 0;
+	Conveyor* selectedConveyor = nullptr;
 	static inline bool connecting = false;
 	static inline glm::vec3 newLineEnd;
 	/// <summary>
@@ -52,12 +52,12 @@ public:
 		{
 			c.selected = false; //error soms??? heeft te maken met de layer switching
 			c.edit = false;
-			c.selectedPoint = 0;
+			c.selectedPoint = nullptr;
 			for (Point& p : c.path) p.selected = false;
 		}
 
 		if (!selectedConveyor) return;
-		selectedConveyor = 0;
+		selectedConveyor = nullptr;
 	};
 	/// <summary>
 	/// returns the closest conveyor in the layer relative to the origin parameter
@@ -101,12 +101,12 @@ void from_json(const json& j, Layer& l);
 class LayerManager
 {
 public:
-	Shader* shader = 0;
-	Mesh* cube = 0;
-	Mouse* mouse = 0;
+	Shader* shader = nullptr;
+	Mesh* cube = nullptr;
+	Mouse* mouse = nullptr;
 	std::vector<Layer> allLayers;
 	std::vector<BridgeConveyor> allBridgeConveyors;
-	Layer* selectedLayer = 0;
+	Layer* selectedLayer = nullptr;
 
 public:
 	LayerManager()
@@ -145,6 +145,8 @@ public:
 	/// </summary>
 	void UnselectEverything();
 
+	Conveyor* FindClosestConveyorFromAll(glm::vec3 origin);
+
 	/// <summary>
 	/// draws every point per conveyor per layer in the layer manager
 	/// </summary>
@@ -154,4 +156,6 @@ public:
 	/// <param name="orthoProjection">used to check which projection is being used</param>
 	/// <param name="gridSnap">used to determine if the mouse should snap to the grid</param>
 	void DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap, bool& cast, glm::vec3& mousePos);
+
+	void UpdateBridgeConveyors(BridgeConveyor& bg);
 };

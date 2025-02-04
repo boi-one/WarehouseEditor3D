@@ -88,11 +88,11 @@ public:
 	Mouse mouse;
 
 private:
-	CameraManager* cameraManager = 0;
-	Settings* settings = 0;
-	LayerManager* layerManager = 0;
-	Grid* grid = 0;
-	JsonSerialization* jsonSerialization = 0;
+	CameraManager* cameraManager = nullptr;
+	Settings* settings = nullptr;
+	LayerManager* layerManager = nullptr;
+	Grid* grid = nullptr;
+	JsonSerialization* jsonSerialization = nullptr;
 
 	/// <summary>
 	/// the list of all the keys being used, this has to be the same order as in the enum (IMPORTANT!)

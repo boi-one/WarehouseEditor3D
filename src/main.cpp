@@ -24,11 +24,11 @@ struct InitReturn
 	int failed;
 	SDL_Window* window;
 	SDL_GLContext gl_context;
-	InitReturn(int failed = 0, SDL_Window* window = 0)
+	InitReturn(int failed = 0, SDL_Window* window = nullptr)
 	{
 		this->failed = failed;
 		this->window = window;
-		this->gl_context = 0;
+		this->gl_context = nullptr;
 	}
 };
 

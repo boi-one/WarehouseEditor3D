@@ -9,9 +9,9 @@ public:
 	glm::vec3 origin;
 	glm::vec3 direction;
 	glm::vec3 intersection;
-	Mouse* mouse = 0;
-	CameraManager* cameraManager = 0;
-	Viewport* viewport = 0;
+	Mouse* mouse = nullptr;
+	CameraManager* cameraManager = nullptr;
+	Viewport* viewport = nullptr;
 
 	Raycast(glm::vec3 direction, Mouse* mouse, CameraManager* cameraManager, glm::vec3 origin = { 0,0,0 })
 	{

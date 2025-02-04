@@ -27,7 +27,7 @@ public:
 	/// saves the existing layers
 	/// </summary>
 	/// <param name="allLayers">the layers you want to save</param>
-	void Serialize(std::vector<Layer>& allLayers);
+	void Serialize(std::vector<Layer>& allLayers, std::vector<BridgeConveyor>& allBridgeConveyors);
 	/// <summary>
 	/// loads from a file
 	/// </summary>

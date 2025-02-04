@@ -46,7 +46,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		else saved = false;
 		if (ImGui::Button("Save"))
 		{
-			jsonSerialization->Serialize(layerManager->allLayers);
+			jsonSerialization->Serialize(layerManager->allLayers, layerManager->allBridgeConveyors);
 			saved = true;
 			popupTime = SDL_GetTicks() + 1000;
 		}
@@ -237,6 +237,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 			allLayers[i - 1] = tempLayer;
 			allLayers[i] = tempLayerPrev;
 			for (Layer& l : allLayers) if (l.selected) layerManager.selectedLayer = &l;
+			for (BridgeConveyor& bg : layerManager.allBridgeConveyors) layerManager.UpdateBridgeConveyors(bg);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("move down") && i < allLayers.size() - 1)
@@ -248,6 +249,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 			allLayers[i + 1] = tempLayer;
 			allLayers[i] = tempLayerPrev;
 			for (Layer& l : allLayers) if (l.selected) layerManager.selectedLayer = &l;
+			for (BridgeConveyor& bg : layerManager.allBridgeConveyors) layerManager.UpdateBridgeConveyors(bg);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("select"))

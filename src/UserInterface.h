@@ -20,12 +20,12 @@ using namespace Tools;
 class UserInterface
 {
 public:
-	Settings* settings = 0;
-	Mouse* mouse = 0;
-	CameraManager* cameraManager = 0;
-	LayerManager* layerManager = 0;
-	JsonSerialization* jsonSerialization = 0;
-	Grid* grid = 0;
+	Settings* settings = nullptr;
+	Mouse* mouse = nullptr;
+	CameraManager* cameraManager = nullptr;
+	LayerManager* layerManager = nullptr;
+	JsonSerialization* jsonSerialization = nullptr;
+	Grid* grid = nullptr;
 	bool saved = false;
 	int popupTime = 0;
 public:
