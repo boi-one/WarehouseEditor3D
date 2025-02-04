@@ -6,6 +6,7 @@ using json = nlohmann::json;
 #include "Conveyor.h"
 #include "Tools.h"
 using namespace Tools;
+#include "BridgeConveyor.h"
 
 /// <summary>
 /// a layer of conveyors
@@ -104,6 +105,7 @@ public:
 	Mesh* cube = 0;
 	Mouse* mouse = 0;
 	std::vector<Layer> allLayers;
+	std::vector<BridgeConveyor> allBridgeConveyors;
 	Layer* selectedLayer = 0;
 
 public:

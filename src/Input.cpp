@@ -180,6 +180,16 @@ void Input::Update(float deltaTime)
 	{
 		layerManager->selectedLayer->selectedConveyor->Rotate(1);
 	}
+	if (keys[LALT].Down() && layerManager->selectedLayer->selectedConveyor && layerManager->allLayers.size() > 1)
+	{
+		Conveyor& tempConveyor = *layerManager->selectedLayer->ReturnClosestConveyor(mouse.position, *layerManager->selectedLayer->selectedConveyor);
+		Point& tempPoint = *tempConveyor.ClosestPoint(mouse.position, 100);
+		
+		glm::vec3 start = layerManager->selectedLayer->selectedConveyor->selectedPoint->position;
+		glm::vec3 end = tempPoint.position;
+		BridgeConveyor newBridgeConveyor(start, end, layerManager->selectedLayer->width, layerManager->shader);
+		layerManager->allBridgeConveyors.push_back(newBridgeConveyor);
+	}
 
 	if (mouse.middleMouseFirstPress)
 	{
