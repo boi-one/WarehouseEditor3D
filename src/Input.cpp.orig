@@ -158,6 +158,7 @@ void Input::Update(float deltaTime)
 	}
 	if (keys[DEL].Down() && layerManager->selectedLayer->selectedConveyor && layerManager->selectedLayer->selectedConveyor->path.size() > 0)
 	{
+<<<<<<< HEAD
 		for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
 		{
 			Tools::DeleteNonIdenticalFromList(p.connections, *layerManager->selectedLayer->selectedConveyor->selectedPoint);
@@ -171,6 +172,57 @@ void Input::Update(float deltaTime)
 			Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
 			layerManager->selectedLayer->UnselectConveyors();
 		}
+=======
+		//Point* deletePoint = 0;
+		//Point* deletePointParent = 0;
+		//Point* deletePointChild = 0;
+		//for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
+		//{
+		//	if (p.selected)
+		//	{
+		//		deletePoint = &p;
+		//		break;
+		//	}
+		//}
+		//if (deletePoint)
+		//{
+		//	for (Point& p : layerManager->selectedLayer->selectedConveyor->path)
+		//	{
+		//		for (Point& cp : p.connections)
+		//		{
+		//			if (cp.id == deletePoint->id) //checks if the deleted point is in the connections of p
+		//			{
+		//				layerManager->selectedLayer->selectedConveyor->selectedPoint = &p;
+		//				layerManager->selectedLayer->selectedConveyor->selectedPoint->selected = true;
+		//				std::cout << "selected point connections " << layerManager->selectedLayer->selectedConveyor->selectedPoint->connections.size() << std::endl;
+		//				deletePointParent = &p;
+		//				deletePointChild = &cp;
+		//				break;
+		//			}
+		//		}
+		//	}
+		//	for (Point& p : deletePoint->connections)
+		//	{
+		//		std::cout << "dpc " << p.id << std::endl;
+		//
+		//		if(p.id != layerManager->selectedLayer->selectedConveyor->selectedPoint->id)
+		//			layerManager->selectedLayer->selectedConveyor->selectedPoint->connections.push_back(p);
+		//	}
+		//	for (Point& p : layerManager->selectedLayer->selectedConveyor->path) std::cout << p.id << std::endl;
+		//	if (deletePoint && deletePointParent) for (Point& p : deletePointParent->connections)
+		//	{
+		//		if (p.id == deletePoint->id) Tools::DeleteNonIdenticalFromList(deletePointParent->connections, p);
+		//	}
+		//	if (deletePoint) Tools::DeleteNonIdenticalFromList(layerManager->selectedLayer->selectedConveyor->path, *deletePoint);
+		//	if (deletePointParent && deletePointChild) Tools::DeleteNonIdenticalFromList(deletePointParent->connections, *deletePointChild);
+		//}
+		//if (layerManager->selectedLayer->selectedConveyor->path.size() < 1)
+		//{
+		//	Tools::DeleteFromList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
+		//	layerManager->selectedLayer->selectedConveyor = 0;
+		//	layerManager->selectedLayer->UnselectConveyors();
+		//}
+>>>>>>> master
 	}
 	if (keys[ALEFT].Hold())
 	{

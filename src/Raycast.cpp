@@ -14,8 +14,6 @@ void Raycast::Ray()
 	glm::vec3 rayWorld = glm::inverse(cameraManager->camera3d.GetViewMatrix()) * rayEye;
 	rayWorld = glm::normalize(rayWorld);
 
-	//std::cout << rayWorld.x << " " << rayWorld.y << " " << rayWorld.z << std::endl;
-
 	origin = cameraManager->camera3d.position;
 	direction = rayWorld;
 }

@@ -133,7 +133,6 @@ namespace Tools
 		std::vector<char> valid = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ','};
 		for (char c : input)
 		{
-			std::cout << input << std::endl;
 			if (!Tools::ContainsInList(valid, c))
 			{
 				return true;
