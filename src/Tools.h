@@ -113,6 +113,7 @@ namespace Tools
 		}
 		return arr;
 	}
+
 	/// <summary>
 	/// clamps the value between the min and max range
 	/// </summary>
@@ -140,4 +141,5 @@ namespace Tools
 		}
 		return false;
 	}
+
 }
