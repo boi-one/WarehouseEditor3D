@@ -123,7 +123,6 @@ void Mesh::DrawLine(Shader& shader, glm::vec3 color, glm::vec3& start, glm::vec3
 	glm::vec3 pivot = (start + end);
 	model = glm::translate(model, pivot / 2.f);
 
-	const double pi = 3.14159265358979323846;
 	float angle = 0;
 	if (ortho) //2d rotation
 	{
