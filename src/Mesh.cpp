@@ -132,7 +132,7 @@ void Mesh::DrawLine(Shader& shader, glm::vec3 color, glm::vec3& start, glm::vec3
 	else //3d rotation
 	{
 		glm::vec3 direction = glm::normalize(end - start);
-		const glm::vec3 defaultAxis = { 1, 0.0f, 0.0f };
+		const glm::vec3 defaultAxis = { 1.f, 0.f, 0.f };
 		glm::vec3 rotationAxis = glm::cross(defaultAxis, direction);
 		angle = acos(glm::dot(defaultAxis, direction));
 		model = glm::rotate(model, angle, glm::normalize(rotationAxis));

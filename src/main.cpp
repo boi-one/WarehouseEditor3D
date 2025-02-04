@@ -164,13 +164,6 @@ int main()
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		SDL_GL_SwapWindow(window);
-
-		//TODO:
-		//attributes
-		//
-		//  plus en min knopje
-		//
-		//	voeg een naam toe en een waarde(string convert naar double)
 	}
 
 	// Cleanup
