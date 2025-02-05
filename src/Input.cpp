@@ -180,13 +180,13 @@ void Input::Update(float deltaTime)
 	{
 		layerManager->selectedLayer->selectedConveyor->Rotate(1);
 	}
-	if (keys[LALT].Down() && layerManager->selectedLayer->selectedConveyor && layerManager->allLayers.size() > 1)
+	if (keys[SPACE].Down() && cameraManager->orthoProjection && layerManager->selectedLayer->selectedConveyor && layerManager->allLayers.size() > 1)
 	{
 		Conveyor* tempConveyor = nullptr;
 		tempConveyor = layerManager->FindClosestConveyorFromAll(mouse.position);
 		if (tempConveyor)
 		{
-			Point& tempPoint = *tempConveyor->ClosestPoint(mouse.position, 10000);
+			Point& tempPoint = *tempConveyor->ClosestPoint(mouse.position, 200);
 			int pointpos = Tools::FindInList(layerManager->selectedLayer->selectedConveyor->path, *layerManager->selectedLayer->selectedConveyor->selectedPoint);
 			int conveyorpos = Tools::FindInList(layerManager->selectedLayer->allConveyors, *layerManager->selectedLayer->selectedConveyor);
 			Point* start = &layerManager->selectedLayer->allConveyors[conveyorpos].path[pointpos];

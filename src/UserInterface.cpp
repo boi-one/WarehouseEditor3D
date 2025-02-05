@@ -102,6 +102,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("X           : Unselect point");
 			ImGui::Text("G           : Enable grid snapping");
 			ImGui::Text("Alt + Delete: Deletes the selected conveyor");
+			ImGui::Text("Space       : Connect conveyors on different layers");
 			ImGui::Text("Delete      : Deletes the selected point in a conveyor");
 			ImGui::Text("Left Arrow  : Rotates the conveyor counter clockwise");
 			ImGui::Text("Right Arrow : Rotates the conveyor clockwise");
