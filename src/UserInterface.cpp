@@ -124,7 +124,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("D           : Strafe right");
 			ImGui::Text("Left Shift  : Move down");
 			ImGui::Text("Space       : Move up");
-		}							 
+		}
 		ImGui::End();
 	}
 
