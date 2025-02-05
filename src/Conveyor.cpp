@@ -3,7 +3,7 @@
 
 Point* Conveyor::ClosestPoint(glm::vec3& origin, float range)
 {
-	Point* closestPoint = 0;
+	Point* closestPoint = nullptr;
 
 	for (Point& p : path)
 	{
@@ -120,6 +120,7 @@ void to_json(json& j, const Point& p)
 {
 	j = json
 	{
+		{"id", p.id},
 		{"x", p.position.x}, {"y", p.position.y},
 		{"connections", p.connections},
 		{"depth", p.depth}
@@ -128,6 +129,7 @@ void to_json(json& j, const Point& p)
 
 void from_json(const json& j, Point& p)
 {
+	p.id = j.at("id").get<int>();
 	p.position.x = j.at("x").get<float>();
 	p.position.y = j.at("y").get<float>();
 	p.depth = j.at("depth").get<int>();

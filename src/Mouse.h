@@ -19,7 +19,7 @@ public:
 	/// be carefull because this is not set automaticly unlike the rest of the places where the cameraManager is passed as a pointer
 	/// (in this case it is set in the Input constructor)
 	/// </summary>
-	CameraManager* cameraManager = 0;
+	CameraManager* cameraManager = nullptr;
 public:
 	void Update(Camera2D& camera2d, int cellSize);
 	void SetScreenPosition(int x, int y);

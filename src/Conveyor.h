@@ -30,7 +30,7 @@ public:
 	glm::vec3 position;
 	std::vector<Point> connections;
 	bool selected = false;
-	Mesh* mesh = 0;
+	Mesh* mesh = nullptr;
 	/// <summary>
 	/// depth is how high the point is in 3D, the layer class has also a depth, because of the near clip plane of the orthographic camera you can max have 40 layers but if you decrease it to something like -2000 it will display more layers
 	/// </summary>
@@ -80,9 +80,9 @@ public:
 	std::vector<Attribute> attributes;
 	bool selected = false;
 	bool edit = false;
-	Point* previousSelectedPoint = 0;
-	Point* selectedPoint = 0;
-	static inline Mesh* mesh = 0;
+	Point* previousSelectedPoint = nullptr;
+	Point* selectedPoint = nullptr;
+	static inline Mesh* mesh = nullptr;
 	float angle = 0;
 	float widthMin = 1;
 	float widthMax = 60;

@@ -46,7 +46,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 		else saved = false;
 		if (ImGui::Button("Save"))
 		{
-			jsonSerialization->Serialize(layerManager->allLayers);
+			jsonSerialization->Serialize(layerManager->allLayers, layerManager->allBridgeConveyors);
 			saved = true;
 			popupTime = SDL_GetTicks() + 1000;
 		}
@@ -102,6 +102,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("X           : Unselect point");
 			ImGui::Text("G           : Enable grid snapping");
 			ImGui::Text("Alt + Delete: Deletes the selected conveyor");
+			ImGui::Text("Space       : Connect conveyors on different layers");
 			ImGui::Text("Delete      : Deletes the selected point in a conveyor");
 			ImGui::Text("Left Arrow  : Rotates the conveyor counter clockwise");
 			ImGui::Text("Right Arrow : Rotates the conveyor clockwise");
@@ -123,7 +124,7 @@ void UserInterface::InterfaceInteraction(float deltaTime)
 			ImGui::Text("D           : Strafe right");
 			ImGui::Text("Left Shift  : Move down");
 			ImGui::Text("Space       : Move up");
-		}							 
+		}
 		ImGui::End();
 	}
 
@@ -237,6 +238,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 			allLayers[i - 1] = tempLayer;
 			allLayers[i] = tempLayerPrev;
 			for (Layer& l : allLayers) if (l.selected) layerManager.selectedLayer = &l;
+			for (BridgeConveyor& bg : layerManager.allBridgeConveyors) layerManager.UpdateBridgeConveyors(bg);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("move down") && i < allLayers.size() - 1)
@@ -248,6 +250,7 @@ void UserInterface::Layers(LayerManager& layerManager)
 			allLayers[i + 1] = tempLayer;
 			allLayers[i] = tempLayerPrev;
 			for (Layer& l : allLayers) if (l.selected) layerManager.selectedLayer = &l;
+			for (BridgeConveyor& bg : layerManager.allBridgeConveyors) layerManager.UpdateBridgeConveyors(bg);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("select"))

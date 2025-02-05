@@ -35,18 +35,40 @@ void LayerManager::UnselectEverything()
 		{
 			c.edit = false;
 			c.selected = false;
-			c.selectedPoint = 0;
+			c.selectedPoint = nullptr;
 			for (Point& p : c.path) p.selected = false;
 		}
 		l.selected = false;
-		l.selectedConveyor = 0;
+		l.selectedConveyor = nullptr;
 	}
+}
+
+Conveyor* LayerManager::FindClosestConveyorFromAll(glm::vec3 origin)
+{
+	float closestDistance = 999999;
+	Conveyor* closestConveyor = nullptr;
+	for (Layer& l : allLayers)
+	{
+		for (Conveyor& c : l.allConveyors)
+		{
+			for (Point& p : c.path)
+			{
+				float distance = glm::distance(origin, p.position);
+				if (distance < closestDistance)
+				{
+					closestDistance = distance;
+					closestConveyor = &c;
+				}
+			}
+		}
+	}
+	return closestConveyor;
 }
 
 Conveyor* Layer::ReturnClosestConveyor(glm::vec3& origin)
 {
 	float smallestDistance = 99999;
-	Point* closestPoint = 0;
+	Point* closestPoint = nullptr;
 
 	int closestConveyorIndex = -1;
 	int closestPointIndex = -1;
@@ -77,7 +99,7 @@ Conveyor* Layer::ReturnClosestConveyor(glm::vec3& origin)
 Conveyor* Layer::ReturnClosestConveyor(glm::vec3& origin, Conveyor& selected)
 {
 	float smallestDistance = 99999;
-	Point* closestPoint = 0;
+	Point* closestPoint = nullptr;
 
 	int closestConveyorIndex = -1;
 	int closestPointIndex = -1;
@@ -145,6 +167,8 @@ void Layer::SetDepth(int layer)
 
 void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap, bool& cast, glm::vec3& mousePos)
 {
+	for (BridgeConveyor& bg : allBridgeConveyors) bg.Draw();
+
 	glm::vec3 color;
 	int pointAmount = 0;
 	for (Layer& layer : allLayers)
@@ -153,6 +177,29 @@ void LayerManager::DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& or
 		color = { 0.5f, 0.5f, 0.5f };
 		if (layer.selected) color = { 1, 1, 1 };
 		layer.DrawConveyors(shader, cube, mouse, orthoProjection, color, gridSnap, cast, mousePos);
+	}
+}
+
+void LayerManager::UpdateBridgeConveyors(BridgeConveyor& bg)
+{
+	for (Layer& l : allLayers)
+	{
+		for (Conveyor& c : l.allConveyors)
+		{
+			for (Point& p : c.path)
+			{
+				if (bg.startPointID == p.id)
+				{
+					bg.startPoint = &p;
+					bg.startPoint->position.z = l.depth;
+				}
+				if (bg.endPointID == p.id)
+				{
+					bg.endPoint = &p;
+					bg.endPoint->position.z = l.depth;
+				}
+			}
+		}
 	}
 }
 
@@ -179,3 +226,5 @@ void to_json(json& j, const LayerManager& lm)
 {
 
 }
+
+
