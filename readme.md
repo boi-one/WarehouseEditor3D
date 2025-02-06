@@ -32,7 +32,7 @@ In the bottom left you'll see the layer window, this window will display all the
 
 Each layer has some  information and options. you could move the layer up and down in the window, which will affect the position of the layer in 3D space but we will get to that later. You could also select a layer, when selecting a layer this will become the active layer and you can edit it. You can also delete a layer but only when it is **not** selected. The layer can be hidden, this can be done any time with any layer. And at last there is the "edit conveyor width" dropdown. In here you can change the width of all of the conveyors in the selected layer.
 
-When opening one of the layers you can see its content, you can see the current selected layer has a conveyor amount of 3 and when its open you can see information about those conveyors in more detail, you can also change the width of an idividual conveyor
+When opening one of the layers you can see its content, you can see the current selected layer has a conveyor amount of 3 and when its open you can see information about those conveyors in more detail, you can also change the width of an idividual conveyor.
 
 ![conveyors in layer.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/conveyors%20in%20layer.png)
 
