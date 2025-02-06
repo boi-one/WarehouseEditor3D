@@ -30,11 +30,15 @@ In the bottom left you'll see the layer window, this window will display all the
 
 ![layers in layer window.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/layers%20in%20layer%20window.png)
 
-Each layer has some  information and options. you could move the layer up and down in the window, which will affect the position of the layer in 3D space but we will get to that later. You could also select a layer, when selecting a layer this will become the active layer and you can edit it. You can also delete a layer but only when it is **not** selected. And at last you can hide the layer, this can be done any time with any layer.
+Each layer has some  information and options. you could move the layer up and down in the window, which will affect the position of the layer in 3D space but we will get to that later. You could also select a layer, when selecting a layer this will become the active layer and you can edit it. You can also delete a layer but only when it is **not** selected. The layer can be hidden, this can be done any time with any layer. And at last there is the "edit conveyor width" dropdown. In here you can change the width of all of the conveyors in the selected layer.
 
-When opening one of the layers you can see its content, you can see the current selected layer has a conveyor amount of 3 and when its open you can see information about those conveyors in more detail:
+When opening one of the layers you can see its content, you can see the current selected layer has a conveyor amount of 3 and when its open you can see information about those conveyors in more detail, you can also change the width of an idividual conveyor
 
 ![conveyors in layer.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/conveyors%20in%20layer.png)
+
+The last thing you can edit in the conveyor are its attributes, this doesn't do anything in the program but you can save custom data and give it a name, for example you want to say how fast the conveyor moves. Click on create attribute and in the name input you can type "speed" then in the value input you can type "10". Because 10 is a number and not a text string select the checkbox next to delete.
+
+![conveyorattribute.png]()
 
 Each conveyor itself can also be selected, the selected conveyor will be dark green and also can't be deleted.
 A conveyor exist out of points, when you open the conveyor, you can view all the points and their positions. When clicking on one of the points the 2D camera centers on the point.
