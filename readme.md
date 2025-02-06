@@ -38,7 +38,7 @@ When opening one of the layers you can see its content, you can see the current 
 
 The last thing you can edit in the conveyor are its attributes, this doesn't do anything in the program but you can save custom data and give it a name, for example you want to say how fast the conveyor moves. Click on create attribute and in the name input you can type "speed" then in the value input you can type "10". Because 10 is a number and not a text string select the checkbox next to delete.
 
-![conveyorattribute.png]()
+![conveyorattribute.png](https://github.com/boi-one/WarehouseEditor3D/blob/master/readme/conveyorattribute.png)
 
 Each conveyor itself can also be selected, the selected conveyor will be dark green and also can't be deleted.
 A conveyor exist out of points, when you open the conveyor, you can view all the points and their positions. When clicking on one of the points the 2D camera centers on the point.
