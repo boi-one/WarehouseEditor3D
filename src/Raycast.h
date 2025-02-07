@@ -23,6 +23,14 @@ public:
 	}
 
 public:
+	/// <summary>
+	/// "shoots" the ray
+	/// </summary>
 	void Ray();
+	/// <summary>
+	/// checks if it get hit on the specific height
+	/// </summary>
+	/// <param name="planeHeight"> the height</param>
+	/// <returns>true or false depending on if it hit</returns>
 	bool Intersection(float planeHeight);
 };

@@ -21,7 +21,13 @@ namespace Tools
 		}
 		return -1;
 	}
-
+	/// <summary>
+	/// find a point based on id instead of adress
+	/// </summary>
+	/// <typeparam name="T"> a Point</typeparam>
+	/// <param name="list"> the list to check</param>
+	/// <param name="item"> the point to compare to</param>
+	/// <returns> the position in the list, if -1 is being returned that means the instance is not present in the vector</returns>
 	template<typename T> static int FindNonIdenticalInList(std::vector<T>& list, const T& item)
 	{
 		for (int i = 0; i < list.size(); i++)
@@ -30,7 +36,13 @@ namespace Tools
 		}
 		return -1;
 	}
-
+	/// <summary>
+	/// checks if T is contained in the list
+	/// </summary>
+	/// <typeparam name="T">a point or any other class with an overloaded ==</typeparam>
+	/// <param name="list"> the list to check</param>
+	/// <param name="item"> the item to compare to</param>
+	/// <returns> if it was contained in the list or not</returns>
 	template<typename T> static bool ContainsInList(std::vector<T>& list, const T& item)
 	{
 		for (int i = 0; i < list.size(); i++)
@@ -53,7 +65,12 @@ namespace Tools
 		if (list.size() > 0)
 			list.erase(list.begin() + placeInList);
 	}
-
+	/// <summary>
+	/// checks for id instead of its memory adress
+	/// </summary>
+	/// <typeparam name="T">A point</typeparam>
+	/// <param name="list">the list to check</param>
+	/// <param name="item">the point to compare to</param>
 	template<typename T> static void DeleteNonIdenticalFromList(std::vector<T>& list, const T& item)
 	{
 		int placeInList = FindNonIdenticalInList<T>(list, item);
@@ -127,7 +144,11 @@ namespace Tools
 		if (value > max) return max;
 		return value;
 	}
-
+	/// <summary>
+	/// checks if string contains letters
+	/// </summary>
+	/// <param name="input">the checked string</param>
+	/// <returns>if it contained any letters</returns>
 	static bool ContainsLetters(std::string input)
 	{
 		std::vector<char> valid = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ','};

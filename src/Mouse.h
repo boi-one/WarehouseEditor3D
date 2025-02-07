@@ -21,10 +21,28 @@ public:
 	/// </summary>
 	CameraManager* cameraManager = nullptr;
 public:
+	/// <summary>
+	/// updates the position
+	/// </summary>
 	void Update(Camera2D& camera2d, int cellSize);
+	/// <summary>
+	/// moves the mouse to x y
+	/// </summary>
 	void SetScreenPosition(int x, int y);
+	/// <summary>
+	/// used to look around in 3D
+	/// </summary>
+	/// <param name="event">used to check if the mouse is moving and which direction</param>
 	void MouseMovement3D(SDL_Event& event, Camera3D& camera3d);
+	/// <summary>
+	/// zooms in and out in 2D
+	/// </summary>
+	/// <param name="event"> used for the scrollwheel </param>
 	void Scroll(SDL_Event& event, Camera2D& camera2d);
+	/// <summary>
+	/// snaps the mouse to the grid
+	/// </summary>
+	/// <param name="cellSize">how big a cell in the grid is</param>
 	void UpdateMouseOnGrid(int cellSize);
 
 	/// <summary>

@@ -5,6 +5,9 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+/// <summary>
+/// used to connect conveyors from multiple layers to eachother
+/// </summary>
 class BridgeConveyor 
 {
 public:
@@ -28,7 +31,9 @@ public:
 		this->mesh = mesh;
 		this->shader = shader;
 	}
-
+	/// <summary>
+	/// draws the conveyor
+	/// </summary>
 	void Draw();
 
 	friend void to_json(json& j, const BridgeConveyor& bg);

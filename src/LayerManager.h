@@ -157,5 +157,9 @@ public:
 	/// <param name="gridSnap">used to determine if the mouse should snap to the grid</param>
 	void DrawLayers(Shader& shader, Mesh& cube, Mouse& mouse, bool& orthoProjection, bool& gridSnap, bool& cast, glm::vec3& mousePos);
 
+	/// <summary>
+	/// Updates the anchor points of the bridge conveyors so when something changes they still are connected to the right points
+	/// </summary>
+	/// <param name="bg"></param>
 	void UpdateBridgeConveyors(BridgeConveyor& bg);
 };
