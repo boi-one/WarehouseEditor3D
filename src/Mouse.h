@@ -16,7 +16,7 @@ public:
 	bool middleMouseFirstPress = false;
 	bool middleMousePressed = false;
 	/// <summary>
-	/// be carefull because this is not set automaticly unlike the rest of the places where the cameraManager is passed as a pointer
+	/// be careful because this is not set automaticly unlike the rest of the places where the cameraManager is passed as a pointer
 	/// (in this case it is set in the Input constructor)
 	/// </summary>
 	CameraManager* cameraManager = nullptr;
